@@ -1,72 +1,83 @@
 "use client";
 
-import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
+	DndContext,
+	DragEndEvent,
+	KeyboardSensor,
+	PointerSensor,
+	closestCenter,
+	useSensor,
+	useSensors,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+	restrictToParentElement,
+	restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
+import {
+	SortableContext,
+	arrayMove,
+	sortableKeyboardCoordinates,
+	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers"
-import { SortableItem } from "./SortableItem";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useContext } from "react";
+import { TextInput } from "./TextInput";
+import { FormBuilderContext } from "../contexts/FormBuilderContext";
 
-interface FormBuilderProps {
-	formItems: number[]
-	setFormItems: React.Dispatch<React.SetStateAction<number[]>>
-}
+const FormBuilder = () => {
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const sensors = useSensors(
+		useSensor(PointerSensor),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		})
+	);
 
-const FormBuilder = ({ formItems, setFormItems }: FormBuilderProps) => {
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+	return (
+		<Card className="w-[700px] self-center">
+			<CardHeader>
+				<CardTitle>Form Title</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={handleDragEnd}
+					modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+				>
+					<SortableContext
+						items={formItems}
+						strategy={verticalListSortingStrategy}
+					>
+						{formItems.map((formItem) => (
+							<TextInput
+								key={formItem.id}
+								id={formItem.id}
+								placeholder={formItem.props["placeholder"].toString()}
+							/>
+						))}
+					</SortableContext>
+				</DndContext>
+			</CardContent>
+		</Card>
+	);
 
-  return (
-    <Card className="w-[700px] self-center">
-      <CardHeader>
-        <CardTitle>Form Title</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-			 modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-        >
-          <SortableContext items={formItems} strategy={verticalListSortingStrategy}>
-            {formItems.map((id) => (
-              <SortableItem key={id} id={id} />
-            ))}
-          </SortableContext>
-        </DndContext>
-      </CardContent>
-    </Card>
-  );
+	function handleDragEnd(event: DragEndEvent) {
+		const { active, over } = event;
 
-  function handleDragEnd(event: any) {
-    const { active, over } = event;
+		if (over == null) return;
 
-    if (active.id !== over.id) {
-      setFormItems((items) => {
-        const oldIndex = items.indexOf(active.id);
-        const newIndex = items.indexOf(over.id);
+		const activeIndex = formItems.findIndex(
+			(formItem) => formItem.id === active.id
+		);
+		const overIndex = formItems.findIndex(
+			(formItem) => formItem.id === over.id
+		);
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  }
+		if (activeIndex !== overIndex) {
+			setFormItems(arrayMove(formItems, activeIndex, overIndex));
+		}
+	}
 };
 
 export default FormBuilder;

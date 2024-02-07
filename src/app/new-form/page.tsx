@@ -1,22 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import FormBuilder from "../components/FormBuilder";
 import Toolbar from "../components/Toolbar/Toolbar";
+import { FormBuilderContext } from "../contexts/FormBuilderContext";
+import FormItem from "../interfaces/FormItem";
 
 const NewFormPage = () => {
-const [formItems, setFormItems] = useState([1, 2, 3]);
-  return (
-    <>
-      <div>NewFormPage</div>
-      <div className="flex w-full justify-center">
-        <FormBuilder formItems={formItems} setFormItems={setFormItems} />
-      </div>
-		<div className="flex h-full w-18 fixed top-0 right-3">
-			<Toolbar formItems={formItems} setFormItems={setFormItems} />
-		</div>
-    </>
-  );
+	const [formItems, setFormItems] = useState<FormItem[]>([]);
+	
+	return (
+		<FormBuilderContext.Provider value={{formItems: formItems, setFormItems: setFormItems}}>
+			<div>NewFormPage</div>
+			<div className="flex w-full justify-center">
+				<FormBuilder />
+			</div>
+			<Toolbar />
+		</FormBuilderContext.Provider>
+	);
 };
 
 export default NewFormPage;
+                            

@@ -1,26 +1,48 @@
 "use client";
 
-import React from 'react'
-import ToolbarButton from './ToolbarButton'
+import React, { useContext, useState } from "react";
+import ToolbarButton from "./ToolbarButton";
+import Image from "next/image";
+import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 
-interface ToolbarProps {
-	formItems: number[]
-	setFormItems: React.Dispatch<React.SetStateAction<number[]>>
-}
+const Toolbar = () => {
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const [nextId, setNextId] = useState(formItems.length);
 
-const Toolbar = ({ formItems, setFormItems }: ToolbarProps) => {
-  return (
-	 <div className='bg-white rounded border border-2 shadow-md w-full self-center p-2'>
-		<ToolbarButton onBtnClick={handleAddClick}>
-			<img src="plus.svg" alt="icon" />
-		</ToolbarButton>
-	 </div>
-  )
+	return (
+		<div className="bg-white rounded border-2 shadow-md p-2 fixed right-3 top-1/2 transform -translate-y-1/2">
+			<ToolbarButton className="mb-2" onBtnClick={handleAddClick}>
+				<Image
+					className="object-contain"
+					src={"/icons/plus.svg"}
+					alt=""
+					width={50}
+					height={50}
+				/>
+			</ToolbarButton>
 
-  function handleAddClick() {
-		formItems.push(formItems.length+1);
-		setFormItems(formItems);
-  }
-}
+			<ToolbarButton onBtnClick={handleDeleteClick}>
+				<Image src={"/icons/delete.svg"} alt="" width={50} height={50} />
+			</ToolbarButton>
+		</div>
+	);
 
-export default Toolbar
+	function handleAddClick() {
+		setNextId(nextId + 1);
+		const newFormItems = [
+			...formItems,
+			{
+				id: nextId,
+				type: "text-input",
+				props: { placeholder: nextId.toString() },
+			},
+		];
+		setFormItems(newFormItems);
+	}
+
+	function handleDeleteClick() {
+		return;
+	}
+};
+
+export default Toolbar;
