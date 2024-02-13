@@ -7,7 +7,7 @@ import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 
 const Toolbar = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
-	const [nextId, setNextId] = useState(formItems.length);
+	const [nextId, setNextId] = useState(formItems.length + 1);
 
 	return (
 		<div className="bg-white rounded border-2 shadow-md p-2 fixed right-3 top-1/2 transform -translate-y-1/2">

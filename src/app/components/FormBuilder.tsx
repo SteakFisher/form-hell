@@ -21,7 +21,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import React, { useContext } from "react";
-import { TextInput } from "./TextInput";
+import { TextInput } from "./form-components/TextInput";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 
 const FormBuilder = () => {
@@ -49,13 +49,20 @@ const FormBuilder = () => {
 						items={formItems}
 						strategy={verticalListSortingStrategy}
 					>
-						{formItems.map((formItem) => (
-							<TextInput
-								key={formItem.id}
-								id={formItem.id}
-								placeholder={formItem.props["placeholder"].toString()}
-							/>
-						))}
+						{formItems.map((formItem) => {
+							switch (formItem.type) {
+								case "text-input":
+									return (
+										<TextInput
+											key={formItem.id}
+											id={formItem.id}
+											placeholder={formItem.props[
+												"placeholder"
+											].toString()}
+										/>
+									);
+							}
+						})}
 					</SortableContext>
 				</DndContext>
 			</CardContent>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import FormBuilder from "../components/FormBuilder";
-import Toolbar from "../components/Toolbar/Toolbar";
+import Toolbar from "../components/toolbar/Toolbar";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import FormItem from "../interfaces/FormItem";
 
