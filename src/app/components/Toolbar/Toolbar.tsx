@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useContext, useState } from "react";
-import ToolbarButton from "./ToolbarButton";
-import Image from "next/image";
+import { constants } from "@/app/constants";
 import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
+import ToolbarButton from "./ToolbarButton";
 
 const Toolbar = () => {
-	const { formItems, setFormItems } = useContext(FormBuilderContext);
-	const [nextId, setNextId] = useState(formItems.length + 1);
+	const { formItems, setFormItems, debounceRefs } = useContext(FormBuilderContext);
+	const [nextId, setNextId] = useState(formItems.length);
+	const router = useRouter();
 
 	return (
 		<div className="bg-white rounded border-2 shadow-md p-2 fixed right-3 top-1/2 transform -translate-y-1/2">
@@ -15,14 +18,13 @@ const Toolbar = () => {
 				<Image
 					className="object-contain"
 					src={"/icons/plus.svg"}
-					alt=""
+					alt="Add"
 					width={50}
 					height={50}
 				/>
 			</ToolbarButton>
-
-			<ToolbarButton onBtnClick={handleDeleteClick}>
-				<Image src={"/icons/delete.svg"} alt="" width={50} height={50} />
+			<ToolbarButton onBtnClick={handleSaveClick}>
+				<Image src={"/icons/save.svg"} alt="Save" width={50} height={50} />
 			</ToolbarButton>
 		</div>
 	);
@@ -34,14 +36,15 @@ const Toolbar = () => {
 			{
 				id: nextId,
 				type: "text-input",
-				props: { placeholder: nextId.toString() },
+				props: { ...constants.defaultTextInputProps },
 			},
 		];
 		setFormItems(newFormItems);
 	}
 
-	function handleDeleteClick() {
-		return;
+	function handleSaveClick() {
+		debounceRefs.forEach((ref)=>{ref.flush();})
+		router.push(`../../new-form/save?formItems=${JSON.stringify(formItems)}`);
 	}
 };
 

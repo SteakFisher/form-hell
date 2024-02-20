@@ -1,3 +1,4 @@
+import TextInputProps from "@/app/interfaces/form-component-interfaces/TextInputProps";
 import {
 	Accordion,
 	AccordionContent,
@@ -6,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -13,74 +15,126 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { SortableItem } from "./SortableItem";
-import { ChangeEvent, useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { useDebouncedCallback } from "use-debounce";
+import { constants } from "@/app/constants";
+import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
+import { Button } from "@/components/ui/button";
 
-interface TextInputProps {
+export function TextInput({
+	id,
+	props,
+}: {
 	id: number;
-	placeholder: string;
-}
-
-export function TextInput({ id, placeholder }: TextInputProps) {
-	const [inputType, setInputType] = useState("short-text");
-	const isInputLong = inputType === "long-text";
-	const [minLength, setMinLength] = useState("");
-	const [maxLength, setMaxLength] = useState("");
+	props: TextInputProps;
+}) {
+	const { debounceRefs } = useContext(FormBuilderContext);
+	const [accordionItem, setAccordionItem] = useState("");
 	const [lengthError, setLengthError] = useState("");
-	const [lengthType, setLengthType] = useState("characters");
-	const [regex, _setRegex] = useState("");
 	const [regexError, setRegexError] = useState("");
-	const numRegex = /^(0|[1-9]\d*)$/;
+	const regexRef = useRef<HTMLInputElement>(null);
+
+	const handleMaxLengthChange = useDebouncedCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const newMaxLength = e.target.value;
+			props.maxLength = newMaxLength;
+			setLengthError(validateLength());
+		},
+		constants.debounceWait
+	);
+	const handleMinLengthChange = useDebouncedCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const newMinLength = e.target.value;
+			props.minLength = newMinLength;
+			setLengthError(validateLength());
+		},
+		constants.debounceWait
+	);
+	const handleRegexChange = useDebouncedCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const newRegex = e.target.value;
+			setRegex(newRegex);
+		},
+		constants.debounceWait
+	);
+	const handlePlaceholderChange = useDebouncedCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			props.placeholder = e.target.value;
+		},
+		constants.debounceWait
+	);
+
+	useEffect(() => {
+		debounceRefs.set(`${id}max-length`, handleMaxLengthChange)
+		.set(`${id}min-length`, handleMinLengthChange)
+		.set(`${id}regex`, handleRegexChange)
+		.set(`${id}placeholder`, handlePlaceholderChange)
+	}, []);
 
 	return (
-		<SortableItem id={id} title="Text Input">
+		<SortableItem id={id} props={props} key={id}>
 			<CardContent>
-				{isInputLong ? (
-					<Textarea placeholder={placeholder} className="resize-none" />
-				) : (
-					<Input type={inputType} placeholder={placeholder} />
-				)}
-				<Select
-					defaultValue={inputType}
-					onValueChange={handleInputTypeChange}
+				<div className="flex space-x-4">
+					<div className="flex items-center">
+						<Label htmlFor="inputType">Type</Label>
+						<Select
+							defaultValue="short-text"
+							onValueChange={handleInputTypeChange}
+						>
+							<SelectTrigger className="w-[180px] ml-2" id="inputType">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="short-text">Short Text</SelectItem>
+								<SelectItem value="email">Email</SelectItem>
+								<SelectItem value="numeric">Numeric</SelectItem>
+								<SelectItem value="long-text">Long Text</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="flex items-center">
+						<Label htmlFor="placeholder">Placeholder</Label>
+						<Input
+							type="text"
+							defaultValue={props.placeholder}
+							id="placeholder"
+							className="ml-2 w-72"
+							maxLength={50}
+							onChange={handlePlaceholderChange}
+						/>
+					</div>
+				</div>
+				<Accordion
+					type="single"
+					collapsible
+					value={accordionItem}
+					onValueChange={handleAccordionToggle}
 				>
-					<SelectTrigger className="w-[180px] mt-5">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="short-text">Short Text</SelectItem>
-						<SelectItem value="email">Email</SelectItem>
-						<SelectItem value="numeric">Number</SelectItem>
-						<SelectItem value="tel">Tel</SelectItem>
-						<SelectItem value="long-text">Long Text</SelectItem>
-					</SelectContent>
-				</Select>
-				<Accordion type="single" collapsible>
 					<AccordionItem value="item-1" className="border-b-0">
-						<AccordionTrigger className="border-b hover:no-underline">
-							Advanced
-						</AccordionTrigger>
-						<AccordionContent className="mt-5">
-							<span className="text-base font-semibold">
-								<u>Validation</u>
-							</span>
+						{/* extra div for straight border-b */}
+						<div className="border-b">
+							<AccordionTrigger className="rounded-sm hover:no-underline px-1 custom-focus mt-2">
+								Advanced
+							</AccordionTrigger>
+						</div>
 
-							<div className="flex w-full mt-3 justify-between">
+						<AccordionContent className="mt-5 px-[1px]">
+							<div className="text-base font-semibold">
+								<u>Length</u>
+							</div>
+
+							<div className="flex w-full mt-3 space-x-6">
 								<div className="flex">
 									<div className="flex h-9 items-center">
 										<Label htmlFor="min-length">Min. Length</Label>
 									</div>
-									<div className="flex flex-col ml-2">
-										<Input
-											className="w-24"
-											id="min-length"
-											value={minLength}
-											onChange={handleMinLengthChange}
-											placeholder="0"
-										/>
-									</div>
+									<Input
+										className="w-24 ml-2"
+										id="min-length"
+										onChange={handleMinLengthChange}
+										placeholder="0"
+									/>
 								</div>
 								<div className="flex">
 									<div className="flex h-9 items-center">
@@ -89,48 +143,62 @@ export function TextInput({ id, placeholder }: TextInputProps) {
 									<Input
 										className="w-24 ml-2"
 										id="max-length"
-										value={maxLength}
 										onChange={handleMaxLengthChange}
 									/>
 								</div>
-								<div className="flex mr-[1px]">
-									<div className="flex h-9 items-center">
-										<Select
-											defaultValue={lengthType}
-											onValueChange={setLengthType}
-										>
-											<SelectTrigger className="w-32">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="characters">
-													Characters
-												</SelectItem>
-												<SelectItem value="words">Words</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
+								<Select
+									defaultValue={props.lengthType}
+									onValueChange={handleLengthTypeChange}
+								>
+									<SelectTrigger className="w-36">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="characters">
+											Characters
+										</SelectItem>
+										<SelectItem value="words">Words</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+							{lengthError && <div className="error">{lengthError}</div>}
+
+							<div className="text-base font-semibold mt-5">
+								<u>Regex</u>
+							</div>
+							<div className="flex mt-4 items-center space-x-6">
+								<Select
+									defaultValue={props.regexMethod}
+									onValueChange={handleRegexMethodChange}
+								>
+									<SelectTrigger className="w-36">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="contains">Contains</SelectItem>
+										<SelectItem value="doesnt-contain">
+											{"Doesn't contain"}
+										</SelectItem>
+										<SelectItem value="matches">Matches</SelectItem>
+										<SelectItem value="doesnt-match">
+											{"Doesn't match"}
+										</SelectItem>
+									</SelectContent>
+								</Select>
+
+								<div className="flex items-center">
+									<Label htmlFor="regex">Regex pattern</Label>
+									<Input
+										className="w-56 ml-2"
+										id="regex"
+										ref={regexRef}
+										defaultValue={props.regex}
+										onChange={handleRegexChange}
+										maxLength={1000}
+									/>
 								</div>
 							</div>
-							{lengthError && (
-								<div className="error">
-									<span>{lengthError}</span>
-								</div>
-							)}
-							<div className="flex mt-4 items-center">
-								<Label htmlFor="regex">Regex</Label>
-								<Input
-									className="w-56 ml-2"
-									id="regex"
-									value={regex}
-									onChange={handleRegexChange}
-								/>
-							</div>
-							{regexError && (
-								<div className="error">
-									<span>{regexError}</span>
-								</div>
-							)}
+							{regexError && <div className="error">{regexError}</div>}
 						</AccordionContent>
 					</AccordionItem>
 				</Accordion>
@@ -138,67 +206,71 @@ export function TextInput({ id, placeholder }: TextInputProps) {
 		</SortableItem>
 	);
 
-	function handleMinLengthChange(e: ChangeEvent<HTMLInputElement>) {
-		const newMinLength = e.target.value;
-		setMinLength(newMinLength);
-		setLengthError(validateLength(newMinLength, maxLength));
-	}
-
-	function handleMaxLengthChange(e: ChangeEvent<HTMLInputElement>) {
-		const newMaxLength = e.target.value;
-		setMaxLength(newMaxLength);
-		setLengthError(validateLength(minLength, newMaxLength));
-	}
-
-	function validateLength(min: string, max: string): string {
-		const minNum = Number(min);
-		const maxNum = Number(max);
-
-		if (!(minNum > -1 && maxNum > -1)) {
-			return "Both values must be positive integers or zero.";
-		}
-		if (maxNum < minNum) {
-			return "Max. length must be greater than or equal to min. length";
-		}
-		return "";
-	}
-
-	function handleRegexChange(e: ChangeEvent<HTMLInputElement>) {
-		const newRegex = e.target.value;
-		setRegex(newRegex);
-	}
-
-	function setRegex(newRegex: string) {
-		_setRegex(newRegex);
-
-		try {
-			new RegExp(newRegex);
-			regexError ? setRegexError("") : null;
-		} catch (e) {
-			regexError ? null : setRegexError("Enter a valid regex pattern");
-		}
+	function handleAccordionToggle() {
+		setAccordionItem(accordionItem ? "" : "item-1");
 	}
 
 	function handleInputTypeChange(inputType: string) {
 		switch (inputType) {
 			case "short-text":
-				setInputType("short-text");
+				props.inputType = "short-text";
+				setRegex("");
 				break;
 			case "long-text":
-				setInputType("long-text");
+				props.inputType = "long-text";
+				setRegex("");
 				break;
 			case "email":
-				setInputType("email");
+				props.inputType = "email";
+				setRegex(constants.emailRegex.toString());
 				break;
 			case "numeric":
-				setInputType("numeric");
-				setRegex(numRegex.toString());
+				props.inputType = "numeric";
+				setRegex(constants.numRegex.toString());
 				break;
-			case "tel":
-				setInputType("tel");
-				break;
-			default:
-				return;
 		}
+	}
+
+	function handleLengthTypeChange(newLengthType: string) {
+		props.lengthType = newLengthType;
+	}
+
+	function handleRegexMethodChange(newRegexMethod: string) {
+		props.regexMethod = newRegexMethod;
+	}
+
+	function setRegex(newRegex: string) {
+		props.regex = newRegex;
+
+		if (regexRef.current == null) return;
+		regexRef.current.value = newRegex;
+
+		try {
+			new RegExp(newRegex);
+			setRegexError("");
+		} catch (e) {
+			setRegexError("Enter a valid regex pattern");
+		}
+	}
+
+	function validateLength(): string {
+		const minNum = Number(props.minLength);
+		const maxNum = Number(props.maxLength);
+
+		if (
+			!(
+				props.minLength.match(constants.numRegex) &&
+				props.maxLength.match(constants.numRegex)
+			)
+		) {
+			return "Both values must be positive integers or zero";
+		}
+		if (minNum > 999999999 || maxNum > 999999999) {
+			return "Please enter a smaller number";
+		}
+		if (maxNum < minNum && maxNum && minNum) {
+			return "Max. length must be greater than or equal to min. length";
+		}
+		return "";
 	}
 }

@@ -1,5 +1,7 @@
+import TextInputProps from "./form-component-interfaces/TextInputProps";
+import TitleProps from "./form-component-interfaces/TitleProps";
+
 export default interface FormItem {
 	id: number;
-	type: string;
-	props: { [key: string]: string | number };
+	props: TextInputProps | TitleProps;
 }

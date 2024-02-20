@@ -23,7 +23,7 @@
 		--border: 240 5.9% 90%;
 		--input: 240 5.9% 90%;
 		--ring: 240 5.9% 10%;
-		--radius: 0.5rem;
+		--radius: 0.3rem;
 	}
 
 	.dark {
@@ -49,10 +49,6 @@
 	}
 }
 
-.error {
-	@apply flex justify-center bg-red-100 border border-red-400 text-red-700 px-2 py-2 my-2 rounded relative;
-}
-
 @layer base {
 	* {
 		@apply border-border;
@@ -60,4 +56,15 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+.error {
+	@apply flex justify-center bg-red-100 border border-red-400 text-red-700 px-2 py-2 my-2 rounded relative;
+}
+
+.borderless-input {
+	@apply border-none px-0;
+}
+.custom-focus:focus-visible {
+	@apply outline-none outline-[0px];
 }
