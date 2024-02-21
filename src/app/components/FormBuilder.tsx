@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import {
 	DndContext,
 	DragEndEvent,
@@ -21,16 +20,15 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import autosize from "autosize";
-import { useContext, useEffect, useRef } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import { constants } from "../constants";
+import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import TextInputProps from "../interfaces/form-component-interfaces/TextInputProps";
 import { TextInput } from "./form-components/TextInput";
+import Title from "./form-components/Title";
+import TitleProps from "../interfaces/form-component-interfaces/TitleProps";
 
 const FormBuilder = () => {
-	const { formItems, setFormItems, debounceRefs } = useContext(FormBuilderContext);
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -38,57 +36,8 @@ const FormBuilder = () => {
 		})
 	);
 
-	const descriptionRef = useRef(null);
-	const formTitleRef = useRef(null);
-
-	const handleTitleChange = useDebouncedCallback(
-		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-			if (!(formItems[0].props.type === "title")) return;
-			formItems[0].props.title = e.target.value;
-		},
-		constants.debounceWait
-	);
-
-	const handleDescriptionChange = useDebouncedCallback(
-		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-			if (!(formItems[0].props.type === "title")) return;
-			formItems[0].props.description = e.target.value;
-		},
-		constants.debounceWait
-	);
-
-	useEffect(() => {
-		if (descriptionRef.current == null) return;
-		if (formTitleRef.current == null) return;
-		autosize(descriptionRef.current);
-		autosize(formTitleRef.current);
-
-		debounceRefs
-			.set(`0description`, handleDescriptionChange)
-			.set(`0title`, handleTitleChange);
-	}, []);
-
 	return (
 		<Card className="w-[800px] self-center">
-			<CardHeader className="border-b mx-6 px-0">
-				<Textarea
-					ref={formTitleRef}
-					placeholder="Form Title"
-					defaultValue={formItems[0].props.title}
-					maxLength={100}
-					className="text-2xl mb-3 resize-none h-[50px] borderless-input"
-				/>
-				<div>
-					<Textarea
-						rows={2}
-						ref={descriptionRef}
-						placeholder="Description"
-						defaultValue={(formItems[0].props.type === "title") ? formItems[0].props.description : ""}
-						maxLength={500}
-						className="text-base font-thin resize-none"
-					/>
-				</div>
-			</CardHeader>
 			<CardContent>
 				<DndContext
 					sensors={sensors}
@@ -106,9 +55,16 @@ const FormBuilder = () => {
 									return (
 										<TextInput
 											key={formItem.id}
-											props={formItem.props as TextInputProps}
+											props={formItem.props}
 											id={formItem.id}
 										/>
+									);
+								case "title":
+									return (
+										<Title
+											key={formItem.id}
+											props={formItem.props}
+										></Title>
 									);
 							}
 						})}
