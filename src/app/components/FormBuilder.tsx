@@ -38,6 +38,9 @@ const FormBuilder = () => {
 
 	return (
 		<Card className="w-[800px] self-center">
+			{formItems[0].props.type == "title" && (
+				<Title key={formItems[0].id} props={formItems[0].props}></Title>
+			)}
 			<CardContent>
 				<DndContext
 					sensors={sensors}
@@ -58,13 +61,6 @@ const FormBuilder = () => {
 											props={formItem.props}
 											id={formItem.id}
 										/>
-									);
-								case "title":
-									return (
-										<Title
-											key={formItem.id}
-											props={formItem.props}
-										></Title>
 									);
 							}
 						})}
