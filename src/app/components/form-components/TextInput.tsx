@@ -20,6 +20,7 @@ import { SortableItem } from "./SortableItem";
 import { useDebouncedCallback } from "use-debounce";
 import { constants } from "@/app/constants";
 import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
+import { Separator } from "@/components/ui/separator";
 
 export function TextInput({
 	id,
@@ -28,6 +29,9 @@ export function TextInput({
 	id: number;
 	props: TextInputProps;
 }) {
+	const emailRegex = /.+@.+/;
+	const numRegex = /^(0|[1-9]\d*)?$/;
+
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const [accordionItem, setAccordionItem] = useState("");
 	const [lengthError, setLengthError] = useState("");
@@ -40,7 +44,7 @@ export function TextInput({
 			props.maxLength = newMaxLength;
 			setLengthError(validateLength());
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 	const handleMinLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -48,27 +52,28 @@ export function TextInput({
 			props.minLength = newMinLength;
 			setLengthError(validateLength());
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 	const handleRegexChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const newRegex = e.target.value;
 			setRegex(newRegex);
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 	const handlePlaceholderChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			props.placeholder = e.target.value;
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 
 	useEffect(() => {
-		debounceRefs.set(`${id}max-length`, handleMaxLengthChange)
-		.set(`${id}min-length`, handleMinLengthChange)
-		.set(`${id}regex`, handleRegexChange)
-		.set(`${id}placeholder`, handlePlaceholderChange)
+		debounceRefs
+			.set(`${id}max-length`, handleMaxLengthChange)
+			.set(`${id}min-length`, handleMinLengthChange)
+			.set(`${id}regex`, handleRegexChange)
+			.set(`${id}placeholder`, handlePlaceholderChange);
 	}, []);
 
 	return (
@@ -81,7 +86,7 @@ export function TextInput({
 							defaultValue="short-text"
 							onValueChange={handleInputTypeChange}
 						>
-							<SelectTrigger className="w-[180px] ml-2" id="inputType">
+							<SelectTrigger className="ml-2 w-[180px]" id="inputType">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -112,24 +117,23 @@ export function TextInput({
 				>
 					<AccordionItem value="item-1" className="border-b-0">
 						{/* extra div for straight border-b */}
-						<div className="border-b">
-							<AccordionTrigger className="rounded-sm hover:no-underline px-1 custom-focus mt-2">
-								Advanced
-							</AccordionTrigger>
-						</div>
+						<AccordionTrigger className="custom-focus mt-2 rounded-sm px-1 hover:no-underline">
+							Advanced
+						</AccordionTrigger>
+						<Separator />
 
 						<AccordionContent className="mt-5 px-[1px]">
 							<div className="text-base font-semibold">
 								<u>Length</u>
 							</div>
 
-							<div className="flex w-full mt-3 space-x-6">
+							<div className="mt-3 flex w-full space-x-6">
 								<div className="flex">
 									<div className="flex h-9 items-center">
 										<Label htmlFor="min-length">Min. Length</Label>
 									</div>
 									<Input
-										className="w-24 ml-2"
+										className="ml-2 w-24"
 										id="min-length"
 										onChange={handleMinLengthChange}
 										placeholder="0"
@@ -140,7 +144,7 @@ export function TextInput({
 										<Label htmlFor="max-length">Max. Length</Label>
 									</div>
 									<Input
-										className="w-24 ml-2"
+										className="ml-2 w-24"
 										id="max-length"
 										onChange={handleMaxLengthChange}
 									/>
@@ -162,10 +166,10 @@ export function TextInput({
 							</div>
 							{lengthError && <div className="error">{lengthError}</div>}
 
-							<div className="text-base font-semibold mt-5">
+							<div className="mt-5 text-base font-semibold">
 								<u>Regex</u>
 							</div>
-							<div className="flex mt-4 items-center space-x-6">
+							<div className="mt-4 flex items-center space-x-6">
 								<Select
 									defaultValue={props.regexMethod}
 									onValueChange={handleRegexMethodChange}
@@ -188,7 +192,7 @@ export function TextInput({
 								<div className="flex items-center">
 									<Label htmlFor="regex">Regex pattern</Label>
 									<Input
-										className="w-56 ml-2"
+										className="ml-2 w-56"
 										id="regex"
 										ref={regexRef}
 										defaultValue={props.regex}
@@ -221,11 +225,11 @@ export function TextInput({
 				break;
 			case "email":
 				props.inputType = "email";
-				setRegex(constants.emailRegex.toString());
+				setRegex(emailRegex.toString());
 				break;
 			case "numeric":
 				props.inputType = "numeric";
-				setRegex(constants.numRegex.toString());
+				setRegex(numRegex.toString());
 				break;
 		}
 	}
@@ -257,10 +261,7 @@ export function TextInput({
 		const maxNum = Number(props.maxLength);
 
 		if (
-			!(
-				props.minLength.match(constants.numRegex) &&
-				props.maxLength.match(constants.numRegex)
-			)
+			!(props.minLength.match(numRegex) && props.maxLength.match(numRegex))
 		) {
 			return "Both values must be positive integers or zero";
 		}

@@ -1,3 +1,4 @@
+import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
 
 const TitlePropsObj: TitleProps = {
@@ -6,21 +7,21 @@ const TitlePropsObj: TitleProps = {
 	type: "title",
 };
 
+const TextInputPropsObj: TextInputProps = {
+	inputType: "short-text",
+	lengthType: "characters",
+	minLength: "",
+	maxLength: "",
+	placeholder: "",
+	regex: "",
+	regexMethod: "contains",
+	required: "false",
+	title: "",
+	type: "text-input"
+}
+
 export const constants = Object.freeze({
-	defaultTextInputProps: {
-		inputType: "short-text",
-		lengthType: "characters",
-		minLength: "",
-		maxLength: "",
-		placeholder: "",
-		regex: "",
-		regexMethod: "contains",
-		required: "false",
-		title: "",
-		type: "text-input",
-	},
+	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
 	debounceWait: 500,
-	emailRegex: /.+@.+/,
-	numRegex: /^(0|[1-9]\d*)?$/,
 });

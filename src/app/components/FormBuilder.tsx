@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
 	DndContext,
 	DragEndEvent,
@@ -22,10 +22,8 @@ import {
 } from "@dnd-kit/sortable";
 import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
-import TextInputProps from "../interfaces/form-component-interfaces/TextInputProps";
 import { TextInput } from "./form-components/TextInput";
 import Title from "./form-components/Title";
-import TitleProps from "../interfaces/form-component-interfaces/TitleProps";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -33,13 +31,13 @@ const FormBuilder = () => {
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
-		})
+		}),
 	);
 
 	return (
 		<Card className="w-[800px] self-center">
 			{formItems[0].props.type == "title" && (
-				<Title key={formItems[0].id} props={formItems[0].props}></Title>
+				<Title key={formItems[0].id} props={formItems[0].props} />
 			)}
 			<CardContent>
 				<DndContext
@@ -76,10 +74,10 @@ const FormBuilder = () => {
 		if (over == null) return;
 
 		const activeIndex = formItems.findIndex(
-			(formItem) => formItem.id === active.id
+			(formItem) => formItem.id === active.id,
 		);
 		const overIndex = formItems.findIndex(
-			(formItem) => formItem.id === over.id
+			(formItem) => formItem.id === over.id,
 		);
 
 		if (activeIndex !== overIndex) {

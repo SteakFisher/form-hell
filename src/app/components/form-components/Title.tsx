@@ -7,7 +7,7 @@ import autosize from "autosize";
 import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-const Title = ({ props }: { props: TitleProps} ) => {
+const Title = ({ props }: { props: TitleProps }) => {
 	const { debounceRefs } = useContext(FormBuilderContext);
 
 	const descriptionRef = useRef(null);
@@ -17,14 +17,14 @@ const Title = ({ props }: { props: TitleProps} ) => {
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 			props.title = e.target.value;
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 
 	const handleDescriptionChange = useDebouncedCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 			props.description = e.target.value;
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 
 	useEffect(() => {
@@ -39,26 +39,23 @@ const Title = ({ props }: { props: TitleProps} ) => {
 	}, []);
 
 	return (
-		<CardHeader className="border-b mx-6 px-0">
+		<CardHeader className="mx-6 border-b px-0">
 			<Textarea
 				ref={formTitleRef}
 				placeholder="Form Title"
 				defaultValue={props.title}
-				maxLength={100}
-				className="text-2xl mb-3 resize-none h-[50px] borderless-input"
+				maxLength={250}
+				className="borderless-input mb-3 h-[50px] resize-none text-2xl"
 				onChange={handleTitleChange}
 			/>
-			<div>
-				<Textarea
-					rows={2}
-					ref={descriptionRef}
-					placeholder="Description"
-					defaultValue={props.description}
-					maxLength={500}
-					className="text-base font-thin resize-none"
-					onChange={handleDescriptionChange}
-				/>
-			</div>
+			<Textarea
+				ref={descriptionRef}
+				placeholder="Description"
+				defaultValue={props.description}
+				maxLength={750}
+				className="h-[42px] resize-none text-base"
+				onChange={handleDescriptionChange}
+			/>
 		</CardHeader>
 	);
 };

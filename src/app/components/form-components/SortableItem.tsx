@@ -36,13 +36,13 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 			const target = e.target as HTMLButtonElement;
 			props.required = target.ariaChecked ?? "";
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 	const handleTitleChange = useDebouncedCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 			props.title = e.target.value;
 		},
-		constants.debounceWait
+		constants.debounceWait,
 	);
 
 	useEffect(() => {
@@ -56,7 +56,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 
 	return (
 		<div ref={setNodeRef} style={style}>
-			<Card className={"flex overflow-hidden my-5"}>
+			<Card className={"my-5 flex overflow-hidden"}>
 				<div className="w-full">
 					<CardHeader>
 						<div className="flex justify-between">
@@ -66,12 +66,12 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 									placeholder="Title"
 									defaultValue={props.title}
 									onChange={handleTitleChange}
-									className="flex resize-none w-[600px] h-[38px]"
+									className="flex h-[38px] w-[600px] resize-none"
 									maxLength={500}
 								/>
 							</CardTitle>
 							<div
-								className=" fill-red-600 mt-[9px]"
+								className=" mt-[9px] fill-red-600"
 								style={{ cursor: "pointer" }}
 								onClick={handleDeleteClick}
 							>
@@ -91,7 +91,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 				</div>
 
 				<div
-					className="flex bg-accent rounded-r-xl custom-focus"
+					className="custom-focus flex rounded-r-xl bg-accent"
 					{...attributes}
 					{...listeners}
 				>

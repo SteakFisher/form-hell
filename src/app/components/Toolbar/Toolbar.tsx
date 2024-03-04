@@ -6,14 +6,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ToolbarButton from "./ToolbarButton";
+import { useToast } from "@/components/ui/use-toast";
 
 const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs } = useContext(FormBuilderContext);
+	const { formItems, setFormItems, debounceRefs } =
+		useContext(FormBuilderContext);
 	const [nextId, setNextId] = useState(formItems.length);
 	const router = useRouter();
+	const { toast } = useToast();
 
 	return (
-		<div className="bg-white rounded border-2 shadow-md p-2 fixed right-3 top-1/2 transform -translate-y-1/2">
+		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform rounded border-2 bg-white p-2 shadow-md">
 			<ToolbarButton className="mb-2" onBtnClick={handleAddClick}>
 				<Image
 					className="object-contain"
@@ -35,7 +38,6 @@ const Toolbar = () => {
 			...formItems,
 			{
 				id: nextId,
-				type: "text-input",
 				props: { ...constants.defaultTextInputProps },
 			},
 		];
@@ -43,7 +45,22 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
-		debounceRefs.forEach((ref)=>{ref.flush();})
+		debounceRefs.forEach((ref) => {
+			ref.flush();
+		});
+
+		// doesn't really work, eg if hidden by accordion
+		const errors = document.getElementsByClassName("error");
+		if (errors.length !== 0) {
+			errors[0].scrollIntoView();
+			toast({
+				title: "Error",
+				description: "Please fix all invalid fields",
+				duration: 2500,
+			});
+			return;
+		}
+
 		router.push(`../../new-form/save?formItems=${JSON.stringify(formItems)}`);
 	}
 };
