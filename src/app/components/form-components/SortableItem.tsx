@@ -12,11 +12,13 @@ import { ReactNode, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../../public/icons/delete.svg";
 import { FormBuilderContext } from "../../contexts/FormBuilderContext";
+import { propsTypes } from "@/app/interfaces/propsTypes";
+import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 
 interface SortableItemProps {
 	id: number;
 	children: ReactNode;
-	props: TextInputProps;
+	props: propsTypes;
 }
 
 export function SortableItem({ children, id, props }: SortableItemProps) {
@@ -25,7 +27,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const style = {
-		transform: CSS.Transform.toString(transform),
+		transform: CSS.Translate.toString(transform),
 		transition,
 	};
 
@@ -34,7 +36,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 	const handleCheckboxClick = useDebouncedCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			const target = e.target as HTMLButtonElement;
-			props.required = target.ariaChecked ?? "";
+			props.required = target.ariaChecked === "true" ? true : false;
 		},
 		constants.debounceWait,
 	);
@@ -55,7 +57,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 	}, []);
 
 	return (
-		<div ref={setNodeRef} style={style}>
+		<div ref={setNodeRef} style={style} id={id.toString()}>
 			<Card className={"my-5 flex overflow-hidden"}>
 				<div className="w-full">
 					<CardHeader>
@@ -66,7 +68,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 									placeholder="Title"
 									defaultValue={props.title}
 									onChange={handleTitleChange}
-									className="flex h-[38px] w-[600px] resize-none"
+									className="h-[36px] w-[600px] resize-none font-normal"
 									maxLength={500}
 								/>
 							</CardTitle>
@@ -82,8 +84,8 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 							<Label htmlFor="required">Required</Label>
 							<Checkbox
 								id="required"
-								defaultValue={props.required}
 								onClick={handleCheckboxClick}
+								defaultChecked={props.required}
 							/>
 						</div>
 					</CardHeader>
@@ -91,16 +93,11 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 				</div>
 
 				<div
-					className="custom-focus flex rounded-r-xl bg-accent"
+					className="custom-focus flex cursor-move items-center rounded-r-xl bg-accent"
 					{...attributes}
 					{...listeners}
 				>
-					<Image
-						src={"/icons/drag_indicator.svg"}
-						alt=""
-						width={30}
-						height={30}
-					/>
+					<DragHandleDots2Icon className="size-7 text-black" />
 				</div>
 			</Card>
 		</div>
@@ -110,7 +107,7 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);
 		debounceRefs.delete(`${id}checkbox`);
 		debounceRefs.delete(`${id}title`);
-		switch (props.inputType) {
+		switch (props.type) {
 			case "text-input":
 				debounceRefs.delete(`${id}min-length`);
 				debounceRefs.delete(`${id}max-length`);

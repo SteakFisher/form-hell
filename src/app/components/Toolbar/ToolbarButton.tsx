@@ -6,7 +6,7 @@ import React, { ReactNode } from "react";
 interface ToolbarButtonProps {
 	children: ReactNode;
 	text?: string;
-	onBtnClick: () => void;
+	onBtnClick?: () => void;
 	className?: string;
 }
 

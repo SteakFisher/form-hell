@@ -6,7 +6,7 @@ export default interface TextInputProps {
 	placeholder: string;
 	regex: string;
 	regexMethod: string;
-	required: string;
+	required: boolean;
 	title: string;
 	type: "text-input";
 }

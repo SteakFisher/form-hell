@@ -41,16 +41,18 @@ export function TextInput({
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const newMaxLength = e.target.value;
-			props.maxLength = newMaxLength;
-			setLengthError(validateLength());
+			const _error = validateLength(props.minLength, newMaxLength);
+			setLengthError(_error);
+			if (!_error) props.maxLength = newMaxLength;
 		},
 		constants.debounceWait,
 	);
 	const handleMinLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const newMinLength = e.target.value;
-			props.minLength = newMinLength;
-			setLengthError(validateLength());
+			const _error = validateLength(newMinLength, props.maxLength);
+			setLengthError(_error);
+			if (!_error) props.minLength = newMinLength;
 		},
 		constants.debounceWait,
 	);
@@ -243,26 +245,23 @@ export function TextInput({
 	}
 
 	function setRegex(newRegex: string) {
-		props.regex = newRegex;
-
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;
 
 		try {
 			new RegExp(newRegex);
 			setRegexError("");
+			props.regex = newRegex;
 		} catch (e) {
 			setRegexError("Enter a valid regex pattern");
 		}
 	}
 
-	function validateLength(): string {
-		const minNum = Number(props.minLength);
-		const maxNum = Number(props.maxLength);
+	function validateLength(minLength: string, maxLength: string): string {
+		const minNum = Number(minLength);
+		const maxNum = Number(maxLength);
 
-		if (
-			!(props.minLength.match(numRegex) && props.maxLength.match(numRegex))
-		) {
+		if (!(minLength.match(numRegex) && maxLength.match(numRegex))) {
 			return "Both values must be positive integers or zero";
 		}
 		if (minNum > 999999999 || maxNum > 999999999) {
