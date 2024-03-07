@@ -1,19 +1,18 @@
 import { constants } from "@/app/constants";
-import TextInputProps from "@/app/interfaces/form-component-interfaces/TextInputProps";
+import { propsTypes } from "@/app/interfaces/propsTypes";
+import { typesEnum } from "@/app/misc/typesEnum";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
-import Image from "next/image";
 import { ReactNode, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../../public/icons/delete.svg";
 import { FormBuilderContext } from "../../contexts/FormBuilderContext";
-import { propsTypes } from "@/app/interfaces/propsTypes";
-import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 
 interface SortableItemProps {
 	id: number;
@@ -60,6 +59,9 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 		<div ref={setNodeRef} style={style} id={id.toString()}>
 			<Card className={"my-5 flex overflow-hidden"}>
 				<div className="w-full">
+					<div className="mt-2 h-7 justify-center px-5 text-center text-base">
+						<u>{returnTitle(typesEnum[props.type])}</u>
+					</div>
 					<CardHeader>
 						<div className="flex justify-between">
 							<CardTitle>
@@ -102,6 +104,17 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 			</Card>
 		</div>
 	);
+
+	function returnTitle(type: typesEnum) {
+		switch (type) {
+			case "text-input":
+				return "Text Input";
+			case "multiple-choice":
+				return "Multiple Choice";
+			case "dropdown":
+				return "Dropdown";
+		}
+	}
 
 	function handleDeleteClick() {
 		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);

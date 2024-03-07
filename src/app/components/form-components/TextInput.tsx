@@ -1,3 +1,5 @@
+import { constants } from "@/app/constants";
+import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 import TextInputProps from "@/app/interfaces/form-component-interfaces/TextInputProps";
 import {
 	Accordion,
@@ -15,12 +17,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
-import { SortableItem } from "./SortableItem";
-import { useDebouncedCallback } from "use-debounce";
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 import { Separator } from "@/components/ui/separator";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { SortableItem } from "./SortableItem";
 
 export function TextInput({
 	id,
@@ -37,22 +37,26 @@ export function TextInput({
 	const [lengthError, setLengthError] = useState("");
 	const [regexError, setRegexError] = useState("");
 	const regexRef = useRef<HTMLInputElement>(null);
+	const lengthsRef = useRef({
+		minLength: props.minLength,
+		maxLength: props.maxLength,
+	});
 
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
-			const newMaxLength = e.target.value;
-			const _error = validateLength(props.minLength, newMaxLength);
+			lengthsRef.current.maxLength = e.target.value;
+			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.maxLength = newMaxLength;
+			if (!_error) props.maxLength = lengthsRef.current.maxLength;
 		},
 		constants.debounceWait,
 	);
 	const handleMinLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
-			const newMinLength = e.target.value;
-			const _error = validateLength(newMinLength, props.maxLength);
+			lengthsRef.current.minLength = e.target.value;
+			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.minLength = newMinLength;
+			if (!_error) props.minLength = lengthsRef.current.minLength;
 		},
 		constants.debounceWait,
 	);
@@ -257,10 +261,15 @@ export function TextInput({
 		}
 	}
 
-	function validateLength(minLength: string, maxLength: string): string {
+	function validateLength(): string {
+		const minLength = lengthsRef.current.minLength;
+		const maxLength = lengthsRef.current.maxLength;
+
 		const minNum = Number(minLength);
 		const maxNum = Number(maxLength);
 
+		if (maxLength !== "" && maxNum === 0 && maxNum === 0)
+			return "Both values cannot be zero";
 		if (!(minLength.match(numRegex) && maxLength.match(numRegex))) {
 			return "Both values must be positive integers or zero";
 		}
