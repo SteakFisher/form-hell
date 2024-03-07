@@ -2,18 +2,12 @@ import { constants } from "@/app/constants";
 import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 import { DropdownItemProps } from "@/app/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
-import {
-	ChangeEvent,
-	useContext,
-	useEffect,
-	useRef
-} from "react";
+import { ChangeEvent, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 function DropdownItem({ props }: { props: DropdownItemProps }) {
@@ -36,10 +30,7 @@ function DropdownItem({ props }: { props: DropdownItemProps }) {
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		debounceRefs.set(
-			`${props.parentId}:${props.id}:text`,
-			handleTextChange,
-		);
+		debounceRefs.set(`${props.parentId}:${props.id}:text`, handleTextChange);
 	}, []);
 
 	return (
@@ -54,7 +45,6 @@ function DropdownItem({ props }: { props: DropdownItemProps }) {
 					<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
 				</div>
 			)}
-			<Checkbox disabled className="ml-2 disabled:cursor-default" />
 			<div className="ml-2 flex size-full items-center justify-between">
 				<Textarea
 					ref={textRef}

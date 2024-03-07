@@ -2,6 +2,8 @@
 
 import { constants } from "@/app/constants";
 import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
+import { propsTypes } from "@/app/interfaces/propsTypes";
+import { typesEnum } from "@/app/misc/typesEnum";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,13 +11,15 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckboxIcon, PlusIcon, TextIcon } from "@radix-ui/react-icons";
+import {
+	CheckboxIcon,
+	DropdownMenuIcon,
+	TextIcon
+} from "@radix-ui/react-icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import ToolbarButton from "./ToolbarButton";
-import { typesEnum } from "@/app/misc/typesEnum";
-import { propsTypes } from "@/app/interfaces/propsTypes";
 
 const Toolbar = () => {
 	const { formItems, setFormItems, debounceRefs } =
@@ -72,7 +76,7 @@ const Toolbar = () => {
 					>
 						Dropdown
 						<DropdownMenuShortcut>
-							<CheckboxIcon className="size-5" />
+							<DropdownMenuIcon className="size-5" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
@@ -91,7 +95,7 @@ const Toolbar = () => {
 				props: { ...returnTypeProps(type) },
 			},
 		];
-		nextId.current ++;
+		nextId.current++;
 		setFormItems(newFormItems);
 	}
 
@@ -102,9 +106,12 @@ const Toolbar = () => {
 			case typesEnum.title:
 				return constants.defaultTitleProps;
 			case typesEnum["multiple-choice"]:
-				return {...constants.defaultMultipleChoiceProps, items: new Array()};
+				return {
+					...constants.defaultMultipleChoiceProps,
+					items: new Array(),
+				};
 			case typesEnum["dropdown"]:
-				return {...constants.defaultDropdownProps, items: new Array()};
+				return { ...constants.defaultDropdownProps, items: new Array() };
 		}
 	}
 

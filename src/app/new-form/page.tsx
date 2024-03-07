@@ -1,12 +1,11 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import FormBuilder from "../components/FormBuilder";
 import Toolbar from "../components/toolbar/Toolbar";
+import { constants } from "../constants";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import FormItem from "../interfaces/FormItem";
-import { constants } from "../constants";
-import { DebouncedState } from "use-debounce";
 
 const NewFormPage = () => {
 	const [formItems, setFormItems] = useState<FormItem[]>([
@@ -22,7 +21,6 @@ const NewFormPage = () => {
 				debounceRefs: debounceRefs,
 			}}
 		>
-			<div>NewFormPage</div>
 			<div className="flex w-full justify-center">
 				<FormBuilder />
 			</div>
