@@ -72,10 +72,10 @@ export function TextInput({
 
 	useEffect(() => {
 		debounceRefs
-			.set(`${id}max-length`, handleMaxLengthChange)
-			.set(`${id}min-length`, handleMinLengthChange)
-			.set(`${id}regex`, handleRegexChange)
-			.set(`${id}placeholder`, handlePlaceholderChange);
+			.set(`${id}:max-length`, handleMaxLengthChange)
+			.set(`${id}:min-length`, handleMinLengthChange)
+			.set(`${id}:regex`, handleRegexChange)
+			.set(`${id}:placeholder`, handlePlaceholderChange);
 	}, []);
 
 	return (

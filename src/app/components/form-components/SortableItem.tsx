@@ -52,8 +52,8 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 		autosize(titleRef.current);
 
 		debounceRefs
-			.set(`${id}checkbox`, handleCheckboxClick)
-			.set(`${id}title`, handleTitleChange);
+			.set(`${id}:checkbox`, handleCheckboxClick)
+			.set(`${id}:title`, handleTitleChange);
 	}, []);
 
 	return (
@@ -105,13 +105,8 @@ export function SortableItem({ children, id, props }: SortableItemProps) {
 
 	function handleDeleteClick() {
 		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);
-		debounceRefs.delete(`${id}checkbox`);
-		debounceRefs.delete(`${id}title`);
-		switch (props.type) {
-			case "text-input":
-				debounceRefs.delete(`${id}min-length`);
-				debounceRefs.delete(`${id}max-length`);
-				debounceRefs.delete(`${id}regex`);
+		for (const key of debounceRefs.keys()) {
+			if (key.startsWith(`${id}:`)) debounceRefs.delete(key);
 		}
 
 		setFormItems([

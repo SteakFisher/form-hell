@@ -20,10 +20,11 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import { TextInput } from "./form-components/TextInput";
 import Title from "./form-components/Title";
+import Dropdown from "./form-components/dropdown/Dropdown";
 import MultipleChoice from "./form-components/multiple-choice/MultipleChoice";
 
 const FormBuilder = () => {
@@ -64,6 +65,14 @@ const FormBuilder = () => {
 								case "multiple-choice":
 									return (
 										<MultipleChoice
+											key={formItem.id}
+											props={formItem.props}
+											id={formItem.id}
+										/>
+									);
+								case "dropdown":
+									return (
+										<Dropdown
 											key={formItem.id}
 											props={formItem.props}
 											id={formItem.id}

@@ -1,4 +1,4 @@
-import { MultipleChoiceProps } from "@/app/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
+import { DropdownProps } from "@/app/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import {
@@ -22,19 +22,19 @@ import {
 } from "@dnd-kit/sortable";
 import { useContext, useEffect, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
-import MultipleChoiceItem from "./MultipleChoiceItem";
+import DropdownItem from "./DropdownItem";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useDebouncedCallback } from "use-debounce";
 import { constants } from "@/app/constants";
 import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
 
-function MultipleChoice({
+function Dropdown({
 	id,
 	props,
 }: {
 	id: number;
-	props: MultipleChoiceProps;
+	props: DropdownProps;
 }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
@@ -47,38 +47,16 @@ function MultipleChoice({
 	const [itemsState, setItemsState] = useState([...props.items]);
 	const [hasOther, setHasOther] = useState(false);
 
-	const handleCheckboxClick = useDebouncedCallback(
-		(e: React.MouseEvent<HTMLButtonElement>) => {
-			const target = e.target as HTMLButtonElement;
-			props.allowMultiple = target.ariaChecked === "true" ? true : false;
-		},
-		constants.debounceWait,
-	);
-
 	useEffect(() => {
 		props.items.forEach((item) => {
 			if (item.other) setHasOther(true);
 		});
-		debounceRefs.set(
-			`${id}:checkbox`,
-			handleCheckboxClick,
-		);
 	}, []);
 	const nextId = useRef(1);
-
-	
 
 	return (
 		<SortableItem id={id} props={props}>
 			<CardContent>
-				<div className="mb-9 flex space-x-2">
-					<Label htmlFor="allow-multiple">Allow multiple selection</Label>
-					<Checkbox
-						id="allow-multiple"
-						defaultChecked={props.allowMultiple}
-						onClick={handleCheckboxClick}
-					/>
-				</div>
 				<div>
 					<DndContext
 						sensors={sensors}
@@ -92,7 +70,7 @@ function MultipleChoice({
 						>
 							{itemsState.map((item, index) => {
 								return (
-									<MultipleChoiceItem props={item} key={item.id} />
+									<DropdownItem props={item} key={item.id} />
 								);
 							})}
 						</SortableContext>
@@ -177,4 +155,4 @@ function MultipleChoice({
 	}
 }
 
-export default MultipleChoice;
+export default Dropdown;

@@ -64,6 +64,17 @@ const Toolbar = () => {
 							<CheckboxIcon className="size-5" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onSelect={() => {
+							handleAddElement(typesEnum["dropdown"]);
+						}}
+					>
+						Dropdown
+						<DropdownMenuShortcut>
+							<CheckboxIcon className="size-5" />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ToolbarButton onBtnClick={handleSaveClick}>
@@ -92,6 +103,8 @@ const Toolbar = () => {
 				return constants.defaultTitleProps;
 			case typesEnum["multiple-choice"]:
 				return {...constants.defaultMultipleChoiceProps, items: new Array()};
+			case typesEnum["dropdown"]:
+				return {...constants.defaultDropdownProps, items: new Array()};
 		}
 	}
 
