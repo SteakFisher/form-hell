@@ -1,25 +1,16 @@
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
-import { MultipleChoiceItemProps } from "@/app/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceItemProps";
-import { Card, CardContent } from "@/components/ui/card";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { DropdownItemProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSortable } from "@dnd-kit/sortable";
-import autosize from "autosize";
-import Image from "next/image";
-import React, {
-	ChangeEvent,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
-import { DebouncedState, useDebouncedCallback } from "use-debounce";
 import { CSS } from "@dnd-kit/utilities";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import autosize from "autosize";
+import { ChangeEvent, useContext, useEffect, useRef } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
-function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
+function DropdownItem({ props }: { props: DropdownItemProps }) {
 	const textRef = useRef(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -39,10 +30,7 @@ function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		debounceRefs.set(
-			`${props.parentId}:${props.id}:text`,
-			handleTextChange,
-		);
+		debounceRefs.set(`${props.parentId}:${props.id}:text`, handleTextChange);
 	}, []);
 
 	return (
@@ -57,7 +45,6 @@ function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
 					<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
 				</div>
 			)}
-			<Checkbox disabled className="ml-2 disabled:cursor-default" />
 			<div className="ml-2 flex size-full items-center justify-between">
 				<Textarea
 					ref={textRef}
@@ -82,4 +69,4 @@ function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
 	);
 }
 
-export default MultipleChoiceItem;
+export default DropdownItem;

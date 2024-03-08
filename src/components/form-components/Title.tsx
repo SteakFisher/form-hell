@@ -1,6 +1,6 @@
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
-import TitleProps from "@/app/interfaces/form-component-interfaces/TitleProps";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
 import { CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import autosize from "autosize";

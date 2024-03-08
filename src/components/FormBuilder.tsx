@@ -22,10 +22,10 @@ import {
 } from "@dnd-kit/sortable";
 import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
-import { TextInput } from "./form-components/TextInput";
-import Title from "./form-components/Title";
-import Dropdown from "./form-components/dropdown/Dropdown";
-import MultipleChoice from "./form-components/multiple-choice/MultipleChoice";
+import { TextInput } from "@/components/form-components/TextInput";
+import Title from "@/components/form-components/Title";
+import Dropdown from "@/components/form-components/dropdown/Dropdown";
+import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);

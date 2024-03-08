@@ -1,9 +1,18 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import FormItem from "../../interfaces/FormItem";
+import FormItem from "@/interfaces/FormItem";
+import { Suspense } from "react";
 
-export default function SavePage() {
+export default function SavePageSuspense() {
+	return (
+		<Suspense>
+			<SavePage />
+		</Suspense>
+	);
+}
+
+function SavePage() {
 	const searchParams = useSearchParams();
 
 	const formItemsParam = searchParams.get("formItems");
@@ -16,7 +25,7 @@ export default function SavePage() {
 				return (
 					<div key={formItem.id}>
 						<div>{formItem.id}</div>
-						<div>{formItem.type}</div>
+						<div>{formItem.props.type}</div>
 						<div>{JSON.stringify(formItem.props)}</div>
 						<br></br>
 					</div>

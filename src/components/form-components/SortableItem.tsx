@@ -1,6 +1,6 @@
-import { constants } from "@/app/constants";
-import { propsTypes } from "@/app/interfaces/propsTypes";
-import { typesEnum } from "@/app/misc/typesEnum";
+import { constants } from "@/constants";
+import { propsTypes } from "@/interfaces/propsTypes";
+import { typesEnum } from "@/misc/typesEnum";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -11,8 +11,8 @@ import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import { ReactNode, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import DeleteIcon from "../../../../public/icons/delete.svg";
-import { FormBuilderContext } from "../../contexts/FormBuilderContext";
+import DeleteIcon from "../../../public/icons/delete.svg";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
 interface SortableItemProps {
 	id: number;

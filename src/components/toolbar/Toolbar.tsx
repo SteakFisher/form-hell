@@ -1,9 +1,9 @@
 "use client";
 
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
-import { propsTypes } from "@/app/interfaces/propsTypes";
-import { typesEnum } from "@/app/misc/typesEnum";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { propsTypes } from "@/interfaces/propsTypes";
+import { typesEnum } from "@/misc/typesEnum";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
 import {
 	CheckboxIcon,
 	DropdownMenuIcon,
-	TextIcon
+	TextIcon,
 } from "@radix-ui/react-icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

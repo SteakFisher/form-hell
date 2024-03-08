@@ -1,4 +1,4 @@
-import { DropdownProps } from "@/app/interfaces/form-component-interfaces/dropdown/DropdownProps";
+import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import {
@@ -26,8 +26,8 @@ import DropdownItem from "./DropdownItem";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useDebouncedCallback } from "use-debounce";
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
 function Dropdown({
 	id,

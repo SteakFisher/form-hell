@@ -1,6 +1,6 @@
-import { constants } from "@/app/constants";
-import { FormBuilderContext } from "@/app/contexts/FormBuilderContext";
-import TextInputProps from "@/app/interfaces/form-component-interfaces/TextInputProps";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {
 	Accordion,
 	AccordionContent,

@@ -33,7 +33,6 @@ const MultipleChoicePropsObj: MultipleChoiceProps = {
 }
 
 const DropdownPropsObj: DropdownProps = {
-	allowMultiple: false,
 	items: [],
 	required: false,
 	title: "",
