@@ -16,10 +16,20 @@ import React, {
 import { DebouncedState, useDebouncedCallback } from "use-debounce";
 import { CSS } from "@dnd-kit/utilities";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
+import {
+	Cross1Icon,
+	DragHandleDots2Icon,
+	RadiobuttonIcon,
+} from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
-function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
+function MultipleChoiceItem({
+	props,
+	isRadio,
+}: {
+	props: MultipleChoiceItemProps;
+	isRadio: boolean;
+}) {
 	const textRef = useRef(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -54,7 +64,14 @@ function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
 					<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
 				</div>
 			)}
-			<Checkbox disabled className="ml-2 disabled:cursor-default" />
+			{isRadio ? (
+				<div className="ml-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+			) : (
+				<Checkbox
+					disabled
+					className="ml-2 disabled:cursor-default disabled:opacity-100"
+				/>
+			)}
 			<div className="ml-2 flex size-full items-center justify-between">
 				<Textarea
 					ref={textRef}
@@ -68,6 +85,10 @@ function MultipleChoiceItem({ props }: { props: MultipleChoiceItemProps }) {
 					className="ml-2 size-9 px-3"
 					variant="ghost"
 					size="icon"
+					onMouseDown={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
 					onClick={() => {
 						props.onDelete(props.id);
 					}}

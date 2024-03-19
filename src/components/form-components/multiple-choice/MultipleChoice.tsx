@@ -1,6 +1,6 @@
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	DndContext,
 	DragEndEvent,
@@ -28,6 +28,16 @@ import { Label } from "@/components/ui/label";
 import { useDebouncedCallback } from "use-debounce";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 function MultipleChoice({
 	id,
@@ -43,14 +53,16 @@ function MultipleChoice({
 			coordinateGetter: sortableKeyboardCoordinates,
 		}),
 	);
-	
-	const [itemsState, setItemsState] = useState([...props.items]);
+
 	const [hasOther, setHasOther] = useState(false);
+	const [itemsState, setItemsState] = useState([...props.items]);
+	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
 
 	const handleCheckboxClick = useDebouncedCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			const target = e.target as HTMLButtonElement;
 			props.allowMultiple = target.ariaChecked === "true" ? true : false;
+			setIsRadio(!props.allowMultiple);
 		},
 		constants.debounceWait,
 	);
@@ -59,17 +71,16 @@ function MultipleChoice({
 		props.items.forEach((item) => {
 			if (item.other) setHasOther(true);
 		});
-		debounceRefs.set(
-			`${id}:checkbox`,
-			handleCheckboxClick,
-		);
+		debounceRefs.set(`${id}:checkbox`, handleCheckboxClick);
 	}, []);
 	const nextId = useRef(1);
 
-	
-
 	return (
-		<SortableItem id={id} props={props}>
+		<SortableItem
+			id={id}
+			props={props}
+			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
+		>
 			<CardContent>
 				<div className="mb-9 flex space-x-2">
 					<Label htmlFor="allow-multiple">Allow multiple selection</Label>
@@ -92,7 +103,11 @@ function MultipleChoice({
 						>
 							{itemsState.map((item, index) => {
 								return (
-									<MultipleChoiceItem props={item} key={item.id} />
+									<MultipleChoiceItem
+										props={item}
+										key={item.id}
+										isRadio={isRadio}
+									/>
 								);
 							})}
 						</SortableContext>
@@ -153,10 +168,10 @@ function MultipleChoice({
 
 	function handleAddOtherClick() {
 		props.items.push({
-			parentId: id,
 			id: nextId.current,
 			other: true,
 			onDelete: handleDeleteClick,
+			parentId: id,
 			value: "Other",
 		});
 		nextId.current++;
@@ -166,7 +181,7 @@ function MultipleChoice({
 
 	function handleDeleteClick(idToDelete: number) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
-		const item = props.items[itemIndex]
+		const item = props.items[itemIndex];
 		if (item.other) setHasOther(false);
 		props.items = [
 			...props.items.slice(0, itemIndex),
@@ -175,6 +190,48 @@ function MultipleChoice({
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 	}
+}
+
+function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
+	return (
+		<div className="h-min w-full whitespace-pre-wrap">
+			<CardHeader>
+				<CardTitle className="flex text-base">
+					<span>{props.title || "Title"}</span>
+					<span>
+						{props.required ? (
+							<sup className="ml-2 text-red-500">*</sup>
+						) : null}
+					</span>
+				</CardTitle>
+			</CardHeader>
+			<CardContent className="space-y-1">
+				{props.items.map((item, index) => {
+					return (
+						<div className="flex min-h-8 items-center" key={index}>
+							{isRadio ? (
+								<div className="mr-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+							) : (
+								<Checkbox
+									disabled
+									className="mr-2 disabled:cursor-default disabled:opacity-100"
+								/>
+							)}
+							{item.other ? (
+								<Input
+									className="disabled:cursor-default disabled:opacity-100"
+									placeholder="Other"
+									disabled
+								/>
+							) : (
+								item.value
+							)}
+						</div>
+					);
+				})}
+			</CardContent>
+		</div>
+	);
 }
 
 export default MultipleChoice;

@@ -7,7 +7,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CardContent } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,7 +18,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+	ChangeEvent,
+	forwardRef,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
 
@@ -33,14 +40,16 @@ export function TextInput({
 	const numRegex = /^(0|[1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
-	const [accordionItem, setAccordionItem] = useState("");
-	const [lengthError, setLengthError] = useState("");
-	const [regexError, setRegexError] = useState("");
+
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
 		minLength: props.minLength,
 		maxLength: props.maxLength,
 	});
+
+	const [accordionItem, setAccordionItem] = useState("");
+	const [lengthError, setLengthError] = useState("");
+	const [regexError, setRegexError] = useState("");
 
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +92,12 @@ export function TextInput({
 	}, []);
 
 	return (
-		<SortableItem id={id} props={props} key={id}>
+		<SortableItem
+			id={id}
+			props={props}
+			key={id}
+			UnfocusedSortableItem={() => UnfocusedTextInput(props)}
+		>
 			<CardContent>
 				<div className="flex space-x-4">
 					<div className="flex items-center">
@@ -281,4 +295,29 @@ export function TextInput({
 		}
 		return "";
 	}
+}
+
+function UnfocusedTextInput(props: TextInputProps) {
+	return (
+		<div className="h-min w-full whitespace-pre-wrap">
+			<CardHeader>
+				<CardTitle className="flex text-base">
+					<span>{props.title || "Title"}</span>
+					<span>
+						{props.required ? (
+							<sup className="ml-2 text-red-500">*</sup>
+						) : null}
+					</span>
+				</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<Input
+					id="name"
+					placeholder={props.placeholder || "Text"}
+					disabled
+					className="disabled:cursor-default disabled:opacity-100"
+				/>
+			</CardContent>
+		</div>
+	);
 }

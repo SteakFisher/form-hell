@@ -21,7 +21,7 @@ const NewFormPage = () => {
 				debounceRefs: debounceRefs,
 			}}
 		>
-			<div className="flex w-full justify-center">
+			<div className="flex w-full justify-center py-7">
 				<FormBuilder />
 			</div>
 			<Toolbar />

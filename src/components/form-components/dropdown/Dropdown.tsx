@@ -1,6 +1,16 @@
-import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -23,19 +33,10 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useDebouncedCallback } from "use-debounce";
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { CaretSortIcon } from "@radix-ui/react-icons";
+import { Input } from "@/components/ui/input";
 
-function Dropdown({
-	id,
-	props,
-}: {
-	id: number;
-	props: DropdownProps;
-}) {
+function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -43,7 +44,7 @@ function Dropdown({
 			coordinateGetter: sortableKeyboardCoordinates,
 		}),
 	);
-	
+
 	const [itemsState, setItemsState] = useState([...props.items]);
 	const [hasOther, setHasOther] = useState(false);
 
@@ -55,7 +56,11 @@ function Dropdown({
 	const nextId = useRef(1);
 
 	return (
-		<SortableItem id={id} props={props}>
+		<SortableItem
+			id={id}
+			props={props}
+			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
+		>
 			<CardContent>
 				<div>
 					<DndContext
@@ -69,9 +74,7 @@ function Dropdown({
 							strategy={verticalListSortingStrategy}
 						>
 							{itemsState.map((item, index) => {
-								return (
-									<DropdownItem props={item} key={item.id} />
-								);
+								return <DropdownItem props={item} key={item.id} />;
 							})}
 						</SortableContext>
 					</DndContext>
@@ -144,7 +147,7 @@ function Dropdown({
 
 	function handleDeleteClick(idToDelete: number) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
-		const item = props.items[itemIndex]
+		const item = props.items[itemIndex];
 		if (item.other) setHasOther(false);
 		props.items = [
 			...props.items.slice(0, itemIndex),
@@ -153,6 +156,41 @@ function Dropdown({
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 	}
+}
+
+function UnfocusedDropdown(props: DropdownProps) {
+	return (
+		<div className="h-min w-full whitespace-pre-wrap">
+			<CardHeader>
+				<CardTitle className="flex text-base">
+					<span>{props.title || "Title"}</span>
+					<span>
+						{props.required ? (
+							<sup className="ml-2 text-red-500">*</sup>
+						) : null}
+					</span>
+				</CardTitle>
+			</CardHeader>
+			<CardContent className="space-y-2">
+				{props.items.map((item, index) => {
+					return (
+						<div className="flex items-center" key={index + 1}>
+							{index + 1}.{" "}
+							{item.other ? (
+								<Input
+									className="disabled:cursor-default disabled:opacity-100"
+									placeholder="Other"
+									disabled
+								/>
+							) : (
+								item.value
+							)}
+						</div>
+					);
+				})}
+			</CardContent>
+		</div>
+	);
 }
 
 export default Dropdown;
