@@ -14,6 +14,7 @@ import {
 import {
 	CheckboxIcon,
 	DropdownMenuIcon,
+	SliderIcon,
 	TextIcon,
 } from "@radix-ui/react-icons";
 import Image from "next/image";
@@ -79,6 +80,17 @@ const Toolbar = () => {
 							<DropdownMenuIcon className="size-5" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onSelect={() => {
+							handleAddElement(typesEnum["range"]);
+						}}
+					>
+						Range
+						<DropdownMenuShortcut>
+							<SliderIcon className="size-5" />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ToolbarButton onBtnClick={handleSaveClick}>
@@ -101,17 +113,19 @@ const Toolbar = () => {
 
 	function returnTypeProps(type: typesEnum): propsTypes {
 		switch (type) {
+			case typesEnum["dropdown"]:
+				return { ...constants.defaultDropdownProps, items: new Array() };
 			case typesEnum["text-input"]:
 				return constants.defaultTextInputProps;
-			case typesEnum.title:
+			case typesEnum["title"]:
 				return constants.defaultTitleProps;
 			case typesEnum["multiple-choice"]:
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array(),
 				};
-			case typesEnum["dropdown"]:
-				return { ...constants.defaultDropdownProps, items: new Array() };
+			case typesEnum["range"]:
+				return constants.defaultRangeProps;
 		}
 	}
 
@@ -120,7 +134,7 @@ const Toolbar = () => {
 			ref.flush();
 		});
 
-		router.push(`../../new-form/save?formItems=${JSON.stringify(formItems)}`);
+		router.push("../../new-form/save");
 	}
 };
 

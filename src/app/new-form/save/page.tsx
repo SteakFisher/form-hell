@@ -1,23 +1,10 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import FormItem from "@/interfaces/FormItem";
-import { Suspense } from "react";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { useContext } from "react";
 
-export default function SavePageSuspense() {
-	return (
-		<Suspense>
-			<SavePage />
-		</Suspense>
-	);
-}
-
-function SavePage() {
-	const searchParams = useSearchParams();
-
-	const formItemsParam = searchParams.get("formItems");
-	if (!formItemsParam) return;
-	const formItems: FormItem[] = JSON.parse(formItemsParam);
+export default function SavePage() {
+	const { formItems } = useContext(FormBuilderContext);
 
 	return (
 		<div>

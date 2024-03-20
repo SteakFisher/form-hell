@@ -41,7 +41,7 @@ export function SortableItem({
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
-	
+
 	const style = {
 		transform: CSS.Translate.toString(transform),
 		transition,
@@ -85,12 +85,6 @@ export function SortableItem({
 		if (relatedTarget?.id === "drag-handle") return;
 		if (e.currentTarget.contains(e.relatedTarget)) return;
 
-		debounceRefs.get(`${id}:checkbox`)?.flush();
-		debounceRefs.get(`${id}:title`)?.flush();
-
-		debounceRefs.delete(`${id}:checkbox`);
-		debounceRefs.delete(`${id}:title`);
-
 		setIsFocused(false);
 	}
 
@@ -129,6 +123,14 @@ function FocusedSortableItem({
 		debounceRefs
 			.set(`${id}:checkbox`, handleCheckboxClick)
 			.set(`${id}:title`, handleTitleChange);
+
+		return () => {
+			for (const key of debounceRefs.keys()) {
+				if (key.startsWith(`${id}:`)) {
+					debounceRefs.get(key)?.flush();
+				}
+			}
+		};
 	}, []);
 
 	return (

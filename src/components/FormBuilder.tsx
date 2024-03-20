@@ -26,6 +26,7 @@ import { TextInput } from "@/components/form-components/TextInput";
 import Title from "@/components/form-components/Title";
 import Dropdown from "@/components/form-components/dropdown/Dropdown";
 import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
+import Range from "./form-components/Range";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -74,6 +75,15 @@ const FormBuilder = () => {
 								case "dropdown":
 									return (
 										<Dropdown
+											key={formItem.id}
+											props={formItem.props}
+											id={formItem.id}
+										/>
+									);
+								case "range":
+									console.log("rnage");
+									return (
+										<Range
 											key={formItem.id}
 											props={formItem.props}
 											id={formItem.id}

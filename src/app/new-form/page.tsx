@@ -8,24 +8,13 @@ import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
 
 const NewFormPage = () => {
-	const [formItems, setFormItems] = useState<FormItem[]>([
-		{ id: 0, props: constants.defaultTitleProps },
-	]);
-	let debounceRefs = new Map();
-
 	return (
-		<FormBuilderContext.Provider
-			value={{
-				formItems: formItems,
-				setFormItems: setFormItems,
-				debounceRefs: debounceRefs,
-			}}
-		>
-			<div className="flex w-full justify-center py-7">
+		<>
+			<div className="flex w-full justify-center">
 				<FormBuilder />
 			</div>
 			<Toolbar />
-		</FormBuilderContext.Provider>
+		</>
 	);
 };
 

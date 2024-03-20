@@ -1,3 +1,4 @@
+import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
 import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
@@ -39,9 +40,19 @@ const DropdownPropsObj: DropdownProps = {
 	type: "dropdown"
 }
 
+const RangePropsObj: RangeProps = {
+	min: "",
+	max: "",
+	step: "",
+	required: false,
+	title: "",
+	type: "range"
+}
+
 export const constants = Object.freeze({
 	defaultDropdownProps: DropdownPropsObj,
 	defaultMultipleChoiceProps: MultipleChoicePropsObj,
+	defaultRangeProps: RangePropsObj,
 	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
 	debounceWait: 500,

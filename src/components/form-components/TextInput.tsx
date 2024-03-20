@@ -1,6 +1,3 @@
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {
 	Accordion,
 	AccordionContent,
@@ -18,13 +15,15 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {
 	ChangeEvent,
-	forwardRef,
 	useContext,
 	useEffect,
 	useRef,
-	useState,
+	useState
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
