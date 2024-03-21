@@ -18,13 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
-import {
-	ChangeEvent,
-	useContext,
-	useEffect,
-	useRef,
-	useState
-} from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
 
@@ -36,7 +30,7 @@ export function TextInput({
 	props: TextInputProps;
 }) {
 	const emailRegex = /.+@.+/;
-	const numRegex = /^(0|[1-9]\d*)?$/;
+	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
 
@@ -102,7 +96,7 @@ export function TextInput({
 					<div className="flex items-center">
 						<Label htmlFor="inputType">Type</Label>
 						<Select
-							defaultValue="short-text"
+							defaultValue={props.inputType}
 							onValueChange={handleInputTypeChange}
 						>
 							<SelectTrigger className="ml-2 w-[180px]" id="inputType">
@@ -111,7 +105,7 @@ export function TextInput({
 							<SelectContent>
 								<SelectItem value="short-text">Short Text</SelectItem>
 								<SelectItem value="email">Email</SelectItem>
-								<SelectItem value="numeric">Numeric</SelectItem>
+								<SelectItem value="number">Number</SelectItem>
 								<SelectItem value="long-text">Long Text</SelectItem>
 							</SelectContent>
 						</Select>
@@ -152,6 +146,7 @@ export function TextInput({
 										<Label htmlFor="min-length">Min. Length</Label>
 									</div>
 									<Input
+										defaultValue={props.minLength}
 										className="ml-2 w-24"
 										id="min-length"
 										onChange={handleMinLengthChange}
@@ -163,6 +158,7 @@ export function TextInput({
 										<Label htmlFor="max-length">Max. Length</Label>
 									</div>
 									<Input
+										defaultValue={props.maxLength}
 										className="ml-2 w-24"
 										id="max-length"
 										onChange={handleMaxLengthChange}
@@ -246,9 +242,9 @@ export function TextInput({
 				props.inputType = "email";
 				setRegex(emailRegex.toString());
 				break;
-			case "numeric":
-				props.inputType = "numeric";
-				setRegex(numRegex.toString());
+			case "number":
+				props.inputType = "number";
+				setRegex(constants.intRegex.toString());
 				break;
 		}
 	}
@@ -281,10 +277,15 @@ export function TextInput({
 		const minNum = Number(minLength);
 		const maxNum = Number(maxLength);
 
-		if (maxLength !== "" && maxNum === 0 && maxNum === 0)
-			return "Both values cannot be zero";
-		if (!(minLength.match(numRegex) && maxLength.match(numRegex))) {
-			return "Both values must be positive integers or zero";
+		if (minLength.match(/^(0)*$/) && maxLength.match(/^(0)+$/))
+			return "Both min. length and max. length cannot be zero";
+		if (
+			!(
+				minLength.match(positiveNumRegex) &&
+				maxLength.match(positiveNumRegex)
+			)
+		) {
+			return "Min. length and max. length must be positive integers or zero";
 		}
 		if (minNum > 999999999 || maxNum > 999999999) {
 			return "Please enter a smaller number";

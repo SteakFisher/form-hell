@@ -81,7 +81,6 @@ const FormBuilder = () => {
 										/>
 									);
 								case "range":
-									console.log("rnage");
 									return (
 										<Range
 											key={formItem.id}

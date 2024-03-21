@@ -85,6 +85,12 @@ export function SortableItem({
 		if (relatedTarget?.id === "drag-handle") return;
 		if (e.currentTarget.contains(e.relatedTarget)) return;
 
+		for (const key of debounceRefs.keys()) {
+			if (key.startsWith(`${id}:`)) {
+				debounceRefs.get(key)?.flush();
+			}
+		}
+
 		setIsFocused(false);
 	}
 
@@ -123,14 +129,6 @@ function FocusedSortableItem({
 		debounceRefs
 			.set(`${id}:checkbox`, handleCheckboxClick)
 			.set(`${id}:title`, handleTitleChange);
-
-		return () => {
-			for (const key of debounceRefs.keys()) {
-				if (key.startsWith(`${id}:`)) {
-					debounceRefs.get(key)?.flush();
-				}
-			}
-		};
 	}, []);
 
 	return (

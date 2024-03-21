@@ -2,7 +2,7 @@ import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
 import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
-import { MultipleChoiceProps } from './interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps';
+import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 
 const TitlePropsObj: TitleProps = {
 	description: "",
@@ -22,23 +22,23 @@ const TextInputPropsObj: TextInputProps = {
 	regexMethod: "contains",
 	required: false,
 	title: "",
-	type: "text-input"
-}
+	type: "text-input",
+};
 
 const MultipleChoicePropsObj: MultipleChoiceProps = {
 	allowMultiple: false,
 	items: [],
 	required: false,
 	title: "",
-	type: "multiple-choice"
-}
+	type: "multiple-choice",
+};
 
 const DropdownPropsObj: DropdownProps = {
 	items: [],
 	required: false,
 	title: "",
-	type: "dropdown"
-}
+	type: "dropdown",
+};
 
 const RangePropsObj: RangeProps = {
 	min: "",
@@ -46,8 +46,8 @@ const RangePropsObj: RangeProps = {
 	step: "",
 	required: false,
 	title: "",
-	type: "range"
-}
+	type: "range",
+};
 
 export const constants = Object.freeze({
 	defaultDropdownProps: DropdownPropsObj,
@@ -56,4 +56,5 @@ export const constants = Object.freeze({
 	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
 	debounceWait: 500,
+	intRegex: /^(-)?((0+)|[1-9]\d*)?$/,
 });
