@@ -37,7 +37,7 @@ export function SortableItem({
 	props,
 	UnfocusedSortableItem,
 }: SortableItemProps) {
-	const { debounceRefs } = useContext(FormBuilderContext);
+	const { debounceRefs, focusedIndexRef } = useContext(FormBuilderContext);
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
@@ -95,6 +95,7 @@ export function SortableItem({
 	}
 
 	function handleOnFocus() {
+		focusedIndexRef.current = id;
 		setIsFocused(true);
 	}
 }

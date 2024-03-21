@@ -1,7 +1,10 @@
-import { ChangeEvent, ReactNode, createContext, useState } from "react";
-import FormItem from "../interfaces/FormItem";
+import {
+	ChangeEvent,
+	MutableRefObject,
+	createContext
+} from "react";
 import { DebouncedState } from "use-debounce";
-import { constants } from "@/constants";
+import FormItem from "../interfaces/FormItem";
 
 interface FormBuilderContextInterface {
 	formItems: FormItem[];
@@ -10,10 +13,12 @@ interface FormBuilderContextInterface {
 		string,
 		DebouncedState<(e: ChangeEvent<any> | React.MouseEvent<any>) => void>
 	>;
+	focusedIndexRef: MutableRefObject<Number>;
 }
 
 export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	formItems: [],
 	setFormItems: () => {},
 	debounceRefs: new Map(),
+	focusedIndexRef: { current: 0 },
 });

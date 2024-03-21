@@ -23,7 +23,7 @@ import { useContext, useRef } from "react";
 import ToolbarButton from "./ToolbarButton";
 
 const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs } =
+	const { formItems, setFormItems, debounceRefs, focusedIndexRef } =
 		useContext(FormBuilderContext);
 	let nextId = useRef(1);
 	const router = useRouter();
@@ -130,8 +130,12 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
-		debounceRefs.forEach((ref) => {
-			ref.flush();
+		let flag = false;
+		debounceRefs.forEach((ref, key) => {
+			if (key.startsWith(focusedIndexRef.current.toString())) {
+				ref.flush();
+				flag = true;
+			} else if (flag) return;
 		});
 
 		router.push("../../new-form/save");
