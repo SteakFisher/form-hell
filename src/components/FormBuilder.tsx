@@ -39,12 +39,13 @@ const FormBuilder = () => {
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<Card className="w-[800px] self-center">
-			{formItems[0].props.type == "title" && (
+		<Card className="w-[800px]">
+			{formItems[0].props.type === "title" && (
 				<Title key={formItems[0].id} props={formItems[0].props} />
 			)}
 			<CardContent ref={formBuilderRef}>
 				<DndContext
+				id={"sortable-items-dndcontext"}
 					sensors={sensors}
 					collisionDetection={closestCenter}
 					onDragEnd={handleDragEnd}

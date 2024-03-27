@@ -3,5 +3,4 @@ export interface MultipleChoiceItemProps {
 	other?: boolean;
 	parentId: number;
 	value?: string;
-	onDelete: (idToDelete: number) => void;
 }

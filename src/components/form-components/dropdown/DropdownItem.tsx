@@ -1,8 +1,8 @@
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownItemProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
@@ -10,8 +10,14 @@ import autosize from "autosize";
 import { ChangeEvent, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-function DropdownItem({ props }: { props: DropdownItemProps }) {
-	const textRef = useRef(null);
+function DropdownItem({
+	props,
+	onDelete,
+}: {
+	props: DropdownItemProps;
+	onDelete: (idToDelete: number) => void;
+}) {
+	const textRef = useRef<HTMLTextAreaElement>(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
@@ -51,15 +57,16 @@ function DropdownItem({ props }: { props: DropdownItemProps }) {
 					disabled={props.other}
 					defaultValue={props.value}
 					onChange={handleTextChange}
+					placeholder="Enter option value"
 					className="h-[32px] resize-none disabled:cursor-default"
-					maxLength={500}
+					maxLength={300}
 				/>
 				<Button
 					className="ml-2 size-9 px-3"
 					variant="ghost"
 					size="icon"
 					onClick={() => {
-						props.onDelete(props.id);
+						onDelete(props.id);
 					}}
 				>
 					<Cross1Icon />

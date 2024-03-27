@@ -3,5 +3,4 @@ export interface DropdownItemProps {
 	other?: true;
 	parentId: number;
 	value?: string;
-	onDelete: (idToDelete: number) => void;
 }

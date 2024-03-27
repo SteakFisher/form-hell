@@ -10,7 +10,7 @@ import FormItem from "@/interfaces/FormItem";
 const NewFormPage = () => {
 	return (
 		<>
-			<div className="flex w-full justify-center">
+			<div className="flex w-full justify-center py-8">
 				<FormBuilder />
 			</div>
 			<Toolbar />

@@ -26,9 +26,11 @@ import { Button } from "@/components/ui/button";
 function MultipleChoiceItem({
 	props,
 	isRadio,
+	onDelete,
 }: {
 	props: MultipleChoiceItemProps;
 	isRadio: boolean;
+	onDelete: (idToDelete: number) => void;
 }) {
 	const textRef = useRef(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
@@ -78,6 +80,7 @@ function MultipleChoiceItem({
 					disabled={props.other}
 					defaultValue={props.value}
 					onChange={handleTextChange}
+					placeholder="Enter option value"
 					className="h-[32px] resize-none disabled:cursor-default"
 					maxLength={500}
 				/>
@@ -90,7 +93,7 @@ function MultipleChoiceItem({
 						e.preventDefault();
 					}}
 					onClick={() => {
-						props.onDelete(props.id);
+						onDelete(props.id);
 					}}
 				>
 					<Cross1Icon />

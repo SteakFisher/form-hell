@@ -10,9 +10,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import {
+	memo,
 	ReactNode,
-	RefObject,
-	forwardRef,
 	useContext,
 	useEffect,
 	useRef,
@@ -20,9 +19,11 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
+import { cn } from "@/lib/utils";
 
 interface FocusedSortableItemProps {
 	children: ReactNode;
+	className?: string;
 	id: number;
 	props: propsTypes;
 }
@@ -56,14 +57,17 @@ export function SortableItem({
 			onBlur={handleOnBlur}
 			tabIndex={0}
 		>
-			<Card className="my-5 flex w-full select-none overflow-hidden pl-3 focus-visible:border-ring focus-visible:outline-none">
-				{isFocused ? (
-					<FocusedSortableItem id={id} props={props}>
-						{children}
-					</FocusedSortableItem>
-				) : (
+			<Card className="my-5 flex w-full select-none overflow-hidden pl-3 will-change-contents focus-visible:border-ring focus-visible:outline-none">
+				<FocusedSortableItem
+					id={id}
+					props={props}
+					className={isFocused ? "" : "hidden"}
+				>
+					{children}
+				</FocusedSortableItem>
+				<div className={cn("w-full", isFocused ? "hidden" : "")}>
 					<UnfocusedSortableItem />
-				)}
+				</div>
 				<div
 					id="drag-handle"
 					className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
@@ -100,8 +104,9 @@ export function SortableItem({
 	}
 }
 
-function FocusedSortableItem({
+const FocusedSortableItem = memo(function FocusedSortableItem({
 	children,
+	className,
 	id,
 	props,
 }: FocusedSortableItemProps) {
@@ -133,7 +138,7 @@ function FocusedSortableItem({
 	}, []);
 
 	return (
-		<div className="w-full">
+		<div className={cn("w-full", className)}>
 			<CardHeader>
 				<div className="flex justify-between">
 					<CardTitle>
@@ -178,4 +183,4 @@ function FocusedSortableItem({
 			...formItems.slice(itemIndex + 1),
 		]);
 	}
-}
+});

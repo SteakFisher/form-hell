@@ -53,7 +53,8 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 			if (item.other) setHasOther(true);
 		});
 	}, []);
-	const nextId = useRef(1);
+	const nextId = useRef(props.items.length + 1);
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<SortableItem
@@ -61,9 +62,10 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 			props={props}
 			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
 		>
-			<CardContent>
+			<CardContent ref={contentRef} tabIndex={-1}>
 				<div>
 					<DndContext
+						id={`${id}dropdown-context`}
 						sensors={sensors}
 						collisionDetection={closestCenter}
 						onDragEnd={handleDragEnd}
@@ -74,7 +76,13 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 							strategy={verticalListSortingStrategy}
 						>
 							{itemsState.map((item, index) => {
-								return <DropdownItem props={item} key={item.id} />;
+								return (
+									<DropdownItem
+										props={item}
+										key={item.id}
+										onDelete={handleDeleteClick}
+									/>
+								);
 							})}
 						</SortableContext>
 					</DndContext>
@@ -123,7 +131,6 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 			id: newItemId,
 			onDelete: handleDeleteClick,
 			parentId: id,
-			placeholder: "Enter option value",
 			value: "",
 		};
 		hasOther
@@ -137,7 +144,6 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 			parentId: id,
 			id: nextId.current,
 			other: true,
-			onDelete: handleDeleteClick,
 			value: "Other",
 		});
 		nextId.current++;
@@ -155,6 +161,8 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 		];
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
+
+		contentRef.current?.focus();
 	}
 }
 

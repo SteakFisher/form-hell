@@ -1,6 +1,11 @@
-import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -21,23 +26,9 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useDebouncedCallback } from "use-debounce";
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 
 function MultipleChoice({
 	id,
@@ -73,7 +64,8 @@ function MultipleChoice({
 		});
 		debounceRefs.set(`${id}:checkbox`, handleCheckboxClick);
 	}, []);
-	const nextId = useRef(1);
+	const nextId = useRef(props.items.length + 1);
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<SortableItem
@@ -81,7 +73,7 @@ function MultipleChoice({
 			props={props}
 			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
 		>
-			<CardContent>
+			<CardContent ref={contentRef} tabIndex={-1}>
 				<div className="mb-9 flex space-x-2">
 					<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 					<Checkbox
@@ -92,6 +84,7 @@ function MultipleChoice({
 				</div>
 				<div>
 					<DndContext
+					id={`${id}mutliple-choice-context`}
 						sensors={sensors}
 						collisionDetection={closestCenter}
 						onDragEnd={handleDragEnd}
@@ -104,9 +97,10 @@ function MultipleChoice({
 							{itemsState.map((item, index) => {
 								return (
 									<MultipleChoiceItem
-										props={item}
-										key={item.id}
 										isRadio={isRadio}
+										key={item.id}
+										onDelete={handleDeleteClick}
+										props={item}
 									/>
 								);
 							})}
@@ -155,9 +149,7 @@ function MultipleChoice({
 		nextId.current++;
 		const newItem = {
 			id: newItemId,
-			onDelete: handleDeleteClick,
 			parentId: id,
-			placeholder: "Enter option value",
 			value: "",
 		};
 		hasOther
@@ -170,7 +162,6 @@ function MultipleChoice({
 		props.items.push({
 			id: nextId.current,
 			other: true,
-			onDelete: handleDeleteClick,
 			parentId: id,
 			value: "Other",
 		});
@@ -189,6 +180,8 @@ function MultipleChoice({
 		];
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
+
+		contentRef.current?.focus();
 	}
 }
 

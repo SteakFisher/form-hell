@@ -25,7 +25,7 @@ import ToolbarButton from "./ToolbarButton";
 const Toolbar = () => {
 	const { formItems, setFormItems, debounceRefs, focusedIndexRef } =
 		useContext(FormBuilderContext);
-	let nextId = useRef(1);
+	let nextId = useRef(formItems.length);
 	const router = useRouter();
 
 	return (
