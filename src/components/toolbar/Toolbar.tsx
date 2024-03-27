@@ -138,6 +138,8 @@ const Toolbar = () => {
 			} else if (flag) return;
 		});
 
+		localStorage.setItem("formItems", JSON.stringify(formItems))
+
 		router.push("../../new-form/save");
 	}
 };
