@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { propsTypes } from "@/interfaces/propsTypes";
+import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
@@ -19,7 +20,6 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
-import { cn } from "@/lib/utils";
 
 interface FocusedSortableItemProps {
 	children: ReactNode;
@@ -58,16 +58,13 @@ export function SortableItem({
 			tabIndex={0}
 		>
 			<Card className="my-5 flex w-full select-none overflow-hidden pl-3 will-change-contents focus-visible:border-ring focus-visible:outline-none">
-				<FocusedSortableItem
-					id={id}
-					props={props}
-					className={isFocused ? "" : "hidden"}
-				>
-					{children}
-				</FocusedSortableItem>
-				<div className={cn("w-full", isFocused ? "hidden" : "")}>
+				{isFocused ? (
+					<FocusedSortableItem id={id} props={props}>
+						{children}
+					</FocusedSortableItem>
+				) : (
 					<UnfocusedSortableItem />
-				</div>
+				)}
 				<div
 					id="drag-handle"
 					className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
@@ -147,7 +144,7 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 							placeholder="Title"
 							defaultValue={props.title}
 							onChange={handleTitleChange}
-							className="h-[36px] w-[600px] resize-none font-normal"
+							className="h-[30px] w-[600px] resize-none text-base leading-snug tracking-tight"
 							maxLength={500}
 						/>
 					</CardTitle>

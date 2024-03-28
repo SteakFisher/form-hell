@@ -84,7 +84,7 @@ function MultipleChoice({
 				</div>
 				<div>
 					<DndContext
-					id={`${id}mutliple-choice-context`}
+						id={`${id}mutliple-choice-context`}
 						sensors={sensors}
 						collisionDetection={closestCenter}
 						onDragEnd={handleDragEnd}
@@ -187,9 +187,9 @@ function MultipleChoice({
 
 function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
+		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
-				<CardTitle className="flex text-base">
+			<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
 						{props.required ? (
@@ -198,7 +198,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-1">
+			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
 				{props.items.map((item, index) => {
 					return (
 						<div className="flex min-h-8 items-center" key={index}>

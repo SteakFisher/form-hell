@@ -130,7 +130,7 @@ function UnfocusedRange(props: RangeProps) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>
-				<CardTitle className="flex text-base">
+				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
 						{props.required ? (
@@ -141,7 +141,10 @@ function UnfocusedRange(props: RangeProps) {
 			</CardHeader>
 			<CardContent className="flex">
 				{props.min || 0}
-				<Slider className="mx-2" disabled />
+				<Slider
+					className="pointer-events-none mx-2"
+					disabled
+				/>
 				{props.max || 1}
 			</CardContent>
 		</div>

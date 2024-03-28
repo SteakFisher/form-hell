@@ -290,7 +290,7 @@ export function TextInput({
 		if (minNum > 999999999 || maxNum > 999999999) {
 			return "Please enter a smaller number";
 		}
-		if (maxNum < minNum && maxNum && minNum) {
+		if (maxNum < minNum && maxLength) {
 			return "Max. length must be greater than or equal to min. length";
 		}
 		return "";
@@ -301,7 +301,7 @@ function UnfocusedTextInput(props: TextInputProps) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>
-				<CardTitle className="flex text-base">
+			<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
 						{props.required ? (

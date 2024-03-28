@@ -168,9 +168,9 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 
 function UnfocusedDropdown(props: DropdownProps) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
+		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
-				<CardTitle className="flex text-base">
+				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
 						{props.required ? (
@@ -179,23 +179,23 @@ function UnfocusedDropdown(props: DropdownProps) {
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-2">
-				{props.items.map((item, index) => {
-					return (
-						<div className="flex items-center" key={index + 1}>
-							{index + 1}.{" "}
-							{item.other ? (
+			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
+				{props.items.map((item, index) => (
+					<div className="flex" key={index + 1}>
+						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
+						{item.other ? (
+							<div className="flex-1">
 								<Input
-									className="disabled:cursor-default disabled:opacity-100"
+									className="w-full disabled:cursor-default disabled:opacity-100"
 									placeholder="Other"
 									disabled
 								/>
-							) : (
-								item.value
-							)}
-						</div>
-					);
-				})}
+							</div>
+						) : (
+							<span className="flex-1">{item.value}</span>
+						)}
+					</div>
+				))}
 			</CardContent>
 		</div>
 	);
