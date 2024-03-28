@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { SortableItem } from "./SortableItem";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -7,8 +7,21 @@ import { Input } from "../ui/input";
 import { Slider } from "../ui/slider";
 import { constants } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
 function Range({ id, props }: { id: number; props: RangeProps }) {
+	return (
+		<SortableItem
+			id={id}
+			props={props}
+			FocusedSortableItemChild={() => FocusedRange(props, id)}
+			UnfocusedSortableItem={() => UnfocusedRange(props)}
+		/>
+	);
+}
+
+function FocusedRange(props: RangeProps, id: number) {
+	const {debounceRefs} = useContext(FormBuilderContext);
 	const rangeRef = useRef({
 		min: props.min,
 		max: props.max,
@@ -45,54 +58,54 @@ function Range({ id, props }: { id: number; props: RangeProps }) {
 		constants.debounceWait,
 	);
 
+	useEffect(()=>{
+		debounceRefs.set(`${id}max`, handleMaxChange)
+		.set(`${id}min`, handleMinChange)
+		.set(`${id}step`, handleStepChange)
+	})
+
 	return (
-		<SortableItem
-			UnfocusedSortableItem={() => UnfocusedRange(props)}
-			id={id}
-			props={props}
-		>
-			<CardContent className="w-full justify-center">
-				<div className="mt-3 flex w-min space-x-6 ">
-					<div className="flex">
-						<div className="flex h-9 items-center">
-							<Label htmlFor="min">Min.</Label>
-						</div>
-						<Input
-							defaultValue={props.min}
-							className="ml-2 w-24"
-							id="min"
-							onChange={handleMinChange}
-							placeholder="0"
-						/>
+		<CardContent className="w-full justify-center">
+			<div className="mt-3 flex w-min space-x-6 ">
+				<div className="flex">
+					<div className="flex h-9 items-center">
+						<Label htmlFor="min">Min.</Label>
 					</div>
-					<div className="flex">
-						<div className="flex h-9 items-center">
-							<Label htmlFor="max">Max.</Label>
-						</div>
-						<Input
-							defaultValue={props.max}
-							className="ml-2 w-24"
-							id="max"
-							onChange={handleMaxChange}
-							placeholder="1"
-						/>
-					</div>
-					<div className="flex">
-						<div className="flex h-9 items-center">
-							<Label htmlFor="step">Step</Label>
-						</div>
-						<Input
-							defaultValue={props.step}
-							className="ml-2 w-24"
-							id="step"
-							onChange={handleStepChange}
-							placeholder="1"
-						/>
-					</div>
+					<Input
+						defaultValue={props.min}
+						className="ml-2 w-24"
+						id="min"
+						onChange={handleMinChange}
+						placeholder="0"
+					/>
 				</div>
-				{rangeError && <div className="error">{rangeError}</div>}
-			</CardContent>
-		</SortableItem>
+				<div className="flex">
+					<div className="flex h-9 items-center">
+						<Label htmlFor="max">Max.</Label>
+					</div>
+					<Input
+						defaultValue={props.max}
+						className="ml-2 w-24"
+						id="max"
+						onChange={handleMaxChange}
+						placeholder="1"
+					/>
+				</div>
+				<div className="flex">
+					<div className="flex h-9 items-center">
+						<Label htmlFor="step">Step</Label>
+					</div>
+					<Input
+						defaultValue={props.step}
+						className="ml-2 w-24"
+						id="step"
+						onChange={handleStepChange}
+						placeholder="1"
+					/>
+				</div>
+			</div>
+			{rangeError && <div className="error">{rangeError}</div>}
+		</CardContent>
 	);
 
 	function validateRange() {
@@ -133,18 +146,13 @@ function UnfocusedRange(props: RangeProps) {
 				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
-						{props.required ? (
-							<sup className="ml-2 text-red-500">*</sup>
-						) : null}
+						{props.required && <sup className="ml-2 text-red-500">*</sup>}
 					</span>
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="flex">
 				{props.min || 0}
-				<Slider
-					className="pointer-events-none mx-2"
-					disabled
-				/>
+				<Slider className="pointer-events-none mx-2" disabled />
 				{props.max || 1}
 			</CardContent>
 		</div>

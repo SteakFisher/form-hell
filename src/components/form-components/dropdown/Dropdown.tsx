@@ -37,6 +37,17 @@ import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 
 function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
+	return (
+		<SortableItem
+			id={id}
+			props={props}
+			FocusedSortableItemChild={() => FocusedDropdown(props, id)}
+			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
+		/>
+	);
+}
+
+function FocusedDropdown(props: DropdownProps, id: number) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -46,68 +57,46 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 	);
 
 	const [itemsState, setItemsState] = useState([...props.items]);
-	const [hasOther, setHasOther] = useState(false);
 
-	useEffect(() => {
-		props.items.forEach((item) => {
-			if (item.other) setHasOther(true);
-		});
-	}, []);
 	const nextId = useRef(props.items.length + 1);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
-		>
-			<CardContent ref={contentRef} tabIndex={-1}>
-				<div>
-					<DndContext
-						id={`${id}dropdown-context`}
-						sensors={sensors}
-						collisionDetection={closestCenter}
-						onDragEnd={handleDragEnd}
-						modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+		<CardContent ref={contentRef} tabIndex={-1}>
+			<div>
+				<DndContext
+					id={`${id}dropdown-context`}
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={handleDragEnd}
+					modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+				>
+					<SortableContext
+						items={itemsState}
+						strategy={verticalListSortingStrategy}
 					>
-						<SortableContext
-							items={itemsState}
-							strategy={verticalListSortingStrategy}
-						>
-							{itemsState.map((item, index) => {
-								return (
-									<DropdownItem
-										props={item}
-										key={item.id}
-										onDelete={handleDeleteClick}
-									/>
-								);
-							})}
-						</SortableContext>
-					</DndContext>
-				</div>
-				<div className="flex items-center">
-					<Button
-						onClick={handleAddItemClick}
-						variant={"ghost"}
-						className="px-2"
-					>
-						{`Add Item`}
-					</Button>
-					{!hasOther && (
-						<>
-							<span className="px-1 text-sm font-medium">or</span>
-							<Button
-								variant={"ghost"}
-								className="px-2"
-								onClick={handleAddOtherClick}
-							>{`Add "Other"`}</Button>
-						</>
-					)}
-				</div>
-			</CardContent>
-		</SortableItem>
+						{itemsState.map((item, index) => {
+							return (
+								<DropdownItem
+									props={item}
+									key={item.id}
+									onDelete={handleDeleteClick}
+								/>
+							);
+						})}
+					</SortableContext>
+				</DndContext>
+			</div>
+			<div className="flex items-center">
+				<Button
+					onClick={handleAddItemClick}
+					variant={"ghost"}
+					className="px-2"
+				>
+					{`Add Item`}
+				</Button>
+			</div>
+		</CardContent>
 	);
 
 	function handleDragEnd(event: DragEndEvent) {
@@ -129,32 +118,16 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 		nextId.current++;
 		const newItem = {
 			id: newItemId,
-			onDelete: handleDeleteClick,
 			parentId: id,
 			value: "",
 		};
-		hasOther
-			? props.items.splice(props.items.length - 1, 0, newItem)
-			: props.items.push(newItem);
-		setItemsState([...props.items]);
-	}
-
-	function handleAddOtherClick() {
-		props.items.push({
-			parentId: id,
-			id: nextId.current,
-			other: true,
-			value: "Other",
-		});
-		nextId.current++;
-		setHasOther(true);
+		props.items.push(newItem);
 		setItemsState([...props.items]);
 	}
 
 	function handleDeleteClick(idToDelete: number) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
 		const item = props.items[itemIndex];
-		if (item.other) setHasOther(false);
 		props.items = [
 			...props.items.slice(0, itemIndex),
 			...props.items.slice(itemIndex + 1),
@@ -173,27 +146,16 @@ function UnfocusedDropdown(props: DropdownProps) {
 				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
-						{props.required ? (
-							<sup className="ml-2 text-red-500">*</sup>
-						) : null}
+						{props.required && <sup className="ml-2 text-red-500">*</sup>}
 					</span>
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
 				{props.items.map((item, index) => (
 					<div className="flex" key={index + 1}>
-						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
-						{item.other ? (
-							<div className="flex-1">
-								<Input
-									className="w-full disabled:cursor-default disabled:opacity-100"
-									placeholder="Other"
-									disabled
-								/>
-							</div>
-						) : (
-							<span className="flex-1">{item.value}</span>
-						)}
+						<span className="mr-1">
+							{index + 1}. {item.value}
+						</span>
 					</div>
 				))}
 			</CardContent>

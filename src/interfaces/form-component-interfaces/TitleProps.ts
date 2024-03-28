@@ -3,5 +3,4 @@ export default interface TitleProps {
 	required: boolean;
 	title: string;
 	type: "title";
-	isValid: boolean;
 }

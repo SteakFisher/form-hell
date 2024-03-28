@@ -29,6 +29,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
+import { Textarea } from "@/components/ui/textarea";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 function MultipleChoice({
 	id,
@@ -37,6 +39,28 @@ function MultipleChoice({
 	id: number;
 	props: MultipleChoiceProps;
 }) {
+	const [isRadio, _setIsRadio] = useState(!props.allowMultiple);
+
+	const setIsRadio = (value: boolean) => _setIsRadio(value);
+
+	return (
+		<SortableItem
+			id={id}
+			props={props}
+			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
+			FocusedSortableItemChild={() =>
+				FocusedMultipleChoice(id, isRadio, props, setIsRadio)
+			}
+		/>
+	);
+}
+
+function FocusedMultipleChoice(
+	id: number,
+	isRadio: boolean,
+	props: MultipleChoiceProps,
+	setIsRadio: (value: boolean) => void,
+) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -45,89 +69,88 @@ function MultipleChoice({
 		}),
 	);
 
-	const [hasOther, setHasOther] = useState(false);
+	const [hasOther, setHasOther] = useState(props.hasOther);
 	const [itemsState, setItemsState] = useState([...props.items]);
-	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
 
-	const handleCheckboxClick = useDebouncedCallback(
-		(e: React.MouseEvent<HTMLButtonElement>) => {
-			const target = e.target as HTMLButtonElement;
-			props.allowMultiple = target.ariaChecked === "true" ? true : false;
-			setIsRadio(!props.allowMultiple);
+	const handleAllowMultipleClick = useDebouncedCallback(
+		(isChecked: boolean) => {
+			props.allowMultiple = isChecked;
+			setIsRadio(!isChecked);
 		},
 		constants.debounceWait,
 	);
 
 	useEffect(() => {
-		props.items.forEach((item) => {
-			if (item.other) setHasOther(true);
-		});
-		debounceRefs.set(`${id}:checkbox`, handleCheckboxClick);
+		debounceRefs.set(`${id}:allow-multiple`, handleAllowMultipleClick);
 	}, []);
+	useEffect(() => {
+		contentRef.current?.focus();
+	}, [isRadio]);
+
 	const nextId = useRef(props.items.length + 1);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
-		>
-			<CardContent ref={contentRef} tabIndex={-1}>
-				<div className="mb-9 flex space-x-2">
-					<Label htmlFor="allow-multiple">Allow multiple selection</Label>
-					<Checkbox
-						id="allow-multiple"
-						defaultChecked={props.allowMultiple}
-						onClick={handleCheckboxClick}
+		<CardContent ref={contentRef} tabIndex={-1}>
+			<div className="mb-9 flex space-x-2">
+				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
+				<Checkbox
+					id="allow-multiple"
+					defaultChecked={props.allowMultiple}
+					onCheckedChange={handleAllowMultipleClick}
+				/>
+			</div>
+			<div>
+				<DndContext
+					id={`${id}mutliple-choice-context`}
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={handleDragEnd}
+					modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+				>
+					<SortableContext
+						items={itemsState}
+						strategy={verticalListSortingStrategy}
+					>
+						{itemsState.map((item, index) => {
+							return (
+								<MultipleChoiceItem
+									isRadio={isRadio}
+									key={item.id}
+									onDelete={handleDeleteClick}
+									props={item}
+								/>
+							);
+						})}
+					</SortableContext>
+				</DndContext>
+				{hasOther && (
+					<MultipleChoiceOtherItem
+						isRadio={isRadio}
+						onDelete={handleDeleteOtherClick}
 					/>
-				</div>
-				<div>
-					<DndContext
-						id={`${id}mutliple-choice-context`}
-						sensors={sensors}
-						collisionDetection={closestCenter}
-						onDragEnd={handleDragEnd}
-						modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-					>
-						<SortableContext
-							items={itemsState}
-							strategy={verticalListSortingStrategy}
-						>
-							{itemsState.map((item, index) => {
-								return (
-									<MultipleChoiceItem
-										isRadio={isRadio}
-										key={item.id}
-										onDelete={handleDeleteClick}
-										props={item}
-									/>
-								);
-							})}
-						</SortableContext>
-					</DndContext>
-				</div>
-				<div className="flex items-center">
-					<Button
-						onClick={handleAddItemClick}
-						variant={"ghost"}
-						className="px-2"
-					>
-						{`Add Item`}
-					</Button>
-					{!hasOther && (
-						<>
-							<span className="px-1 text-sm font-medium">or</span>
-							<Button
-								variant={"ghost"}
-								className="px-2"
-								onClick={handleAddOtherClick}
-							>{`Add "Other"`}</Button>
-						</>
-					)}
-				</div>
-			</CardContent>
-		</SortableItem>
+				)}
+			</div>
+			<div className="flex items-center">
+				<Button
+					onClick={handleAddItemClick}
+					variant={"ghost"}
+					className="px-2"
+				>
+					{`Add Item`}
+				</Button>
+				{!hasOther && (
+					<>
+						<span className="px-1 text-sm font-medium">or</span>
+						<Button
+							variant={"ghost"}
+							className="px-2"
+							onClick={handleAddOtherClick}
+						>{`Add "Other"`}</Button>
+					</>
+				)}
+			</div>
+		</CardContent>
 	);
 
 	function handleDragEnd(event: DragEndEvent) {
@@ -152,28 +175,19 @@ function MultipleChoice({
 			parentId: id,
 			value: "",
 		};
-		hasOther
-			? props.items.splice(props.items.length - 1, 0, newItem)
-			: props.items.push(newItem);
+		props.items.push(newItem);
 		setItemsState([...props.items]);
 	}
 
 	function handleAddOtherClick() {
-		props.items.push({
-			id: nextId.current,
-			other: true,
-			parentId: id,
-			value: "Other",
-		});
-		nextId.current++;
+		props.hasOther = true;
 		setHasOther(true);
-		setItemsState([...props.items]);
+		contentRef.current?.focus();
 	}
 
 	function handleDeleteClick(idToDelete: number) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
 		const item = props.items[itemIndex];
-		if (item.other) setHasOther(false);
 		props.items = [
 			...props.items.slice(0, itemIndex),
 			...props.items.slice(itemIndex + 1),
@@ -183,22 +197,65 @@ function MultipleChoice({
 
 		contentRef.current?.focus();
 	}
+
+	function handleDeleteOtherClick() {
+		props.hasOther = false;
+		setHasOther(false);
+
+		contentRef.current?.focus();
+	}
+}
+
+function MultipleChoiceOtherItem({
+	isRadio,
+	onDelete,
+}: {
+	isRadio: boolean;
+	onDelete: () => void;
+}) {
+	return (
+		<div className="mb-3 flex items-center">
+			{isRadio ? (
+				<div className="ml-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+			) : (
+				<Checkbox
+					disabled
+					className="ml-2 disabled:cursor-default disabled:opacity-100"
+				/>
+			)}
+			<div className="ml-2 flex size-full items-center justify-between">
+				<Textarea
+					disabled={true}
+					value="Other"
+					className="h-[36px] resize-none disabled:cursor-default"
+				/>
+				<Button
+					className="ml-2 size-9 px-3"
+					variant="ghost"
+					size="icon"
+					onClick={() => {
+						onDelete();
+					}}
+				>
+					<Cross1Icon />
+				</Button>
+			</div>
+		</div>
+	);
 }
 
 function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
-			<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
+				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
-						{props.required ? (
-							<sup className="ml-2 text-red-500">*</sup>
-						) : null}
+						{props.required && <sup className="ml-2 text-red-500">*</sup>}
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
+			<CardContent className="space-y-4 [overflow-wrap:anywhere]">
 				{props.items.map((item, index) => {
 					return (
 						<div className="flex min-h-8 items-center" key={index}>
@@ -210,18 +267,27 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 									className="mr-2 disabled:cursor-default disabled:opacity-100"
 								/>
 							)}
-							{item.other ? (
-								<Input
-									className="disabled:cursor-default disabled:opacity-100"
-									placeholder="Other"
-									disabled
-								/>
-							) : (
-								item.value
-							)}
+							{item.value}
 						</div>
 					);
 				})}
+				{props.hasOther && (
+					<div className="flex min-h-8 items-center">
+						{isRadio ? (
+							<div className="mr-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+						) : (
+							<Checkbox
+								disabled
+								className="mr-2 disabled:cursor-default disabled:opacity-100"
+							/>
+						)}
+						<Input
+							className="disabled:cursor-default disabled:opacity-100"
+							placeholder="Other"
+							disabled
+						/>
+					</div>
+				)}
 			</CardContent>
 		</div>
 	);

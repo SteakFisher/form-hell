@@ -11,7 +11,7 @@ interface FormBuilderContextInterface {
 	setFormItems: (formItems: FormItem[]) => void;
 	debounceRefs: Map<
 		string,
-		DebouncedState<(e: ChangeEvent<any> | React.MouseEvent<any>) => void>
+		DebouncedState<() => void>
 	>;
 	focusedIndexRef: MutableRefObject<Number>;
 }

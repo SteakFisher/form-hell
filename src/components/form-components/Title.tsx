@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 const Title = ({ props }: { props: TitleProps }) => {
-	const { debounceRefs } = useContext(FormBuilderContext);
+	const { debounceRefs, focusedIndexRef } = useContext(FormBuilderContext);
 
 	const descriptionRef = useRef(null);
 	const formTitleRef = useRef(null);
@@ -34,12 +34,16 @@ const Title = ({ props }: { props: TitleProps }) => {
 		autosize(formTitleRef.current);
 
 		debounceRefs
-			.set(`0description`, handleDescriptionChange)
-			.set(`0title`, handleTitleChange);
+			.set(`0:description`, handleDescriptionChange)
+			.set(`0:title`, handleTitleChange);
 	}, []);
 
 	return (
-		<CardHeader className="mx-6 border-b px-0">
+		<CardHeader
+			className="mx-6 border-b px-0"
+			tabIndex={-1}
+			onFocus={() => (focusedIndexRef.current = 0)}
+		>
 			<Textarea
 				ref={formTitleRef}
 				placeholder="Form Title"

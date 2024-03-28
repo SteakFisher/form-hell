@@ -27,6 +27,7 @@ import Title from "@/components/form-components/Title";
 import Dropdown from "@/components/form-components/dropdown/Dropdown";
 import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
 import Range from "./form-components/Range";
+import MultipleChoiceGrid from "./form-components/MultipleChoiceGrid";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -45,7 +46,7 @@ const FormBuilder = () => {
 			)}
 			<CardContent ref={formBuilderRef}>
 				<DndContext
-				id={"sortable-items-dndcontext"}
+					id={"sortable-items-dndcontext"}
 					sensors={sensors}
 					collisionDetection={closestCenter}
 					onDragEnd={handleDragEnd}
@@ -57,9 +58,9 @@ const FormBuilder = () => {
 					>
 						{formItems.map((formItem) => {
 							switch (formItem.props.type) {
-								case "text-input":
+								case "dropdown":
 									return (
-										<TextInput
+										<Dropdown
 											key={formItem.id}
 											props={formItem.props}
 											id={formItem.id}
@@ -73,9 +74,9 @@ const FormBuilder = () => {
 											id={formItem.id}
 										/>
 									);
-								case "dropdown":
+								case "multiple-choice-grid":
 									return (
-										<Dropdown
+										<MultipleChoiceGrid
 											key={formItem.id}
 											props={formItem.props}
 											id={formItem.id}
@@ -84,6 +85,14 @@ const FormBuilder = () => {
 								case "range":
 									return (
 										<Range
+											key={formItem.id}
+											props={formItem.props}
+											id={formItem.id}
+										/>
+									);
+								case "text-input":
+									return (
+										<TextInput
 											key={formItem.id}
 											props={formItem.props}
 											id={formItem.id}

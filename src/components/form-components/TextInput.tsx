@@ -29,6 +29,18 @@ export function TextInput({
 	id: number;
 	props: TextInputProps;
 }) {
+	return (
+		<SortableItem
+			id={id}
+			props={props}
+			key={id}
+			UnfocusedSortableItem={() => UnfocusedTextInput(props)}
+			FocusedSortableItemChild={() => FocusedTextInput(props, id)}
+		/>
+	);
+}
+
+function FocusedTextInput(props: TextInputProps, id: number) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
 
@@ -85,143 +97,136 @@ export function TextInput({
 	}, []);
 
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			key={id}
-			UnfocusedSortableItem={() => UnfocusedTextInput(props)}
-		>
-			<CardContent>
-				<div className="flex space-x-4">
-					<div className="flex items-center">
-						<Label htmlFor="inputType">Type</Label>
-						<Select
-							defaultValue={props.inputType}
-							onValueChange={handleInputTypeChange}
-						>
-							<SelectTrigger className="ml-2 w-[180px]" id="inputType">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="short-text">Short Text</SelectItem>
-								<SelectItem value="email">Email</SelectItem>
-								<SelectItem value="number">Number</SelectItem>
-								<SelectItem value="long-text">Long Text</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="flex items-center">
-						<Label htmlFor="placeholder">Placeholder</Label>
-						<Input
-							type="text"
-							defaultValue={props.placeholder}
-							id="placeholder"
-							className="ml-2 w-72"
-							maxLength={50}
-							onChange={handlePlaceholderChange}
-						/>
-					</div>
+		<CardContent>
+			<div className="flex space-x-4">
+				<div className="flex items-center">
+					<Label htmlFor="inputType">Type</Label>
+					<Select
+						defaultValue={props.inputType}
+						onValueChange={handleInputTypeChange}
+					>
+						<SelectTrigger className="ml-2 w-[180px]" id="inputType">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="short-text">Short Text</SelectItem>
+							<SelectItem value="email">Email</SelectItem>
+							<SelectItem value="number">Number</SelectItem>
+							<SelectItem value="long-text">Long Text</SelectItem>
+						</SelectContent>
+					</Select>
 				</div>
-				<Accordion
-					type="single"
-					collapsible
-					value={accordionItem}
-					onValueChange={handleAccordionToggle}
-				>
-					<AccordionItem value="item-1" className="border-b-0">
-						{/* extra div for straight border-b */}
-						<AccordionTrigger className="custom-focus mt-2 rounded-sm px-1 hover:no-underline">
-							Advanced
-						</AccordionTrigger>
-						<Separator />
+				<div className="flex items-center">
+					<Label htmlFor="placeholder">Placeholder</Label>
+					<Input
+						type="text"
+						defaultValue={props.placeholder}
+						id="placeholder"
+						className="ml-2 w-72"
+						maxLength={50}
+						onChange={handlePlaceholderChange}
+					/>
+				</div>
+			</div>
+			<Accordion
+				type="single"
+				collapsible
+				value={accordionItem}
+				onValueChange={handleAccordionToggle}
+			>
+				<AccordionItem value="item-1" className="border-b-0">
+					{/* extra div for straight border-b */}
+					<AccordionTrigger className="custom-focus mt-2 rounded-sm px-1 hover:no-underline">
+						Advanced
+					</AccordionTrigger>
+					<Separator />
 
-						<AccordionContent className="mt-5 px-[1px]">
-							<div className="text-base font-semibold">
-								<u>Length</u>
-							</div>
+					<AccordionContent className="mt-5 px-[1px]">
+						<div className="text-base font-semibold">
+							<u>Length</u>
+						</div>
 
-							<div className="mt-3 flex w-full space-x-6">
-								<div className="flex">
-									<div className="flex h-9 items-center">
-										<Label htmlFor="min-length">Min. Length</Label>
-									</div>
-									<Input
-										defaultValue={props.minLength}
-										className="ml-2 w-24"
-										id="min-length"
-										onChange={handleMinLengthChange}
-										placeholder="0"
-									/>
+						<div className="mt-3 flex w-full space-x-6">
+							<div className="flex">
+								<div className="flex h-9 items-center">
+									<Label htmlFor="min-length">Min. Length</Label>
 								</div>
-								<div className="flex">
-									<div className="flex h-9 items-center">
-										<Label htmlFor="max-length">Max. Length</Label>
-									</div>
-									<Input
-										defaultValue={props.maxLength}
-										className="ml-2 w-24"
-										id="max-length"
-										onChange={handleMaxLengthChange}
-									/>
+								<Input
+									defaultValue={props.minLength}
+									className="ml-2 w-24"
+									id="min-length"
+									onChange={handleMinLengthChange}
+									placeholder="0"
+								/>
+							</div>
+							<div className="flex">
+								<div className="flex h-9 items-center">
+									<Label htmlFor="max-length">Max. Length</Label>
 								</div>
-								<Select
-									defaultValue={props.lengthType}
-									onValueChange={handleLengthTypeChange}
-								>
-									<SelectTrigger className="w-36">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="characters">
-											Characters
-										</SelectItem>
-										<SelectItem value="words">Words</SelectItem>
-									</SelectContent>
-								</Select>
+								<Input
+									defaultValue={props.maxLength}
+									className="ml-2 w-24"
+									id="max-length"
+									onChange={handleMaxLengthChange}
+								/>
 							</div>
-							{lengthError && <div className="error">{lengthError}</div>}
+							<Select
+								defaultValue={props.lengthType}
+								onValueChange={handleLengthTypeChange}
+							>
+								<SelectTrigger className="w-36">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="characters">
+										Characters
+									</SelectItem>
+									<SelectItem value="words">Words</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						{lengthError && <div className="error">{lengthError}</div>}
 
-							<div className="mt-5 text-base font-semibold">
-								<u>Regex</u>
-							</div>
-							<div className="mt-4 flex items-center space-x-6">
-								<Select
-									defaultValue={props.regexMethod}
-									onValueChange={handleRegexMethodChange}
-								>
-									<SelectTrigger className="w-36">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="contains">Contains</SelectItem>
-										<SelectItem value="doesnt-contain">
-											{"Doesn't contain"}
-										</SelectItem>
-										<SelectItem value="matches">Matches</SelectItem>
-										<SelectItem value="doesnt-match">
-											{"Doesn't match"}
-										</SelectItem>
-									</SelectContent>
-								</Select>
+						<div className="mt-5 text-base font-semibold">
+							<u>Regex</u>
+						</div>
+						<div className="mt-4 flex items-center space-x-6">
+							<Select
+								defaultValue={props.regexMethod}
+								onValueChange={handleRegexMethodChange}
+							>
+								<SelectTrigger className="w-36">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="contains">Contains</SelectItem>
+									<SelectItem value="doesnt-contain">
+										{"Doesn't contain"}
+									</SelectItem>
+									<SelectItem value="matches">Matches</SelectItem>
+									<SelectItem value="doesnt-match">
+										{"Doesn't match"}
+									</SelectItem>
+								</SelectContent>
+							</Select>
 
-								<div className="flex items-center">
-									<Label htmlFor="regex">Regex pattern</Label>
-									<Input
-										className="ml-2 w-56"
-										id="regex"
-										ref={regexRef}
-										defaultValue={props.regex}
-										onChange={handleRegexChange}
-										maxLength={1000}
-									/>
-								</div>
+							<div className="flex items-center">
+								<Label htmlFor="regex">Regex pattern</Label>
+								<Input
+									className="ml-2 w-56"
+									id="regex"
+									ref={regexRef}
+									defaultValue={props.regex}
+									onChange={handleRegexChange}
+									maxLength={1000}
+								/>
 							</div>
-							{regexError && <div className="error">{regexError}</div>}
-						</AccordionContent>
-					</AccordionItem>
-				</Accordion>
-			</CardContent>
-		</SortableItem>
+						</div>
+						{regexError && <div className="error">{regexError}</div>}
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+		</CardContent>
 	);
 
 	function handleAccordionToggle() {
@@ -301,12 +306,10 @@ function UnfocusedTextInput(props: TextInputProps) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>
-			<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
+				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
 					<span>{props.title || "Title"}</span>
 					<span>
-						{props.required ? (
-							<sup className="ml-2 text-red-500">*</sup>
-						) : null}
+						{props.required && <sup className="ml-2 text-red-500">*</sup>}
 					</span>
 				</CardTitle>
 			</CardHeader>

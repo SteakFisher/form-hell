@@ -22,8 +22,8 @@ import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
 
 interface FocusedSortableItemProps {
-	children: ReactNode;
 	className?: string;
+	FocusedSortableItemChild: () => ReactNode;
 	id: number;
 	props: propsTypes;
 }
@@ -33,7 +33,7 @@ interface SortableItemProps extends FocusedSortableItemProps {
 }
 
 export function SortableItem({
-	children,
+	FocusedSortableItemChild,
 	id,
 	props,
 	UnfocusedSortableItem,
@@ -59,9 +59,11 @@ export function SortableItem({
 		>
 			<Card className="my-5 flex w-full select-none overflow-hidden pl-3 will-change-contents focus-visible:border-ring focus-visible:outline-none">
 				{isFocused ? (
-					<FocusedSortableItem id={id} props={props}>
-						{children}
-					</FocusedSortableItem>
+					<FocusedSortableItem
+						id={id}
+						props={props}
+						FocusedSortableItemChild={FocusedSortableItemChild}
+					/>
 				) : (
 					<UnfocusedSortableItem />
 				)}
@@ -88,6 +90,7 @@ export function SortableItem({
 
 		for (const key of debounceRefs.keys()) {
 			if (key.startsWith(`${id}:`)) {
+				console.log(key);
 				debounceRefs.get(key)?.flush();
 			}
 		}
@@ -102,7 +105,7 @@ export function SortableItem({
 }
 
 const FocusedSortableItem = memo(function FocusedSortableItem({
-	children,
+	FocusedSortableItemChild,
 	className,
 	id,
 	props,
@@ -111,10 +114,9 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 	const { formItems, setFormItems, debounceRefs } =
 		useContext(FormBuilderContext);
 
-	const handleCheckboxClick = useDebouncedCallback(
-		(e: React.MouseEvent<HTMLButtonElement>) => {
-			const target = e.target as HTMLButtonElement;
-			props.required = target.ariaChecked === "true" ? true : false;
+	const handleRequiredChange = useDebouncedCallback(
+		(isChecked: boolean) => {
+			props.required = isChecked;
 		},
 		constants.debounceWait,
 	);
@@ -130,7 +132,7 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 		autosize(titleRef.current);
 
 		debounceRefs
-			.set(`${id}:checkbox`, handleCheckboxClick)
+			.set(`${id}:required`, handleRequiredChange)
 			.set(`${id}:title`, handleTitleChange);
 	}, []);
 
@@ -160,12 +162,12 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 					<Label htmlFor="required">Required</Label>
 					<Checkbox
 						id="required"
-						onClick={handleCheckboxClick}
+						onCheckedChange={handleRequiredChange}
 						defaultChecked={props.required}
 					/>
 				</div>
 			</CardHeader>
-			{children}
+			<FocusedSortableItemChild />
 		</div>
 	);
 

@@ -61,11 +61,9 @@ function MultipleChoiceItem({
 			id={props.id.toString()}
 			className="mb-3 flex items-center"
 		>
-			{props.other || (
-				<div className="custom-focus" {...attributes} {...listeners}>
-					<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
-				</div>
-			)}
+			<div className="custom-focus" {...attributes} {...listeners}>
+				<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
+			</div>
 			{isRadio ? (
 				<div className="ml-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
 			) : (
@@ -77,7 +75,6 @@ function MultipleChoiceItem({
 			<div className="ml-2 flex size-full items-center justify-between">
 				<Textarea
 					ref={textRef}
-					disabled={props.other}
 					defaultValue={props.value}
 					onChange={handleTextChange}
 					placeholder="Enter option value"
@@ -88,10 +85,6 @@ function MultipleChoiceItem({
 					className="ml-2 size-9 px-3"
 					variant="ghost"
 					size="icon"
-					onMouseDown={(e) => {
-						e.stopPropagation();
-						e.preventDefault();
-					}}
 					onClick={() => {
 						onDelete(props.id);
 					}}

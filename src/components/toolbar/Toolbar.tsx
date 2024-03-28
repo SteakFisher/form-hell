@@ -12,7 +12,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+	CalendarIcon,
 	CheckboxIcon,
+	CheckCircledIcon,
 	DropdownMenuIcon,
 	SliderIcon,
 	TextIcon,
@@ -21,6 +23,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useRef } from "react";
 import ToolbarButton from "./ToolbarButton";
+import MCQGridIcon from "../../../public/icons/mcq_grid.svg";
 
 const Toolbar = () => {
 	const { formItems, setFormItems, debounceRefs, focusedIndexRef } =
@@ -55,7 +58,7 @@ const Toolbar = () => {
 					>
 						Text
 						<DropdownMenuShortcut>
-							<TextIcon className="size-5" />
+							<TextIcon className="size-[1.4rem]" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
@@ -66,7 +69,7 @@ const Toolbar = () => {
 					>
 						Multiple choice
 						<DropdownMenuShortcut>
-							<CheckboxIcon className="size-5" />
+							<CheckCircledIcon className="size-[1.4rem]" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
@@ -77,7 +80,7 @@ const Toolbar = () => {
 					>
 						Dropdown
 						<DropdownMenuShortcut>
-							<DropdownMenuIcon className="size-5" />
+							<DropdownMenuIcon className="size-[1.4rem]" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
@@ -88,7 +91,29 @@ const Toolbar = () => {
 					>
 						Range
 						<DropdownMenuShortcut>
-							<SliderIcon className="size-5" />
+							<SliderIcon className="size-[1.4rem]" />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onSelect={() => {
+							handleAddElement(typesEnum["multiple-choice-grid"]);
+						}}
+					>
+						Multiple choice grid
+						<DropdownMenuShortcut className="size-[1.4rem] fill-white">
+							<MCQGridIcon />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onSelect={() => {
+							// handleAddElement(typesEnum["range"]);
+						}}
+					>
+						Date
+						<DropdownMenuShortcut>
+							<CalendarIcon className="size-[1.4rem]" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
@@ -115,15 +140,20 @@ const Toolbar = () => {
 		switch (type) {
 			case typesEnum["dropdown"]:
 				return { ...constants.defaultDropdownProps, items: new Array() };
-			case typesEnum["text-input"]:
-				return constants.defaultTextInputProps;
-			case typesEnum["title"]:
-				return constants.defaultTitleProps;
 			case typesEnum["multiple-choice"]:
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array(),
 				};
+			case typesEnum["multiple-choice-grid"]:
+				return {
+					...constants.defaultMultipleChoiceGridProps,
+				};
+			case typesEnum["text-input"]:
+				return constants.defaultTextInputProps;
+			case typesEnum["title"]:
+				return constants.defaultTitleProps;
+
 			case typesEnum["range"]:
 				return constants.defaultRangeProps;
 		}
@@ -131,14 +161,16 @@ const Toolbar = () => {
 
 	function handleSaveClick() {
 		let flag = false;
+		console.log(focusedIndexRef)
+
 		debounceRefs.forEach((ref, key) => {
-			if (key.startsWith(focusedIndexRef.current.toString())) {
+			if (key.startsWith(focusedIndexRef.current.toString() + ":")) {
 				ref.flush();
 				flag = true;
 			} else if (flag) return;
 		});
 
-		localStorage.setItem("formItems", JSON.stringify(formItems))
+		localStorage.setItem("formItems", JSON.stringify(formItems));
 
 		router.push("../../new-form/save");
 	}
