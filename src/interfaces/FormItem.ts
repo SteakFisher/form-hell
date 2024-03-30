@@ -3,6 +3,6 @@ import TitleProps from "./form-component-interfaces/TitleProps";
 import { propsTypes } from "./propsTypes";
 
 export default interface FormItem {
-	id: number;
+	id: string;
 	props: propsTypes;
 }

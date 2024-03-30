@@ -15,7 +15,7 @@ function DropdownItem({
 	onDelete,
 }: {
 	props: DropdownItemProps;
-	onDelete: (idToDelete: number) => void;
+	onDelete: (idToDelete: string) => void;
 }) {
 	const textRef = useRef<HTMLTextAreaElement>(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
@@ -46,15 +46,12 @@ function DropdownItem({
 			id={props.id.toString()}
 			className="mb-3 flex items-center"
 		>
-			{props.other || (
-				<div className="custom-focus" {...attributes} {...listeners}>
-					<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
-				</div>
-			)}
+			<div className="custom-focus" {...attributes} {...listeners}>
+				<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
+			</div>
 			<div className="ml-2 flex size-full items-center justify-between">
 				<Textarea
 					ref={textRef}
-					disabled={props.other}
 					defaultValue={props.value}
 					onChange={handleTextChange}
 					placeholder="Enter option value"

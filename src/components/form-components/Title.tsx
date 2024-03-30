@@ -42,7 +42,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 		<CardHeader
 			className="mx-6 border-b px-0"
 			tabIndex={-1}
-			onFocus={() => (focusedIndexRef.current = 0)}
+			onFocus={() => (focusedIndexRef.current = "0")}
 		>
 			<Textarea
 				ref={formTitleRef}

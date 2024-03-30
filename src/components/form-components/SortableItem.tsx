@@ -24,7 +24,7 @@ import DeleteIcon from "../../../public/icons/delete.svg";
 interface FocusedSortableItemProps {
 	className?: string;
 	FocusedSortableItemChild: () => ReactNode;
-	id: number;
+	id: string;
 	props: propsTypes;
 }
 

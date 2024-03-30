@@ -1,4 +1,4 @@
-export interface DropdownItemProps {
+export interface MultipleChoiceGridItemProps {
 	id: string;
 	parentId: string;
 	value: string;

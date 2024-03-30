@@ -30,13 +30,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
 import { Textarea } from "@/components/ui/textarea";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
 
 function MultipleChoice({
 	id,
 	props,
 }: {
-	id: number;
+	id: string;
 	props: MultipleChoiceProps;
 }) {
 	const [isRadio, _setIsRadio] = useState(!props.allowMultiple);
@@ -56,7 +56,7 @@ function MultipleChoice({
 }
 
 function FocusedMultipleChoice(
-	id: number,
+	id: string,
 	isRadio: boolean,
 	props: MultipleChoiceProps,
 	setIsRadio: (value: boolean) => void,
@@ -87,7 +87,6 @@ function FocusedMultipleChoice(
 		contentRef.current?.focus();
 	}, [isRadio]);
 
-	const nextId = useRef(props.items.length + 1);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
@@ -137,7 +136,7 @@ function FocusedMultipleChoice(
 					variant={"ghost"}
 					className="px-2"
 				>
-					{`Add Item`}
+					Add item
 				</Button>
 				{!hasOther && (
 					<>
@@ -146,7 +145,9 @@ function FocusedMultipleChoice(
 							variant={"ghost"}
 							className="px-2"
 							onClick={handleAddOtherClick}
-						>{`Add "Other"`}</Button>
+						>
+							{'Add "Other"'}
+						</Button>
 					</>
 				)}
 			</div>
@@ -168,10 +169,8 @@ function FocusedMultipleChoice(
 	}
 
 	function handleAddItemClick() {
-		const newItemId = nextId.current;
-		nextId.current++;
 		const newItem = {
-			id: newItemId,
+			id: crypto.randomUUID(),
 			parentId: id,
 			value: "",
 		};
@@ -185,7 +184,7 @@ function FocusedMultipleChoice(
 		contentRef.current?.focus();
 	}
 
-	function handleDeleteClick(idToDelete: number) {
+	function handleDeleteClick(idToDelete: string) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
 		const item = props.items[itemIndex];
 		props.items = [
@@ -216,7 +215,7 @@ function MultipleChoiceOtherItem({
 	return (
 		<div className="mb-3 flex items-center">
 			{isRadio ? (
-				<div className="ml-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+				<CircleIcon className="ml-2 size-5" />
 			) : (
 				<Checkbox
 					disabled
@@ -260,7 +259,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 					return (
 						<div className="flex min-h-8 items-center" key={index}>
 							{isRadio ? (
-								<div className="mr-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+								<CircleIcon className="mr-2 size-5" />
 							) : (
 								<Checkbox
 									disabled
@@ -274,7 +273,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 				{props.hasOther && (
 					<div className="flex min-h-8 items-center">
 						{isRadio ? (
-							<div className="mr-2 aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow" />
+							<CircleIcon className="mr-2 size-5" />
 						) : (
 							<Checkbox
 								disabled

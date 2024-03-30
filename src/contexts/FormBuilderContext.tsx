@@ -13,12 +13,12 @@ interface FormBuilderContextInterface {
 		string,
 		DebouncedState<() => void>
 	>;
-	focusedIndexRef: MutableRefObject<Number>;
+	focusedIndexRef: MutableRefObject<string>;
 }
 
 export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	formItems: [],
 	setFormItems: () => {},
 	debounceRefs: new Map(),
-	focusedIndexRef: { current: 0 },
+	focusedIndexRef: { current: ""},
 });

@@ -24,24 +24,22 @@ import { useRouter } from "next/navigation";
 import { useContext, useRef } from "react";
 import ToolbarButton from "./ToolbarButton";
 import MCQGridIcon from "../../../public/icons/mcq_grid.svg";
+import PlusIcon from "../../../public/icons/plus.svg";
+import SaveIcon from "../../../public/icons/save.svg";
 
 const Toolbar = () => {
 	const { formItems, setFormItems, debounceRefs, focusedIndexRef } =
 		useContext(FormBuilderContext);
-	let nextId = useRef(formItems.length);
 	const router = useRouter();
 
 	return (
-		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform rounded border-2 bg-white p-2 shadow-md">
+		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform space-y-2 rounded border-2 bg-black p-2 shadow-md">
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<ToolbarButton className="justify-center">
-						<Image
-							src={"/icons/plus.svg"}
-							alt="Add"
-							width={33}
-							height={33}
-						/>
+					<ToolbarButton className="items-center justify-center">
+						<div className="size-7 fill-white opacity-80">
+							<PlusIcon />
+						</div>
 					</ToolbarButton>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
@@ -108,7 +106,7 @@ const Toolbar = () => {
 					<DropdownMenuItem
 						className="h-10 text-sm"
 						onSelect={() => {
-							// handleAddElement(typesEnum["range"]);
+							// handleAddElement(typesEnum["date"]);
 						}}
 					>
 						Date
@@ -118,36 +116,59 @@ const Toolbar = () => {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<ToolbarButton onBtnClick={handleSaveClick}>
-				<Image src={"/icons/save.svg"} alt="Save" width={50} height={50} />
+			<ToolbarButton
+				onBtnClick={handleSaveClick}
+				className="items-center justify-center"
+			>
+				<div className="size-10 fill-white opacity-80">
+					<SaveIcon />
+				</div>
 			</ToolbarButton>
 		</div>
 	);
 
 	function handleAddElement(type: typesEnum) {
+		const newId = crypto.randomUUID();
 		const newFormItems = [
 			...formItems,
 			{
-				id: nextId.current,
-				props: { ...returnTypeProps(type) },
+				id: newId,
+				props: { ...returnTypeProps(type, newId) },
 			},
 		];
-		nextId.current++;
 		setFormItems(newFormItems);
 	}
 
-	function returnTypeProps(type: typesEnum): propsTypes {
+	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
 		switch (type) {
 			case typesEnum["dropdown"]:
-				return { ...constants.defaultDropdownProps, items: new Array() };
+				return { ...constants.defaultDropdownProps, items: new Array({
+					id: crypto.randomUUID(),
+					parentId: parentId,
+					value: "Option 1",
+				}) };
 			case typesEnum["multiple-choice"]:
 				return {
 					...constants.defaultMultipleChoiceProps,
-					items: new Array(),
+					items: new Array({
+						id: crypto.randomUUID(),
+						parentId: parentId,
+						value: "Option 1",
+					}),
 				};
 			case typesEnum["multiple-choice-grid"]:
 				return {
 					...constants.defaultMultipleChoiceGridProps,
+					columns: new Array({
+						id: crypto.randomUUID(),
+						parentId: parentId,
+						value: "Column 1",
+					}),
+					rows: new Array({
+						id: crypto.randomUUID(),
+						parentId: parentId,
+						value: "Row 1",
+					}),
 				};
 			case typesEnum["text-input"]:
 				return constants.defaultTextInputProps;
@@ -161,7 +182,6 @@ const Toolbar = () => {
 
 	function handleSaveClick() {
 		let flag = false;
-		console.log(focusedIndexRef)
 
 		debounceRefs.forEach((ref, key) => {
 			if (key.startsWith(focusedIndexRef.current.toString() + ":")) {

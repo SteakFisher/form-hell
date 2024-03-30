@@ -1,5 +1,5 @@
 export interface MultipleChoiceItemProps {
-	id: number;
-	parentId: number;
+	id: string;
+	parentId: string;
 	value: string;
 }

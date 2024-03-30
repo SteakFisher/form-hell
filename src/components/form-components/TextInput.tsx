@@ -26,7 +26,7 @@ export function TextInput({
 	id,
 	props,
 }: {
-	id: number;
+	id: string;
 	props: TextInputProps;
 }) {
 	return (
@@ -40,7 +40,7 @@ export function TextInput({
 	);
 }
 
-function FocusedTextInput(props: TextInputProps, id: number) {
+function FocusedTextInput(props: TextInputProps, id: string) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
 

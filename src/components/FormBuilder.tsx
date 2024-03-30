@@ -27,7 +27,7 @@ import Title from "@/components/form-components/Title";
 import Dropdown from "@/components/form-components/dropdown/Dropdown";
 import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
 import Range from "./form-components/Range";
-import MultipleChoiceGrid from "./form-components/MultipleChoiceGrid";
+import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);

@@ -9,8 +9,6 @@ export default function SavePage() {
 
 	return (
 		<div>
-			{/*{JSON.stringify(formItems)}*/}
-
 			{formItems.map((formItem) => {
 				return (
 					<div key={formItem.id}>

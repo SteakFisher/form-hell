@@ -9,7 +9,7 @@ import { constants } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
-function Range({ id, props }: { id: number; props: RangeProps }) {
+function Range({ id, props }: { id: string; props: RangeProps }) {
 	return (
 		<SortableItem
 			id={id}
@@ -20,7 +20,7 @@ function Range({ id, props }: { id: number; props: RangeProps }) {
 	);
 }
 
-function FocusedRange(props: RangeProps, id: number) {
+function FocusedRange(props: RangeProps, id: string) {
 	const {debounceRefs} = useContext(FormBuilderContext);
 	const rangeRef = useRef({
 		min: props.min,
@@ -130,7 +130,6 @@ function FocusedRange(props: RangeProps, id: number) {
 			return "Max. must be greater than Min.";
 		}
 		const range = (maxNum - minNum) / stepNum;
-		console.log(range);
 		if (range < 1 || range > 50) {
 			return "Range must be between 1 and 50";
 		}

@@ -1,4 +1,4 @@
-import MultipleChoiceGridProps from "./interfaces/MultipleChoiceGridProps";
+import MultipleChoiceGridProps from "./interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
 import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
@@ -22,10 +22,13 @@ const MultipleChoicePropsObj: MultipleChoiceProps = {
 };
 
 const MultipleChoiceGridPropsObj: MultipleChoiceGridProps = {
+	allowMultiple: false,
+	columns: [],
 	required: false,
+	rows: [],
 	title: "",
 	type: "multiple-choice-grid",
-}
+};
 
 const RangePropsObj: RangeProps = {
 	min: "",

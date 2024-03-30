@@ -1,14 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import {
@@ -30,13 +21,11 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import { Input } from "@/components/ui/input";
 
-function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
+function Dropdown({ id, props }: { id: string; props: DropdownProps }) {
 	return (
 		<SortableItem
 			id={id}
@@ -47,7 +36,7 @@ function Dropdown({ id, props }: { id: number; props: DropdownProps }) {
 	);
 }
 
-function FocusedDropdown(props: DropdownProps, id: number) {
+function FocusedDropdown(props: DropdownProps, id: string) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -58,7 +47,6 @@ function FocusedDropdown(props: DropdownProps, id: number) {
 
 	const [itemsState, setItemsState] = useState([...props.items]);
 
-	const nextId = useRef(props.items.length + 1);
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
@@ -93,7 +81,7 @@ function FocusedDropdown(props: DropdownProps, id: number) {
 					variant={"ghost"}
 					className="px-2"
 				>
-					{`Add Item`}
+					Add item
 				</Button>
 			</div>
 		</CardContent>
@@ -114,10 +102,8 @@ function FocusedDropdown(props: DropdownProps, id: number) {
 	}
 
 	function handleAddItemClick() {
-		const newItemId = nextId.current;
-		nextId.current++;
 		const newItem = {
-			id: newItemId,
+			id: crypto.randomUUID(),
 			parentId: id,
 			value: "",
 		};
@@ -125,7 +111,7 @@ function FocusedDropdown(props: DropdownProps, id: number) {
 		setItemsState([...props.items]);
 	}
 
-	function handleDeleteClick(idToDelete: number) {
+	function handleDeleteClick(idToDelete: string) {
 		const itemIndex = props.items.findIndex((item) => item.id === idToDelete);
 		const item = props.items[itemIndex];
 		props.items = [
