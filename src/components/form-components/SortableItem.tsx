@@ -90,7 +90,6 @@ export function SortableItem({
 
 		for (const key of debounceRefs.keys()) {
 			if (key.startsWith(`${id}:`)) {
-				console.log(key);
 				debounceRefs.get(key)?.flush();
 			}
 		}

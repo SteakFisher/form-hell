@@ -106,7 +106,7 @@ const Toolbar = () => {
 					<DropdownMenuItem
 						className="h-10 text-sm"
 						onSelect={() => {
-							// handleAddElement(typesEnum["date"]);
+							handleAddElement(typesEnum["date"]);
 						}}
 					>
 						Date
@@ -141,12 +141,17 @@ const Toolbar = () => {
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
 		switch (type) {
+			case typesEnum["date"]:
+				return constants.defaultDateProps
 			case typesEnum["dropdown"]:
-				return { ...constants.defaultDropdownProps, items: new Array({
-					id: crypto.randomUUID(),
-					parentId: parentId,
-					value: "Option 1",
-				}) };
+				return {
+					...constants.defaultDropdownProps,
+					items: new Array({
+						id: crypto.randomUUID(),
+						parentId: parentId,
+						value: "Option 1",
+					}),
+				};
 			case typesEnum["multiple-choice"]:
 				return {
 					...constants.defaultMultipleChoiceProps,
@@ -170,13 +175,12 @@ const Toolbar = () => {
 						value: "Row 1",
 					}),
 				};
+			case typesEnum["range"]:
+				return constants.defaultRangeProps;
 			case typesEnum["text-input"]:
 				return constants.defaultTextInputProps;
 			case typesEnum["title"]:
 				return constants.defaultTitleProps;
-
-			case typesEnum["range"]:
-				return constants.defaultRangeProps;
 		}
 	}
 

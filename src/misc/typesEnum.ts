@@ -1,4 +1,5 @@
 export enum typesEnum {
+	"date"="date",
 	"dropdown" = "dropdown",
 	"text-input" = "text-input",
 	"title" = "title",

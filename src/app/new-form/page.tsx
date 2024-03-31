@@ -9,9 +9,9 @@ import { constants } from "@/constants";
 
 const NewFormPage = () => {
 	let debounceRefs = new Map();
-	let focusedIndexRef = useRef(0);
+	let focusedIndexRef = useRef("0");
 	const [formItems, setFormItems] = useState<FormItem[]>([
-		{ id: 0, props: constants.defaultTitleProps },
+		{ id: "0", props: constants.defaultTitleProps },
 	]);
 
 	return (

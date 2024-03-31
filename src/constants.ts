@@ -4,6 +4,13 @@ import TextInputProps from "./interfaces/form-component-interfaces/TextInputProp
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
 import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
 import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
+import DateProps from "./interfaces/form-component-interfaces/DateProps";
+
+const DatePropsObj: DateProps = {
+	required: false,
+	title: "",
+	type: "date"
+}
 
 const DropdownPropsObj: DropdownProps = {
 	items: [],
@@ -60,6 +67,7 @@ const TitlePropsObj: TitleProps = {
 };
 
 export const constants = Object.freeze({
+	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
 	defaultMultipleChoiceProps: MultipleChoicePropsObj,
 	defaultMultipleChoiceGridProps: MultipleChoiceGridPropsObj,

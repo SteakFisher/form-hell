@@ -28,6 +28,7 @@ import Dropdown from "@/components/form-components/dropdown/Dropdown";
 import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
 import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
+import Date from "./form-components/Date";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -58,44 +59,52 @@ const FormBuilder = () => {
 					>
 						{formItems.map((formItem) => {
 							switch (formItem.props.type) {
+								case "date":
+									return (
+										<Date
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
 								case "dropdown":
 									return (
 										<Dropdown
+											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}
-											id={formItem.id}
 										/>
 									);
 								case "multiple-choice":
 									return (
 										<MultipleChoice
+											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}
-											id={formItem.id}
 										/>
 									);
 								case "multiple-choice-grid":
 									return (
 										<MultipleChoiceGrid
+											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}
-											id={formItem.id}
 										/>
 									);
 								case "range":
 									return (
 										<Range
+											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}
-											id={formItem.id}
 										/>
 									);
 								case "text-input":
 									return (
 										<TextInput
+											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}
-											id={formItem.id}
 										/>
 									);
 							}
