@@ -138,11 +138,10 @@ function UnfocusedDropdown(props: DropdownProps) {
 			</CardHeader>
 			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
 				{props.items.map((item, index) => (
-					<div className="flex" key={index + 1}>
-						<span className="mr-1">
-							{index + 1}. {item.value}
-						</span>
-					</div>
+					<p className="flex" key={index + 1}>
+						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
+						<span className="flex-1">{item.value}</span>
+					</p>
 				))}
 			</CardContent>
 		</div>

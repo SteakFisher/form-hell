@@ -313,7 +313,7 @@ function UnfocusedMultipleChoiceGrid(
 									className="flex flex-1 items-center justify-center"
 								>
 									{isRadio ? (
-										<CircleIcon className="size-5" />
+										<CircleIcon className="size-5 shrink-0" />
 									) : (
 										<Checkbox
 											disabled

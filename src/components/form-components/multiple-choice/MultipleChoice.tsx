@@ -215,7 +215,7 @@ function MultipleChoiceOtherItem({
 	return (
 		<div className="mb-3 flex items-center">
 			{isRadio ? (
-				<CircleIcon className="ml-2 size-5" />
+				<CircleIcon className="ml-2 size-5 shrink-0" />
 			) : (
 				<Checkbox
 					disabled
@@ -259,7 +259,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 					return (
 						<div className="flex min-h-8 items-center" key={index}>
 							{isRadio ? (
-								<CircleIcon className="mr-2 size-5" />
+								<CircleIcon className="mr-2 size-5 shrink-0" />
 							) : (
 								<Checkbox
 									disabled
@@ -273,7 +273,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 				{props.hasOther && (
 					<div className="flex min-h-8 items-center">
 						{isRadio ? (
-							<CircleIcon className="mr-2 size-5" />
+							<CircleIcon className="mr-2 size-5 shrink-0" />
 						) : (
 							<Checkbox
 								disabled

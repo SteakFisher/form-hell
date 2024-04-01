@@ -9,7 +9,8 @@ export default function SavePage() {
 
 	return (
 		<div>
-			{formItems.map((formItem) => {
+			{JSON.stringify(formItems)}
+			{/* {formItems.map((formItem) => {
 				return (
 					<div key={formItem.id}>
 						<div>{formItem.id}</div>
@@ -18,7 +19,7 @@ export default function SavePage() {
 						<br></br>
 					</div>
 				);
-			})}
+			})} */}
 		</div>
 	);
 }

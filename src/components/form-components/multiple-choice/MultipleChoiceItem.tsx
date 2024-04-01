@@ -66,7 +66,7 @@ function MultipleChoiceItem({
 				<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
 			</div>
 			{isRadio ? (
-				<CircleIcon className="ml-2 size-5" />
+				<CircleIcon className="ml-2 size-5 shrink-0" />
 			) : (
 				<Checkbox
 					disabled
