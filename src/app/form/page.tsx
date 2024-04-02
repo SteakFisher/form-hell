@@ -24,13 +24,13 @@ export default function Form() {
               case "text-input":
                 return <TextInputComponent key={item.id} props={item.props} />;
               case "multiple-choice":
-                return <MultipleChoiceComponent props={item.props} />;
+                return <MultipleChoiceComponent key={item.id} props={item.props} />;
               case "dropdown":
-                return <DropdownComponent props={item.props} />;
+                return <DropdownComponent key={item.id} props={item.props} />;
               case "range":
-                return <RangeComponent props={item.props} />;
+                return <RangeComponent key={item.id} props={item.props} />;
               case "date":
-                return <DateComponent props={item.props} />;
+                return <DateComponent key={item.id} props={item.props} />;
               default:
                 return null;
             }
