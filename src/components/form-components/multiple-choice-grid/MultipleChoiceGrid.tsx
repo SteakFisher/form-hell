@@ -111,8 +111,11 @@ function FocusedMultipleChoiceGrid({
 	);
 
 	useEffect(() => {
-		debounceRefs.set(`${id}:allow-multiple`, handleAllowMultipleClick);
+		const refs = debounceRefs.get(id);
+		if (!refs) return;
+		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
+
 	useEffect(() => {
 		contentRef.current?.focus();
 	}, [isRadio]);

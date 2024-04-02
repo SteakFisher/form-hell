@@ -94,10 +94,13 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	);
 
 	useEffect(() => {
-		debounceRefs
-			.set(`${id}max`, handleMaxChange)
-			.set(`${id}min`, handleMinChange)
-			.set(`${id}step`, handleStepChange);
+		const refs =
+			debounceRefs.get(id);
+		if (!refs) return;
+		refs
+			.set("max", handleMaxChange)
+			.set("min", handleMinChange)
+			.set("step", handleStepChange);
 	});
 
 	return (

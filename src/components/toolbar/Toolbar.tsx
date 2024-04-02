@@ -28,7 +28,7 @@ import PlusIcon from "../../../public/icons/plus.svg";
 import SaveIcon from "../../../public/icons/save.svg";
 
 const Toolbar = () => {
-	const { addId, formItems, setFormItems, debounceRefs, focusedIndexRef } =
+	const { addId, formItems, setFormItems, debounceRefs, focusedIdRef } =
 		useContext(FormBuilderContext);
 	const router = useRouter();
 
@@ -192,13 +192,8 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
-		let flag = false;
-
-		debounceRefs.forEach((ref, key) => {
-			if (key.startsWith(focusedIndexRef.current.toString() + ":")) {
-				ref.flush();
-				flag = true;
-			} else if (flag) return;
+		debounceRefs.get(focusedIdRef.current)?.forEach((ref) => {
+			ref.flush();
 		});
 
 		localStorage.setItem("formItems", JSON.stringify(formItems));

@@ -119,16 +119,19 @@ function FocusedTextInput({
 	const handlePlaceholderChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			props.placeholder = e.target.value;
+			console.log("placeholder updated");
 		},
 		constants.debounceWait,
 	);
 
 	useEffect(() => {
-		debounceRefs
-			.set(`${id}:max-length`, handleMaxLengthChange)
-			.set(`${id}:min-length`, handleMinLengthChange)
-			.set(`${id}:regex`, handleRegexChange)
-			.set(`${id}:placeholder`, handlePlaceholderChange);
+		const refs = debounceRefs.get(id);
+		if (!refs) return;
+		refs
+			.set("max-length", handleMaxLengthChange)
+			.set("min-length", handleMinLengthChange)
+			.set("regex", handleRegexChange)
+			.set("placeholder", handlePlaceholderChange);
 	}, []);
 
 	return (

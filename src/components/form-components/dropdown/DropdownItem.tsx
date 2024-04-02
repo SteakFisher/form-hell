@@ -36,7 +36,9 @@ function DropdownItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		debounceRefs.set(`${props.parentId}:${props.id}:text`, handleTextChange);
+		const refs = debounceRefs.get(props.parentId);
+		if (!refs) return;
+		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);
 
 	return (

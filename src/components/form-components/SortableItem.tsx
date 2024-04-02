@@ -44,7 +44,7 @@ export function SortableItem<T extends propsTypes>({
 	props,
 	showAdd,
 }: SortableItemProps<T>) {
-	const { debounceRefs, focusedIndexRef, setAddId } =
+	const { addId, debounceRefs, focusedIdRef, setAddId } =
 		useContext(FormBuilderContext);
 
 	const sortableItemRef = useRef<HTMLDivElement>(null);
@@ -90,6 +90,7 @@ export function SortableItem<T extends propsTypes>({
 				onFocus={handleOnFocus}
 				onBlur={handleOnBlur}
 				tabIndex={0}
+				className="custom-focus"
 			>
 				<Card
 					ref={sortableItemRef}
@@ -136,17 +137,21 @@ export function SortableItem<T extends propsTypes>({
 		if (relatedTarget?.id === "drag-handle") return;
 		if (e.currentTarget.contains(e.relatedTarget)) return;
 
-		for (const key of debounceRefs.keys()) {
-			if (key.startsWith(`${id}:`)) {
-				debounceRefs.get(key)?.flush();
-			}
+		const refs = debounceRefs.get(id);
+
+		if (!refs) {
+			setIsFocused(false);
+			return;
 		}
+		refs.forEach((ref, key) => {
+			ref.flush();
+		});
 
 		setIsFocused(false);
 	}
 
 	function handleOnFocus() {
-		focusedIndexRef.current = id;
+		focusedIdRef.current = id;
 		setIsFocused(true);
 	}
 }
@@ -175,9 +180,12 @@ const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
 		if (titleRef.current == null) return;
 		autosize(titleRef.current);
 
-		debounceRefs
-			.set(`${id}:required`, handleRequiredChange)
-			.set(`${id}:title`, handleTitleChange);
+		const refs =
+			debounceRefs.get(id) ?? debounceRefs.set(id, new Map()).get(id);
+		if (!refs) return;
+		refs
+			.set("required", handleRequiredChange)
+			.set("title", handleTitleChange);
 	}, []);
 
 	return (
@@ -214,9 +222,8 @@ const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
 
 	function handleDeleteClick() {
 		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);
-		for (const key of debounceRefs.keys()) {
-			if (key.startsWith(`${id}:`)) debounceRefs.delete(key);
-		}
+
+		debounceRefs.delete(id);
 
 		setFormItems([
 			...formItems.slice(0, itemIndex),

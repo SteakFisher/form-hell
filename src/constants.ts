@@ -9,8 +9,8 @@ import DateProps from "./interfaces/form-component-interfaces/DateProps";
 const DatePropsObj: DateProps = {
 	required: false,
 	title: "",
-	type: "date"
-}
+	type: "date",
+};
 
 const DropdownPropsObj: DropdownProps = {
 	items: [],
