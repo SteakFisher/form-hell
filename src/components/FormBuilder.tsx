@@ -20,7 +20,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef } from "react";
+import { Fragment, useContext, useRef } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import { TextInput } from "@/components/form-components/TextInput";
 import Title from "@/components/form-components/Title";
@@ -31,7 +31,7 @@ import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleC
 import Date from "./form-components/Date";
 
 const FormBuilder = () => {
-	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const { addId, formItems, setFormItems } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -41,11 +41,11 @@ const FormBuilder = () => {
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<Card className="w-[800px]">
+		<Card className="w-[800px] [overflow-anchor:none]">
 			{formItems[0].props.type === "title" && (
 				<Title key={formItems[0].id} props={formItems[0].props} />
 			)}
-			<CardContent ref={formBuilderRef}>
+			<CardContent className="pb-0" ref={formBuilderRef}>
 				<DndContext
 					id={"sortable-items-dndcontext"}
 					sensors={sensors}
@@ -58,56 +58,70 @@ const FormBuilder = () => {
 						strategy={verticalListSortingStrategy}
 					>
 						{formItems.map((formItem) => {
-							switch (formItem.props.type) {
-								case "date":
-									return (
-										<Date
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-								case "dropdown":
-									return (
-										<Dropdown
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-								case "multiple-choice":
-									return (
-										<MultipleChoice
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-								case "multiple-choice-grid":
-									return (
-										<MultipleChoiceGrid
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-								case "range":
-									return (
-										<Range
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-								case "text-input":
-									return (
-										<TextInput
-											id={formItem.id}
-											key={formItem.id}
-											props={formItem.props}
-										/>
-									);
-							}
+							const showAdd = formItem.id === addId;
+							return (
+								<Fragment key={formItem.id}>
+									{(() => {
+										switch (formItem.props.type) {
+											case "date":
+												return (
+													<Date
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+											case "dropdown":
+												return (
+													<Dropdown
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+											case "multiple-choice":
+												return (
+													<MultipleChoice
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+											case "multiple-choice-grid":
+												return (
+													<MultipleChoiceGrid
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+											case "range":
+												return (
+													<Range
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+											case "text-input":
+												return (
+													<TextInput
+														id={formItem.id}
+														key={formItem.id}
+														props={formItem.props}
+														showAdd={showAdd}
+													/>
+												);
+										}
+									})()}
+									{showAdd || <div className="h-8 w-full" />}
+								</Fragment>
+							);
 						})}
 					</SortableContext>
 				</DndContext>
@@ -127,7 +141,7 @@ const FormBuilder = () => {
 			(formItem) => formItem.id === over.id,
 		);
 
-		document.getElementById(formItems[activeIndex].id.toString())?.focus();
+		document.getElementById(formItems[activeIndex].id)?.focus();
 
 		if (activeIndex !== overIndex) {
 			setFormItems(arrayMove(formItems, activeIndex, overIndex));

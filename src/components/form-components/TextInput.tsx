@@ -18,29 +18,64 @@ import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+	ChangeEvent,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
 
-export function TextInput({
+export const TextInput = memo(function TextInput({
 	id,
 	props,
+	showAdd,
 }: {
 	id: string;
 	props: TextInputProps;
+	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
 			key={id}
-			UnfocusedSortableItem={() => UnfocusedTextInput(props)}
-			FocusedSortableItemChild={() => FocusedTextInput(props, id)}
+			showAdd={showAdd}
+			SortableItemChild={TextInputWrapper}
 		/>
 	);
-}
+});
 
-function FocusedTextInput(props: TextInputProps, id: string) {
+const TextInputWrapper = memo(function TextInputWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: TextInputProps;
+}) {
+	return (
+		<>
+			{isFocused ? (
+				<FocusedTextInput id={id} props={props} />
+			) : (
+				<UnfocusedTextInput props={props} />
+			)}
+		</>
+	);
+});
+
+function FocusedTextInput({
+	props,
+	id,
+}: {
+	props: TextInputProps;
+	id: string;
+}) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
 
@@ -302,7 +337,7 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 	}
 }
 
-function UnfocusedTextInput(props: TextInputProps) {
+function UnfocusedTextInput({ props }: { props: TextInputProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>

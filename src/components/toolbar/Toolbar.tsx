@@ -28,14 +28,14 @@ import PlusIcon from "../../../public/icons/plus.svg";
 import SaveIcon from "../../../public/icons/save.svg";
 
 const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs, focusedIndexRef } =
+	const { addId, formItems, setFormItems, debounceRefs, focusedIndexRef } =
 		useContext(FormBuilderContext);
 	const router = useRouter();
 
 	return (
 		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform space-y-2 rounded border-2 bg-black p-2 shadow-md">
 			<DropdownMenu>
-				<DropdownMenuTrigger>
+				<DropdownMenuTrigger className="custom-focus">
 					<ToolbarButton className="items-center justify-center">
 						<div className="size-7 fill-white opacity-80">
 							<PlusIcon />
@@ -129,20 +129,27 @@ const Toolbar = () => {
 
 	function handleAddElement(type: typesEnum) {
 		const newId = crypto.randomUUID();
-		const newFormItems = [
-			...formItems,
-			{
-				id: newId,
-				props: { ...returnTypeProps(type, newId) },
-			},
-		];
-		setFormItems(newFormItems);
+		const newItem = {
+			id: newId,
+			props: { ...returnTypeProps(type, newId) },
+		};
+		const newIndex =
+			formItems.findIndex((formItem) => formItem.id === addId) + 1;
+		if (newIndex === 0) {
+			setFormItems([...formItems, newItem]);
+			return;
+		}
+		setFormItems([
+			...formItems.slice(0, newIndex),
+			newItem,
+			...formItems.slice(newIndex),
+		]);
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
 		switch (type) {
 			case typesEnum["date"]:
-				return constants.defaultDateProps
+				return constants.defaultDateProps;
 			case typesEnum["dropdown"]:
 				return {
 					...constants.defaultDropdownProps,

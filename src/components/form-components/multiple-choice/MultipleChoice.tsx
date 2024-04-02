@@ -25,7 +25,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
@@ -35,32 +35,63 @@ import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
 function MultipleChoice({
 	id,
 	props,
+	showAdd,
 }: {
 	id: string;
 	props: MultipleChoiceProps;
+	showAdd: boolean;
 }) {
-	const [isRadio, _setIsRadio] = useState(!props.allowMultiple);
-
-	const setIsRadio = (value: boolean) => _setIsRadio(value);
-
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
-			FocusedSortableItemChild={() =>
-				FocusedMultipleChoice(id, isRadio, props, setIsRadio)
-			}
+			showAdd={showAdd}
+			SortableItemChild={MultipleChoiceWrapper}
 		/>
 	);
 }
 
-function FocusedMultipleChoice(
-	id: string,
-	isRadio: boolean,
-	props: MultipleChoiceProps,
-	setIsRadio: (value: boolean) => void,
-) {
+const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: MultipleChoiceProps;
+}) {
+	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
+
+	return (
+		<>
+			{isFocused ? (
+				<FocusedMultipleChoice
+					id={id}
+					props={props}
+					isRadio={isRadio}
+					setIsRadio={setIsRadio}
+				/>
+			) : (
+				<UnfocusedMultipleChoice
+					props={props}
+					isRadio={isRadio}
+				/>
+			)}
+		</>
+	);
+});
+
+function FocusedMultipleChoice({
+	id,
+	isRadio,
+	props,
+	setIsRadio,
+}: {
+	id: string;
+	isRadio: boolean;
+	props: MultipleChoiceProps;
+	setIsRadio: (value: boolean) => void;
+}) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -243,7 +274,13 @@ function MultipleChoiceOtherItem({
 	);
 }
 
-function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
+function UnfocusedMultipleChoice({
+	props,
+	isRadio,
+}: {
+	props: MultipleChoiceProps;
+	isRadio: boolean;
+}) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>

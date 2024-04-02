@@ -43,7 +43,7 @@ function DropdownItem({
 		<div
 			ref={setNodeRef}
 			style={style}
-			id={props.id.toString()}
+			id={props.id}
 			className="mb-3 flex items-center"
 		>
 			<div className="custom-focus" {...attributes} {...listeners}>

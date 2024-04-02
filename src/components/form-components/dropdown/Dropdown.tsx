@@ -21,22 +21,50 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef, useState } from "react";
+import { memo, useContext, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
-function Dropdown({ id, props }: { id: string; props: DropdownProps }) {
+function Dropdown({
+	id,
+	props,
+	showAdd,
+}: {
+	id: string;
+	props: DropdownProps;
+	showAdd: boolean;
+}) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			FocusedSortableItemChild={() => FocusedDropdown(props, id)}
-			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
+			showAdd={showAdd}
+			SortableItemChild={DropdownWrapper}
 		/>
 	);
 }
 
-function FocusedDropdown(props: DropdownProps, id: string) {
+const DropdownWrapper = memo(function DropdownWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: DropdownProps;
+}) {
+	return (
+		<>
+			{isFocused ? (
+				<FocusedDropdown props={props} id={id} />
+			) : (
+				<UnfocusedDropdown props={props} />
+			)}
+		</>
+	);
+});
+
+function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -125,7 +153,7 @@ function FocusedDropdown(props: DropdownProps, id: string) {
 	}
 }
 
-function UnfocusedDropdown(props: DropdownProps) {
+function UnfocusedDropdown({ props }: { props: DropdownProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>

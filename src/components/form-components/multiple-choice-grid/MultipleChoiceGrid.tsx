@@ -25,7 +25,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
@@ -35,34 +35,60 @@ import { CircleIcon } from "@radix-ui/react-icons";
 function MultipleChoiceGrid({
 	id,
 	props,
+	showAdd,
 }: {
 	id: string;
 	props: MultipleChoiceGridProps;
+	showAdd: boolean;
 }) {
-	const [isRadio, _setIsRadio] = useState(!props.allowMultiple);
-
-	const setIsRadio = (value: boolean) => _setIsRadio(value);
-
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			UnfocusedSortableItem={() =>
-				UnfocusedMultipleChoiceGrid(props, isRadio)
-			}
-			FocusedSortableItemChild={() =>
-				FocusedMultipleChoiceGrid(id, isRadio, props, setIsRadio)
-			}
+			showAdd={showAdd}
+			SortableItemChild={MultipleChoiceGridWrapper}
 		/>
 	);
 }
 
-function FocusedMultipleChoiceGrid(
-	id: string,
-	isRadio: boolean,
-	props: MultipleChoiceGridProps,
-	setIsRadio: (value: boolean) => void,
-) {
+const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: MultipleChoiceGridProps;
+}) {
+	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
+
+	return (
+		<>
+			{isFocused ? (
+				<FocusedMultipleChoiceGrid
+					id={id}
+					props={props}
+					isRadio={isRadio}
+					setIsRadio={setIsRadio}
+				/>
+			) : (
+				<UnfocusedMultipleChoiceGrid props={props} isRadio={isRadio} />
+			)}
+		</>
+	);
+});
+
+function FocusedMultipleChoiceGrid({
+	id,
+	isRadio,
+	props,
+	setIsRadio,
+}: {
+	id: string;
+	isRadio: boolean;
+	props: MultipleChoiceGridProps;
+	setIsRadio: (value: boolean) => void;
+}) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -74,9 +100,7 @@ function FocusedMultipleChoiceGrid(
 	const [rowsState, setRowsState] = useState([...props.rows]);
 	const [columnsState, setColumnsState] = useState([...props.columns]);
 	const [showAddRow, setShowAddRow] = useState(rowsState.length < 10);
-	const [showAddColumn, setShowAddColumn] = useState(
-		columnsState.length < 10,
-	);
+	const [showAddColumn, setShowAddColumn] = useState(columnsState.length < 10);
 
 	const handleAllowMultipleClick = useDebouncedCallback(
 		(isChecked: boolean) => {
@@ -277,10 +301,13 @@ function FocusedMultipleChoiceGrid(
 	}
 }
 
-function UnfocusedMultipleChoiceGrid(
-	props: MultipleChoiceGridProps,
-	isRadio: boolean,
-) {
+function UnfocusedMultipleChoiceGrid({
+	props,
+	isRadio,
+}: {
+	props: MultipleChoiceGridProps;
+	isRadio: boolean;
+}) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
