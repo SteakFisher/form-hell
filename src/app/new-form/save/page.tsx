@@ -1,11 +1,16 @@
 "use client";
 
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { useContext } from "react";
+import {useContext, useEffect, useState} from "react";
 import FormItem from "@/interfaces/FormItem";
 
 export default function SavePage() {
-	const formItems : FormItem[] = JSON.parse(localStorage.getItem("formItems") ?? "[]");
+	const [formItems, setFormItems] = useState<FormItem[]>([] as FormItem[]);
+
+	useEffect(() => {
+		const formItems : FormItem[] = JSON.parse(localStorage.getItem("formItems") ?? "[]");
+		setFormItems(formItems)
+	}, [])
 
 	return (
 		<div>

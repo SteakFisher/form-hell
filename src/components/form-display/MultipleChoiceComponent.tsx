@@ -37,7 +37,7 @@ export default function MultipleChoiceComponent({ props }: { props: MultipleChoi
               {
                 props.items.map((item, index) => {
                   return (
-                    <div className="flex items-center space-x-2 mb-4">
+                    <div key={item.id}  className="flex items-cen mb-4">
                       <Checkbox
                         id="terms"
                       />
