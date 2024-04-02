@@ -1,8 +1,8 @@
 export interface RangeProps {
-	min: string;
-	max: string;
+	min: number;
+	max: number;
 	required: boolean;
-	step: string;
+	step: number;
 	title: string;
 	type: "range";
 }
