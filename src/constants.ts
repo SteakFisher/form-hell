@@ -38,9 +38,9 @@ const MultipleChoiceGridPropsObj: MultipleChoiceGridProps = {
 };
 
 const RangePropsObj: RangeProps = {
-	min: "",
-	max: "",
-	step: "",
+	min: 0,
+	max: 1,
+	step: 1,
 	required: false,
 	title: "",
 	type: "range",
