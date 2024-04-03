@@ -58,9 +58,9 @@ const RangeWrapper = memo(function RangeWrapper({
 function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const rangeRef = useRef({
-		min: props.min,
-		max: props.max,
-		step: props.step,
+		min: String(props.min),
+		max: String(props.max),
+		step: String(props.step),
 	});
 	const [rangeError, setRangeError] = useState("");
 
@@ -69,7 +69,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.max = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.max = rangeRef.current.max;
+			if (!_error) props.max = +rangeRef.current.max;
 		},
 		constants.debounceWait,
 	);
@@ -78,7 +78,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.min = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.min = rangeRef.current.min;
+			if (!_error) props.min = +rangeRef.current.min;
 		},
 		constants.debounceWait,
 	);
@@ -88,7 +88,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.step = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.step = rangeRef.current.step;
+			if (!_error) props.step = +rangeRef.current.step;
 		},
 		constants.debounceWait,
 	);
