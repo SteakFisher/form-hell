@@ -28,17 +28,14 @@ import DropdownItem from "./DropdownItem";
 function Dropdown({
 	id,
 	props,
-	showAdd,
 }: {
 	id: string;
 	props: DropdownProps;
-	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			showAdd={showAdd}
 			SortableItemChild={DropdownWrapper}
 		/>
 	);

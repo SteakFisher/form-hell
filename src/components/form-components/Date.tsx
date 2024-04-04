@@ -10,17 +10,14 @@ import { format } from "date-fns";
 function Date({
 	props,
 	id,
-	showAdd,
 }: {
 	props: DateProps;
 	id: string;
-	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			showAdd={showAdd}
 			SortableItemChild={DateWrapper}
 		/>
 	);

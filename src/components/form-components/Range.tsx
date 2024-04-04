@@ -18,18 +18,15 @@ import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
 function Range({
 	id,
-	props,
-	showAdd,
+	props
 }: {
 	id: string;
 	props: RangeProps;
-	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			showAdd={showAdd}
 			SortableItemChild={RangeWrapper}
 		/>
 	);

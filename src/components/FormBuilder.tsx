@@ -31,7 +31,7 @@ import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleC
 import Date from "./form-components/Date";
 
 const FormBuilder = () => {
-	const { addId, formItems, setFormItems } = useContext(FormBuilderContext);
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -58,70 +58,56 @@ const FormBuilder = () => {
 						strategy={verticalListSortingStrategy}
 					>
 						{formItems.map((formItem) => {
-							const showAdd = formItem.id === addId;
-							return (
-								<Fragment key={formItem.id}>
-									{(() => {
-										switch (formItem.props.type) {
-											case "date":
-												return (
-													<Date
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-											case "dropdown":
-												return (
-													<Dropdown
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-											case "multiple-choice":
-												return (
-													<MultipleChoice
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-											case "multiple-choice-grid":
-												return (
-													<MultipleChoiceGrid
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-											case "range":
-												return (
-													<Range
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-											case "text-input":
-												return (
-													<TextInput
-														id={formItem.id}
-														key={formItem.id}
-														props={formItem.props}
-														showAdd={showAdd}
-													/>
-												);
-										}
-									})()}
-									{showAdd || <div className="h-8 w-full" />}
-								</Fragment>
-							);
+							switch (formItem.props.type) {
+								case "date":
+									return (
+										<Date
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "dropdown":
+									return (
+										<Dropdown
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "multiple-choice":
+									return (
+										<MultipleChoice
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "multiple-choice-grid":
+									return (
+										<MultipleChoiceGrid
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "range":
+									return (
+										<Range
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "text-input":
+									return (
+										<TextInput
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+							}
 						})}
 					</SortableContext>
 				</DndContext>

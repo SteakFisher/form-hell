@@ -32,18 +32,15 @@ import { SortableItem } from "./SortableItem";
 export const TextInput = memo(function TextInput({
 	id,
 	props,
-	showAdd,
 }: {
 	id: string;
 	props: TextInputProps;
-	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
 			key={id}
-			showAdd={showAdd}
 			SortableItemChild={TextInputWrapper}
 		/>
 	);

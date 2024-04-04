@@ -35,19 +35,15 @@ interface FocusedSortableItemProps<T extends propsTypes> {
 
 interface SortableItemProps<T extends propsTypes>
 	extends FocusedSortableItemProps<T> {
-	showAdd: boolean;
 }
 
 export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
 	id,
 	props,
-	showAdd,
 }: SortableItemProps<T>) {
-	const { addId, debounceRefs, focusedIdRef, setAddId } =
-		useContext(FormBuilderContext);
+	const { debounceRefs, focusedIdRef } = useContext(FormBuilderContext);
 
-	const sortableItemRef = useRef<HTMLDivElement>(null);
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
@@ -56,30 +52,6 @@ export function SortableItem<T extends propsTypes>({
 		transform: CSS.Translate.toString(transform),
 		transition,
 	};
-
-	useEffect(() => {
-		if (!sortableItemRef.current) return;
-
-		const elementHasIntersected = (entries: IntersectionObserverEntry[]) => {
-			if (entries[0].isIntersecting) {
-				setAddId(id);
-			}
-		};
-
-		const ioConfiguration = {
-			rootMargin: "-50% 0% -50% 0%",
-		};
-
-		const observer = new IntersectionObserver(
-			elementHasIntersected,
-			ioConfiguration,
-		);
-		observer.observe(sortableItemRef.current);
-
-		return () => {
-			observer.disconnect();
-		};
-	}, []);
 
 	return (
 		<>
@@ -92,10 +64,7 @@ export function SortableItem<T extends propsTypes>({
 				tabIndex={0}
 				className="custom-focus"
 			>
-
-			
 				<Card
-					ref={sortableItemRef}
 					className={cn(
 						"custom-focus flex select-none overflow-hidden pl-3",
 						isFocused && "border-ring",
@@ -124,13 +93,11 @@ export function SortableItem<T extends propsTypes>({
 					</div>
 				</Card>
 			</div>
-			{showAdd && (
-				<div className="flex h-8 w-full items-center px-2 opacity-85">
-					<div className="h-[1px] flex-grow bg-white" />
-					<PlusCircledIcon className="mx-1.5 size-5" />
-					<div className="h-[1px] flex-grow bg-white" />
-				</div>
-			)}
+			<div className="flex h-8 w-full items-center px-2 opacity-85">
+				<div className="h-[1px] flex-grow bg-white" />
+				<PlusCircledIcon className="mx-1.5 size-5" />
+				<div className="h-[1px] flex-grow bg-white" />
+			</div>
 		</>
 	);
 

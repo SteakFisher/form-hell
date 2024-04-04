@@ -28,7 +28,7 @@ import PlusIcon from "../../../public/icons/plus.svg";
 import SaveIcon from "../../../public/icons/save.svg";
 
 const Toolbar = () => {
-	const { addId, formItems, setFormItems, debounceRefs, focusedIdRef } =
+	const { formItems, setFormItems, debounceRefs, focusedIdRef } =
 		useContext(FormBuilderContext);
 	const router = useRouter();
 
@@ -133,17 +133,7 @@ const Toolbar = () => {
 			id: newId,
 			props: { ...returnTypeProps(type, newId) },
 		};
-		const newIndex =
-			formItems.findIndex((formItem) => formItem.id === addId) + 1;
-		if (newIndex === 0) {
-			setFormItems([...formItems, newItem]);
-			return;
-		}
-		setFormItems([
-			...formItems.slice(0, newIndex),
-			newItem,
-			...formItems.slice(newIndex),
-		]);
+		setFormItems([...formItems, newItem]);
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {

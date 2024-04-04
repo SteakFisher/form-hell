@@ -35,17 +35,14 @@ import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
 function MultipleChoice({
 	id,
 	props,
-	showAdd,
 }: {
 	id: string;
 	props: MultipleChoiceProps;
-	showAdd: boolean;
 }) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			showAdd={showAdd}
 			SortableItemChild={MultipleChoiceWrapper}
 		/>
 	);
