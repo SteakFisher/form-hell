@@ -300,12 +300,12 @@ function FocusedTextInput({
 		props.regexMethod = newRegexMethod;
 	}
 
-	function setRegex(newRegexString: string) {
+	function setRegex(newRegex: string) {
 		if (regexRef.current == null) return;
-		regexRef.current.value = newRegexString;
+		regexRef.current.value = newRegex;
 
 		try {
-			const newRegex = new RegExp(newRegexString);
+			new RegExp(newRegex);
 			setRegexError("");
 			props.regex = newRegex;
 		} catch (e) {

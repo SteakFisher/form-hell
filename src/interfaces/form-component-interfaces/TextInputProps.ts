@@ -4,7 +4,7 @@ export default interface TextInputProps {
 	minLength: number;
 	maxLength: number;
 	placeholder: string;
-	regex: RegExp;
+	regex: string;
 	regexMethod: string;
 	required: boolean;
 	title: string;
