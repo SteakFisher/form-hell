@@ -92,6 +92,8 @@ export function SortableItem<T extends propsTypes>({
 				tabIndex={0}
 				className="custom-focus"
 			>
+
+			
 				<Card
 					ref={sortableItemRef}
 					className={cn(

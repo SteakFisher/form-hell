@@ -83,8 +83,8 @@ function FocusedTextInput({
 
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
-		minLength: props.minLength,
-		maxLength: props.maxLength,
+		minLength: props.minLength.toString(),
+		maxLength: props.maxLength.toString(),
 	});
 
 	const [accordionItem, setAccordionItem] = useState("");
@@ -96,7 +96,7 @@ function FocusedTextInput({
 			lengthsRef.current.maxLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.maxLength = lengthsRef.current.maxLength;
+			if (!_error) props.maxLength = Number(lengthsRef.current.maxLength);
 		},
 		constants.debounceWait,
 	);
@@ -105,7 +105,7 @@ function FocusedTextInput({
 			lengthsRef.current.minLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.minLength = lengthsRef.current.minLength;
+			if (!_error) props.minLength = Number(lengthsRef.current.minLength);
 		},
 		constants.debounceWait,
 	);
@@ -254,7 +254,7 @@ function FocusedTextInput({
 									className="ml-2 w-56"
 									id="regex"
 									ref={regexRef}
-									defaultValue={props.regex}
+									defaultValue={props.regex.toString()}
 									onChange={handleRegexChange}
 									maxLength={1000}
 								/>
@@ -300,12 +300,12 @@ function FocusedTextInput({
 		props.regexMethod = newRegexMethod;
 	}
 
-	function setRegex(newRegex: string) {
+	function setRegex(newRegexString: string) {
 		if (regexRef.current == null) return;
-		regexRef.current.value = newRegex;
+		regexRef.current.value = newRegexString;
 
 		try {
-			new RegExp(newRegex);
+			const newRegex = new RegExp(newRegexString);
 			setRegexError("");
 			props.regex = newRegex;
 		} catch (e) {
