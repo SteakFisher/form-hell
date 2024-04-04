@@ -21,6 +21,7 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
+import AddBar from "../AddBar";
 
 interface FocusedSortableItemProps<T extends propsTypes> {
 	className?: string;
@@ -34,8 +35,7 @@ interface FocusedSortableItemProps<T extends propsTypes> {
 }
 
 interface SortableItemProps<T extends propsTypes>
-	extends FocusedSortableItemProps<T> {
-}
+	extends FocusedSortableItemProps<T> {}
 
 export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
@@ -93,11 +93,7 @@ export function SortableItem<T extends propsTypes>({
 					</div>
 				</Card>
 			</div>
-			<div className="flex h-8 w-full items-center px-2 opacity-85">
-				<div className="h-[1px] flex-grow bg-white" />
-				<PlusCircledIcon className="mx-1.5 size-5" />
-				<div className="h-[1px] flex-grow bg-white" />
-			</div>
+			<AddBar id={id} />
 		</>
 	);
 
