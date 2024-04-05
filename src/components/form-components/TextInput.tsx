@@ -298,6 +298,9 @@ function FocusedTextInput({
 	}
 
 	function setRegex(newRegex: string) {
+		newRegex = newRegex.trim()
+		newRegex = newRegex.substring(1,newRegex.length-1);
+		
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;
 

@@ -49,8 +49,8 @@ const RangePropsObj: RangeProps = {
 const TextInputPropsObj: TextInputProps = {
 	inputType: "short-text",
 	lengthType: "characters",
-	minLength: "",
-	maxLength: "",
+	minLength: 0,
+	maxLength: 0,
 	placeholder: "",
 	regex: "",
 	regexMethod: "contains",
