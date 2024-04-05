@@ -18,11 +18,18 @@ import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+	ChangeEvent,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
 
-export function TextInput({
+export const TextInput = memo(function TextInput({
 	id,
 	props,
 }: {
@@ -34,13 +41,38 @@ export function TextInput({
 			id={id}
 			props={props}
 			key={id}
-			UnfocusedSortableItem={() => UnfocusedTextInput(props)}
-			FocusedSortableItemChild={() => FocusedTextInput(props, id)}
+			SortableItemChild={TextInputWrapper}
 		/>
 	);
-}
+});
 
-function FocusedTextInput(props: TextInputProps, id: string) {
+const TextInputWrapper = memo(function TextInputWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: TextInputProps;
+}) {
+	return (
+		<>
+			{isFocused ? (
+				<FocusedTextInput id={id} props={props} />
+			) : (
+				<UnfocusedTextInput props={props} />
+			)}
+		</>
+	);
+});
+
+function FocusedTextInput({
+	props,
+	id,
+}: {
+	props: TextInputProps;
+	id: string;
+}) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
 
@@ -48,8 +80,8 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
-		minLength: props.minLength,
-		maxLength: props.maxLength,
+		minLength: props.minLength.toString(),
+		maxLength: props.maxLength.toString(),
 	});
 
 	const [accordionItem, setAccordionItem] = useState("");
@@ -61,7 +93,7 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 			lengthsRef.current.maxLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.maxLength = lengthsRef.current.maxLength;
+			if (!_error) props.maxLength = Number(lengthsRef.current.maxLength);
 		},
 		constants.debounceWait,
 	);
@@ -70,7 +102,7 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 			lengthsRef.current.minLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.minLength = lengthsRef.current.minLength;
+			if (!_error) props.minLength = Number(lengthsRef.current.minLength);
 		},
 		constants.debounceWait,
 	);
@@ -84,16 +116,19 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 	const handlePlaceholderChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			props.placeholder = e.target.value;
+			console.log("placeholder updated");
 		},
 		constants.debounceWait,
 	);
 
 	useEffect(() => {
-		debounceRefs
-			.set(`${id}:max-length`, handleMaxLengthChange)
-			.set(`${id}:min-length`, handleMinLengthChange)
-			.set(`${id}:regex`, handleRegexChange)
-			.set(`${id}:placeholder`, handlePlaceholderChange);
+		const refs = debounceRefs.get(id);
+		if (!refs) return;
+		refs
+			.set("max-length", handleMaxLengthChange)
+			.set("min-length", handleMinLengthChange)
+			.set("regex", handleRegexChange)
+			.set("placeholder", handlePlaceholderChange);
 	}, []);
 
 	return (
@@ -216,7 +251,7 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 									className="ml-2 w-56"
 									id="regex"
 									ref={regexRef}
-									defaultValue={props.regex}
+									defaultValue={props.regex.toString()}
 									onChange={handleRegexChange}
 									maxLength={1000}
 								/>
@@ -263,6 +298,9 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 	}
 
 	function setRegex(newRegex: string) {
+		newRegex = newRegex.trim()
+		newRegex = newRegex.substring(1,newRegex.length-1);
+		
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;
 
@@ -302,7 +340,7 @@ function FocusedTextInput(props: TextInputProps, id: string) {
 	}
 }
 
-function UnfocusedTextInput(props: TextInputProps) {
+function UnfocusedTextInput({ props }: { props: TextInputProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>

@@ -25,7 +25,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
@@ -39,28 +39,53 @@ function MultipleChoice({
 	id: string;
 	props: MultipleChoiceProps;
 }) {
-	const [isRadio, _setIsRadio] = useState(!props.allowMultiple);
-
-	const setIsRadio = (value: boolean) => _setIsRadio(value);
-
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			UnfocusedSortableItem={() => UnfocusedMultipleChoice(props, isRadio)}
-			FocusedSortableItemChild={() =>
-				FocusedMultipleChoice(id, isRadio, props, setIsRadio)
-			}
+			SortableItemChild={MultipleChoiceWrapper}
 		/>
 	);
 }
 
-function FocusedMultipleChoice(
-	id: string,
-	isRadio: boolean,
-	props: MultipleChoiceProps,
-	setIsRadio: (value: boolean) => void,
-) {
+const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: MultipleChoiceProps;
+}) {
+	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
+
+	return (
+		<>
+			{isFocused ? (
+				<FocusedMultipleChoice
+					id={id}
+					props={props}
+					isRadio={isRadio}
+					setIsRadio={setIsRadio}
+				/>
+			) : (
+				<UnfocusedMultipleChoice props={props} isRadio={isRadio} />
+			)}
+		</>
+	);
+});
+
+function FocusedMultipleChoice({
+	id,
+	isRadio,
+	props,
+	setIsRadio,
+}: {
+	id: string;
+	isRadio: boolean;
+	props: MultipleChoiceProps;
+	setIsRadio: (value: boolean) => void;
+}) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -81,8 +106,12 @@ function FocusedMultipleChoice(
 	);
 
 	useEffect(() => {
-		debounceRefs.set(`${id}:allow-multiple`, handleAllowMultipleClick);
+		const refs =
+			debounceRefs.get(id);
+		if (!refs) return;
+		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
+
 	useEffect(() => {
 		contentRef.current?.focus();
 	}, [isRadio]);
@@ -215,7 +244,7 @@ function MultipleChoiceOtherItem({
 	return (
 		<div className="mb-3 flex items-center">
 			{isRadio ? (
-				<CircleIcon className="ml-2 size-5" />
+				<CircleIcon className="ml-2 size-5 shrink-0" />
 			) : (
 				<Checkbox
 					disabled
@@ -243,7 +272,13 @@ function MultipleChoiceOtherItem({
 	);
 }
 
-function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
+function UnfocusedMultipleChoice({
+	props,
+	isRadio,
+}: {
+	props: MultipleChoiceProps;
+	isRadio: boolean;
+}) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
@@ -259,7 +294,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 					return (
 						<div className="flex min-h-8 items-center" key={index}>
 							{isRadio ? (
-								<CircleIcon className="mr-2 size-5" />
+								<CircleIcon className="mr-2 size-5 shrink-0" />
 							) : (
 								<Checkbox
 									disabled
@@ -273,7 +308,7 @@ function UnfocusedMultipleChoice(props: MultipleChoiceProps, isRadio: boolean) {
 				{props.hasOther && (
 					<div className="flex min-h-8 items-center">
 						{isRadio ? (
-							<CircleIcon className="mr-2 size-5" />
+							<CircleIcon className="mr-2 size-5 shrink-0" />
 						) : (
 							<Checkbox
 								disabled

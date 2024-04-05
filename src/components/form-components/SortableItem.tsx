@@ -8,9 +8,10 @@ import { propsTypes } from "@/interfaces/propsTypes";
 import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import { DragHandleDots2Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import {
+	ComponentType,
 	memo,
 	ReactNode,
 	useContext,
@@ -20,25 +21,29 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
+import AddBar from "../AddBar";
 
-interface FocusedSortableItemProps {
+interface FocusedSortableItemProps<T extends propsTypes> {
 	className?: string;
-	FocusedSortableItemChild: () => ReactNode;
+	SortableItemChild: ComponentType<{
+		props: T;
+		id: string;
+		isFocused: boolean;
+	}>;
 	id: string;
-	props: propsTypes;
+	props: T;
 }
 
-interface SortableItemProps extends FocusedSortableItemProps {
-	UnfocusedSortableItem: () => ReactNode;
-}
+interface SortableItemProps<T extends propsTypes>
+	extends FocusedSortableItemProps<T> {}
 
-export function SortableItem({
-	FocusedSortableItemChild,
+export function SortableItem<T extends propsTypes>({
+	SortableItemChild,
 	id,
 	props,
-	UnfocusedSortableItem,
-}: SortableItemProps) {
-	const { debounceRefs, focusedIndexRef } = useContext(FormBuilderContext);
+}: SortableItemProps<T>) {
+	const { debounceRefs, focusedIdRef } = useContext(FormBuilderContext);
+
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
@@ -49,38 +54,47 @@ export function SortableItem({
 	};
 
 	return (
-		<div
-			ref={setNodeRef}
-			style={style}
-			id={id.toString()}
-			onFocus={handleOnFocus}
-			onBlur={handleOnBlur}
-			tabIndex={0}
-		>
-			<Card className="my-5 flex w-full select-none overflow-hidden pl-3 will-change-contents focus-visible:border-ring focus-visible:outline-none">
-				{isFocused ? (
-					<FocusedSortableItem
-						id={id}
-						props={props}
-						FocusedSortableItemChild={FocusedSortableItemChild}
-					/>
-				) : (
-					<UnfocusedSortableItem />
-				)}
-				<div
-					id="drag-handle"
-					className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
-					{...attributes}
-					{...listeners}
-					onMouseDown={(e) => {
-						e.stopPropagation();
-						e.preventDefault();
-					}}
+		<>
+			<div
+				ref={setNodeRef}
+				style={style}
+				id={id}
+				onFocus={handleOnFocus}
+				onBlur={handleOnBlur}
+				tabIndex={0}
+				className="custom-focus"
+			>
+				<Card
+					className={cn(
+						"custom-focus flex select-none overflow-hidden pl-3",
+						isFocused && "border-ring",
+					)}
 				>
-					<DragHandleDots2Icon className="size-7 text-black" />
-				</div>
-			</Card>
-		</div>
+					{isFocused ? (
+						<FocusedSortableItem
+							id={id}
+							props={props}
+							SortableItemChild={SortableItemChild}
+						/>
+					) : (
+						<SortableItemChild id={id} props={props} isFocused={false} />
+					)}
+					<div
+						id="drag-handle"
+						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
+						{...attributes}
+						{...listeners}
+						onMouseDown={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+						}}
+					>
+						<DragHandleDots2Icon className="size-7 text-black" />
+					</div>
+				</Card>
+			</div>
+			<AddBar id={id} />
+		</>
 	);
 
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
@@ -88,37 +102,38 @@ export function SortableItem({
 		if (relatedTarget?.id === "drag-handle") return;
 		if (e.currentTarget.contains(e.relatedTarget)) return;
 
-		for (const key of debounceRefs.keys()) {
-			if (key.startsWith(`${id}:`)) {
-				debounceRefs.get(key)?.flush();
-			}
+		const refs = debounceRefs.get(id);
+
+		if (!refs) {
+			setIsFocused(false);
+			return;
 		}
+		refs.forEach((ref, key) => {
+			ref.flush();
+		});
 
 		setIsFocused(false);
 	}
 
 	function handleOnFocus() {
-		focusedIndexRef.current = id;
+		focusedIdRef.current = id;
 		setIsFocused(true);
 	}
 }
 
-const FocusedSortableItem = memo(function FocusedSortableItem({
-	FocusedSortableItemChild,
+const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
+	SortableItemChild,
 	className,
 	id,
 	props,
-}: FocusedSortableItemProps) {
+}: FocusedSortableItemProps<T>) {
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const { formItems, setFormItems, debounceRefs } =
 		useContext(FormBuilderContext);
 
-	const handleRequiredChange = useDebouncedCallback(
-		(isChecked: boolean) => {
-			props.required = isChecked;
-		},
-		constants.debounceWait,
-	);
+	const handleRequiredChange = useDebouncedCallback((isChecked: boolean) => {
+		props.required = isChecked;
+	}, constants.debounceWait);
 	const handleTitleChange = useDebouncedCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 			props.title = e.target.value;
@@ -130,9 +145,12 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 		if (titleRef.current == null) return;
 		autosize(titleRef.current);
 
-		debounceRefs
-			.set(`${id}:required`, handleRequiredChange)
-			.set(`${id}:title`, handleTitleChange);
+		const refs =
+			debounceRefs.get(id) ?? debounceRefs.set(id, new Map()).get(id);
+		if (!refs) return;
+		refs
+			.set("required", handleRequiredChange)
+			.set("title", handleTitleChange);
 	}, []);
 
 	return (
@@ -149,13 +167,10 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 							maxLength={500}
 						/>
 					</CardTitle>
-					<div
-						className=" mt-[9px] fill-red-600"
-						style={{ cursor: "pointer" }}
+					<DeleteIcon
+						className=" mt-[9px] cursor-pointer fill-red-600"
 						onClick={handleDeleteClick}
-					>
-						<DeleteIcon />
-					</div>
+					/>
 				</div>
 				<div className="flex space-x-2 pt-2">
 					<Label htmlFor="required">Required</Label>
@@ -166,19 +181,18 @@ const FocusedSortableItem = memo(function FocusedSortableItem({
 					/>
 				</div>
 			</CardHeader>
-			<FocusedSortableItemChild />
+			<SortableItemChild id={id} props={props} isFocused={true} />
 		</div>
 	);
 
 	function handleDeleteClick() {
 		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);
-		for (const key of debounceRefs.keys()) {
-			if (key.startsWith(`${id}:`)) debounceRefs.delete(key);
-		}
+
+		debounceRefs.delete(id);
 
 		setFormItems([
 			...formItems.slice(0, itemIndex),
 			...formItems.slice(itemIndex + 1),
 		]);
 	}
-});
+};

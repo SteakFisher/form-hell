@@ -9,8 +9,8 @@ import DateProps from "./interfaces/form-component-interfaces/DateProps";
 const DatePropsObj: DateProps = {
 	required: false,
 	title: "",
-	type: "date"
-}
+	type: "date",
+};
 
 const DropdownPropsObj: DropdownProps = {
 	items: [],
@@ -49,8 +49,8 @@ const RangePropsObj: RangeProps = {
 const TextInputPropsObj: TextInputProps = {
 	inputType: "short-text",
 	lengthType: "characters",
-	minLength: "",
-	maxLength: "",
+	minLength: 0,
+	maxLength: 0,
 	placeholder: "",
 	regex: "",
 	regexMethod: "contains",

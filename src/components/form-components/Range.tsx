@@ -1,4 +1,11 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import React, {
+	ChangeEvent,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { SortableItem } from "./SortableItem";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -9,19 +16,44 @@ import { constants } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
-function Range({ id, props }: { id: string; props: RangeProps }) {
+function Range({
+	id,
+	props
+}: {
+	id: string;
+	props: RangeProps;
+}) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			FocusedSortableItemChild={() => FocusedRange(props, id)}
-			UnfocusedSortableItem={() => UnfocusedRange(props)}
+			SortableItemChild={RangeWrapper}
 		/>
 	);
 }
 
-function FocusedRange(props: RangeProps, id: string) {
-	const {debounceRefs} = useContext(FormBuilderContext);
+const RangeWrapper = memo(function RangeWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: RangeProps;
+}) {
+	return (
+		<>
+			{isFocused ? (
+				<FocusedRange id={id} props={props} />
+			) : (
+				<UnfocusedRange props={props} />
+			)}
+		</>
+	);
+});
+
+function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
+	const { debounceRefs } = useContext(FormBuilderContext);
 	const rangeRef = useRef({
 		min: String(props.min),
 		max: String(props.max),
@@ -58,11 +90,15 @@ function FocusedRange(props: RangeProps, id: string) {
 		constants.debounceWait,
 	);
 
-	useEffect(()=>{
-		debounceRefs.set(`${id}max`, handleMaxChange)
-		.set(`${id}min`, handleMinChange)
-		.set(`${id}step`, handleStepChange)
-	})
+	useEffect(() => {
+		const refs =
+			debounceRefs.get(id);
+		if (!refs) return;
+		refs
+			.set("max", handleMaxChange)
+			.set("min", handleMinChange)
+			.set("step", handleStepChange);
+	});
 
 	return (
 		<CardContent className="w-full justify-center">
@@ -138,7 +174,7 @@ function FocusedRange(props: RangeProps, id: string) {
 	}
 }
 
-function UnfocusedRange(props: RangeProps) {
+function UnfocusedRange({ props }: { props: RangeProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>

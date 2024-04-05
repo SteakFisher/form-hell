@@ -52,21 +52,24 @@ function MultipleChoiceItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		debounceRefs.set(`${props.parentId}:${props.id}:text`, handleTextChange);
+		const refs =
+			debounceRefs.get(props.parentId);
+		if (!refs) return;
+		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);
 
 	return (
 		<div
 			ref={setNodeRef}
 			style={style}
-			id={props.id.toString()}
+			id={props.id}
 			className="mb-3 flex items-center"
 		>
 			<div className="custom-focus" {...attributes} {...listeners}>
 				<DragHandleDots2Icon className="size-6 text-[hsl(var(--foreground))]" />
 			</div>
 			{isRadio ? (
-				<CircleIcon className="ml-2 size-5" />
+				<CircleIcon className="ml-2 size-5 shrink-0" />
 			) : (
 				<Checkbox
 					disabled

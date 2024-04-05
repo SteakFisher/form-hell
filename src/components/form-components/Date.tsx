@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { SortableItem } from "./SortableItem";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import DateProps from "@/interfaces/form-component-interfaces/DateProps";
@@ -7,18 +7,38 @@ import { Button } from "../ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 
-function Date({ props, id }: { props: DateProps; id: string }) {
+function Date({
+	props,
+	id,
+}: {
+	props: DateProps;
+	id: string;
+}) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			FocusedSortableItemChild={() => FocusedDate(props)}
-			UnfocusedSortableItem={() => UnfocusedDate(props)}
+			SortableItemChild={DateWrapper}
 		/>
 	);
 }
 
-function FocusedDate(props: DateProps) {
+const DateWrapper = memo(function DateWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: DateProps;
+}) {
+
+	return <>
+		{isFocused ? <FocusedDate /> : <UnfocusedDate props={props} />}
+	</>
+});
+
+function FocusedDate() {
 	return (
 		<CardContent>
 			<Button
@@ -33,7 +53,7 @@ function FocusedDate(props: DateProps) {
 	);
 }
 
-function UnfocusedDate(props: DateProps) {
+function UnfocusedDate({ props }: { props: DateProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>

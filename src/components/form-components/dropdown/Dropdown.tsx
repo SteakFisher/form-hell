@@ -21,22 +21,47 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef, useState } from "react";
+import { memo, useContext, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
-function Dropdown({ id, props }: { id: string; props: DropdownProps }) {
+function Dropdown({
+	id,
+	props,
+}: {
+	id: string;
+	props: DropdownProps;
+}) {
 	return (
 		<SortableItem
 			id={id}
 			props={props}
-			FocusedSortableItemChild={() => FocusedDropdown(props, id)}
-			UnfocusedSortableItem={() => UnfocusedDropdown(props)}
+			SortableItemChild={DropdownWrapper}
 		/>
 	);
 }
 
-function FocusedDropdown(props: DropdownProps, id: string) {
+const DropdownWrapper = memo(function DropdownWrapper({
+	id,
+	props,
+	isFocused,
+}: {
+	id: string;
+	isFocused: boolean;
+	props: DropdownProps;
+}) {
+	return (
+		<>
+			{isFocused ? (
+				<FocusedDropdown props={props} id={id} />
+			) : (
+				<UnfocusedDropdown props={props} />
+			)}
+		</>
+	);
+});
+
+function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -125,7 +150,7 @@ function FocusedDropdown(props: DropdownProps, id: string) {
 	}
 }
 
-function UnfocusedDropdown(props: DropdownProps) {
+function UnfocusedDropdown({ props }: { props: DropdownProps }) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
@@ -138,11 +163,10 @@ function UnfocusedDropdown(props: DropdownProps) {
 			</CardHeader>
 			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
 				{props.items.map((item, index) => (
-					<div className="flex" key={index + 1}>
-						<span className="mr-1">
-							{index + 1}. {item.value}
-						</span>
-					</div>
+					<p className="flex" key={index + 1}>
+						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
+						<span className="flex-1">{item.value}</span>
+					</p>
 				))}
 			</CardContent>
 		</div>

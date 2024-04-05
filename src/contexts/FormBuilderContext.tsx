@@ -1,24 +1,17 @@
-import {
-	ChangeEvent,
-	MutableRefObject,
-	createContext
-} from "react";
+import { ChangeEvent, MutableRefObject, createContext } from "react";
 import { DebouncedState } from "use-debounce";
 import FormItem from "../interfaces/FormItem";
 
 interface FormBuilderContextInterface {
+	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;
+	focusedIdRef: MutableRefObject<string>;
 	formItems: FormItem[];
 	setFormItems: (formItems: FormItem[]) => void;
-	debounceRefs: Map<
-		string,
-		DebouncedState<() => void>
-	>;
-	focusedIndexRef: MutableRefObject<string>;
 }
 
 export const FormBuilderContext = createContext<FormBuilderContextInterface>({
+	debounceRefs: new Map(),
+	focusedIdRef: { current: "" },
 	formItems: [],
 	setFormItems: () => {},
-	debounceRefs: new Map(),
-	focusedIndexRef: { current: ""},
 });

@@ -20,7 +20,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef } from "react";
+import { Fragment, useContext, useRef } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import { TextInput } from "@/components/form-components/TextInput";
 import Title from "@/components/form-components/Title";
@@ -41,11 +41,11 @@ const FormBuilder = () => {
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<Card className="w-[800px]">
+		<Card className="w-[800px] [overflow-anchor:none]">
 			{formItems[0].props.type === "title" && (
 				<Title key={formItems[0].id} props={formItems[0].props} />
 			)}
-			<CardContent ref={formBuilderRef}>
+			<CardContent className="pb-0" ref={formBuilderRef}>
 				<DndContext
 					id={"sortable-items-dndcontext"}
 					sensors={sensors}
@@ -127,7 +127,7 @@ const FormBuilder = () => {
 			(formItem) => formItem.id === over.id,
 		);
 
-		document.getElementById(formItems[activeIndex].id.toString())?.focus();
+		document.getElementById(formItems[activeIndex].id)?.focus();
 
 		if (activeIndex !== overIndex) {
 			setFormItems(arrayMove(formItems, activeIndex, overIndex));

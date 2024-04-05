@@ -1,51 +1,40 @@
-"use client";
-
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { propsTypes } from "@/interfaces/propsTypes";
-import { typesEnum } from "@/misc/typesEnum";
+import React, { useContext } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "./ui/dropdown-menu";
+import { typesEnum } from "@/misc/typesEnum";
+import MCQGridIcon from "../../public/icons/mcq_grid.svg";
 import {
-	CalendarIcon,
-	CheckboxIcon,
 	CheckCircledIcon,
 	DropdownMenuIcon,
 	SliderIcon,
 	TextIcon,
+	CalendarIcon,
+	PlusCircledIcon,
 } from "@radix-ui/react-icons";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useContext, useRef } from "react";
-import ToolbarButton from "./ToolbarButton";
-import MCQGridIcon from "../../../public/icons/mcq_grid.svg";
-import PlusIcon from "../../../public/icons/plus.svg";
-import SaveIcon from "../../../public/icons/save.svg";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { propsTypes } from "@/interfaces/propsTypes";
+import FormItem from "@/interfaces/FormItem";
 
-const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs, focusedIdRef } =
-		useContext(FormBuilderContext);
-	const router = useRouter();
+function AddBar({ id }: { id: string }) {
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
 
 	return (
-		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform space-y-2 rounded border-2 bg-black p-2 shadow-md">
+		<div className="flex h-8 w-full items-center px-2 opacity-85">
+			<div className="h-[1px] flex-grow bg-white" />
 			<DropdownMenu>
 				<DropdownMenuTrigger className="custom-focus">
-					<ToolbarButton className="items-center justify-center">
-						<div className="size-7 fill-white opacity-80">
-							<PlusIcon />
-						</div>
-					</ToolbarButton>
+					<PlusCircledIcon className="mx-1.5 size-6" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					className="w-56"
-					side="left"
-					align="start"
+					side="bottom"
+					align="center"
 					sideOffset={9}
 				>
 					<DropdownMenuItem
@@ -116,14 +105,7 @@ const Toolbar = () => {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<ToolbarButton
-				onBtnClick={handleSaveClick}
-				className="items-center justify-center"
-			>
-				<div className="size-10 fill-white opacity-80">
-					<SaveIcon />
-				</div>
-			</ToolbarButton>
+			<div className="h-[1px] flex-grow bg-white" />
 		</div>
 	);
 
@@ -133,7 +115,16 @@ const Toolbar = () => {
 			id: newId,
 			props: { ...returnTypeProps(type, newId) },
 		};
-		setFormItems([...formItems, newItem]);
+
+		const newFormItems: FormItem[] = [];
+		formItems.forEach((formItem) => {
+			newFormItems.push(formItem);
+			if (formItem.id === id) {
+				newFormItems.push(newItem);
+			}
+		});
+
+		setFormItems(newFormItems);
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
@@ -180,16 +171,6 @@ const Toolbar = () => {
 				return constants.defaultTitleProps;
 		}
 	}
+}
 
-	function handleSaveClick() {
-		debounceRefs.get(focusedIdRef.current)?.forEach((ref) => {
-			ref.flush();
-		});
-
-		localStorage.setItem("formItems", JSON.stringify(formItems));
-
-		router.push("../../new-form/save");
-	}
-};
-
-export default Toolbar;
+export default AddBar;
