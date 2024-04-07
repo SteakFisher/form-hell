@@ -1,5 +1,5 @@
 export default interface TextInputProps {
-	inputType: string;
+	inputType: "short-text" | "long-text" | "email" | "number";
 	lengthType: string;
 	minLength: number;
 	maxLength: number;
