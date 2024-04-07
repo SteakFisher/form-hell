@@ -28,6 +28,7 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
+import { Checkbox } from "../ui/checkbox";
 
 export const TextInput = memo(function TextInput({
 	id,
@@ -88,6 +89,9 @@ function FocusedTextInput({
 	const [lengthError, setLengthError] = useState("");
 	const [regexError, setRegexError] = useState("");
 
+	const handleIgnoreCaseChange = useDebouncedCallback((isChecked: boolean) => {
+		props.regexFlags = isChecked ? "mi" : "m";
+	}, constants.debounceWait);
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			lengthsRef.current.maxLength = e.target.value;
@@ -125,6 +129,7 @@ function FocusedTextInput({
 		const refs = debounceRefs.get(id);
 		if (!refs) return;
 		refs
+			.set("ignore-case", handleIgnoreCaseChange)
 			.set("max-length", handleMaxLengthChange)
 			.set("min-length", handleMinLengthChange)
 			.set("regex", handleRegexChange)
@@ -245,15 +250,23 @@ function FocusedTextInput({
 								</SelectContent>
 							</Select>
 
-							<div className="flex items-center">
+							<div className="flex items-center space-x-2">
 								<Label htmlFor="regex">Regex pattern</Label>
 								<Input
-									className="ml-2 w-56"
+									className="w-56"
 									id="regex"
 									ref={regexRef}
 									defaultValue={props.regex.toString()}
 									onChange={handleRegexChange}
 									maxLength={1000}
+								/>
+							</div>
+							<div className="flex items-center space-x-2">
+								<Label htmlFor="ignore-case">Ignore case</Label>
+								<Checkbox
+									id="ignore-case"
+									defaultChecked={props.regexFlags === "mi"}
+									onCheckedChange={handleIgnoreCaseChange}
 								/>
 							</div>
 						</div>
@@ -299,7 +312,6 @@ function FocusedTextInput({
 
 	function setRegex(newRegex: string) {
 		newRegex = newRegex.trim();
-		newRegex = newRegex.substring(1, newRegex.length - 1);
 
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;

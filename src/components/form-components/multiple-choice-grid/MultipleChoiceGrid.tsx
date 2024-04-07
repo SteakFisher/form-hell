@@ -31,6 +31,7 @@ import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
 import { Separator } from "@/components/ui/separator";
 import { CircleIcon } from "@radix-ui/react-icons";
+import { v4 as uuidv4 } from 'uuid';
 
 function MultipleChoiceGrid({
 	id,
@@ -252,7 +253,7 @@ function FocusedMultipleChoiceGrid({
 
 	function handleAddItemClick(type: "row" | "column") {
 		const newItem = {
-			id: crypto.randomUUID(),
+			id: uuidv4(),
 			parentId: id,
 			value: "",
 		};

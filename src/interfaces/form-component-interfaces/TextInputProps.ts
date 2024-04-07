@@ -5,6 +5,7 @@ export default interface TextInputProps {
 	maxLength: number;
 	placeholder: string;
 	regex: string;
+	regexFlags: string;
 	regexMethod: string;
 	required: boolean;
 	title: string;
