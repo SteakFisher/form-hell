@@ -74,14 +74,14 @@ function FocusedTextInput({
 	id: string;
 }) {
 	const emailRegex = /.+@.+/;
-	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
+	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
 
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
-		minLength: props.minLength.toString(),
-		maxLength: props.maxLength.toString(),
+		minLength: props.minLength ? props.minLength.toString() : "",
+		maxLength: props.maxLength ? props.maxLength.toString() : "",
 	});
 
 	const [accordionItem, setAccordionItem] = useState("");
@@ -187,7 +187,7 @@ function FocusedTextInput({
 									<Label htmlFor="min-length">Min. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.minLength}
+									defaultValue={props.minLength || ""}
 									className="ml-2 w-24"
 									id="min-length"
 									onChange={handleMinLengthChange}
@@ -199,7 +199,7 @@ function FocusedTextInput({
 									<Label htmlFor="max-length">Max. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.maxLength}
+									defaultValue={props.maxLength || ""}
 									className="ml-2 w-24"
 									id="max-length"
 									onChange={handleMaxLengthChange}
@@ -298,9 +298,9 @@ function FocusedTextInput({
 	}
 
 	function setRegex(newRegex: string) {
-		newRegex = newRegex.trim()
-		newRegex = newRegex.substring(1,newRegex.length-1);
-		
+		newRegex = newRegex.trim();
+		newRegex = newRegex.substring(1, newRegex.length - 1);
+
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;
 
@@ -320,18 +320,19 @@ function FocusedTextInput({
 		const minNum = Number(minLength);
 		const maxNum = Number(maxLength);
 
-		if (minLength.match(/^(0)*$/) && maxLength.match(/^(0)+$/))
-			return "Both min. length and max. length cannot be zero";
 		if (
 			!(
 				minLength.match(positiveNumRegex) &&
 				maxLength.match(positiveNumRegex)
 			)
 		) {
-			return "Min. length and max. length must be positive integers or zero";
+			return "Min. length and max. length must be positive integers";
 		}
-		if (minNum > 999999999 || maxNum > 999999999) {
-			return "Please enter a smaller number";
+		if (maxNum > 99999) {
+			return "Please enter a smaller max. length";
+		}
+		if (minNum > 99999) {
+			return "Please enter a smaller min. length";
 		}
 		if (maxNum < minNum && maxLength) {
 			return "Max. length must be greater than or equal to min. length";
