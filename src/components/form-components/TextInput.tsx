@@ -303,11 +303,15 @@ function FocusedTextInput({
 	}
 
 	function handleLengthTypeChange(newLengthType: string) {
-		props.lengthType = newLengthType;
+		props.lengthType = newLengthType as "words" | "characters";
 	}
 
 	function handleRegexMethodChange(newRegexMethod: string) {
-		props.regexMethod = newRegexMethod;
+		props.regexMethod = newRegexMethod as
+			| "contains"
+			| "doesnt-contain"
+			| "matches"
+			| "doesnt-match";
 	}
 
 	function setRegex(newRegex: string) {
