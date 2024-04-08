@@ -1,10 +1,10 @@
 import {createContext} from "react";
-import FormResponse from "@/interfaces/FormResponse";
+import FormItem from "@/interfaces/FormItem";
 
 interface FormRendererContextInterface {
-  formResponses: FormResponse
+  formItems: FormItem[]
 }
 
 export const FormRendererContext = createContext<FormRendererContextInterface>({
-  formResponses: {}
+  formItems: []
 })

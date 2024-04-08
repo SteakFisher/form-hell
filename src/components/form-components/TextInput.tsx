@@ -28,6 +28,7 @@ import {
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
+import { Checkbox } from "../ui/checkbox";
 
 export const TextInput = memo(function TextInput({
 	id,
@@ -74,20 +75,23 @@ function FocusedTextInput({
 	id: string;
 }) {
 	const emailRegex = /.+@.+/;
-	const positiveNumRegex = /^((0+)|[1-9]\d*)?$/;
+	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
 
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
-		minLength: props.minLength.toString(),
-		maxLength: props.maxLength.toString(),
+		minLength: props.minLength ? props.minLength.toString() : "",
+		maxLength: props.maxLength ? props.maxLength.toString() : "",
 	});
 
 	const [accordionItem, setAccordionItem] = useState("");
 	const [lengthError, setLengthError] = useState("");
 	const [regexError, setRegexError] = useState("");
 
+	const handleIgnoreCaseChange = useDebouncedCallback((isChecked: boolean) => {
+		props.regexFlags = isChecked ? "mi" : "m";
+	}, constants.debounceWait);
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			lengthsRef.current.maxLength = e.target.value;
@@ -125,6 +129,7 @@ function FocusedTextInput({
 		const refs = debounceRefs.get(id);
 		if (!refs) return;
 		refs
+			.set("ignore-case", handleIgnoreCaseChange)
 			.set("max-length", handleMaxLengthChange)
 			.set("min-length", handleMinLengthChange)
 			.set("regex", handleRegexChange)
@@ -187,7 +192,7 @@ function FocusedTextInput({
 									<Label htmlFor="min-length">Min. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.minLength}
+									defaultValue={props.minLength || ""}
 									className="ml-2 w-24"
 									id="min-length"
 									onChange={handleMinLengthChange}
@@ -199,7 +204,7 @@ function FocusedTextInput({
 									<Label htmlFor="max-length">Max. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.maxLength}
+									defaultValue={props.maxLength || ""}
 									className="ml-2 w-24"
 									id="max-length"
 									onChange={handleMaxLengthChange}
@@ -245,15 +250,23 @@ function FocusedTextInput({
 								</SelectContent>
 							</Select>
 
-							<div className="flex items-center">
+							<div className="flex items-center space-x-2">
 								<Label htmlFor="regex">Regex pattern</Label>
 								<Input
-									className="ml-2 w-56"
+									className="w-56"
 									id="regex"
 									ref={regexRef}
 									defaultValue={props.regex.toString()}
 									onChange={handleRegexChange}
 									maxLength={1000}
+								/>
+							</div>
+							<div className="flex items-center space-x-2">
+								<Label htmlFor="ignore-case">Ignore case</Label>
+								<Checkbox
+									id="ignore-case"
+									defaultChecked={props.regexFlags === "mi"}
+									onCheckedChange={handleIgnoreCaseChange}
 								/>
 							</div>
 						</div>
@@ -290,17 +303,20 @@ function FocusedTextInput({
 	}
 
 	function handleLengthTypeChange(newLengthType: string) {
-		props.lengthType = newLengthType;
+		props.lengthType = newLengthType as "words" | "characters";
 	}
 
 	function handleRegexMethodChange(newRegexMethod: string) {
-		props.regexMethod = newRegexMethod;
+		props.regexMethod = newRegexMethod as
+			| "contains"
+			| "doesnt-contain"
+			| "matches"
+			| "doesnt-match";
 	}
 
 	function setRegex(newRegex: string) {
-		newRegex = newRegex.trim()
-		newRegex = newRegex.substring(1,newRegex.length-1);
-		
+		newRegex = newRegex.trim();
+
 		if (regexRef.current == null) return;
 		regexRef.current.value = newRegex;
 
@@ -320,18 +336,19 @@ function FocusedTextInput({
 		const minNum = Number(minLength);
 		const maxNum = Number(maxLength);
 
-		if (minLength.match(/^(0)*$/) && maxLength.match(/^(0)+$/))
-			return "Both min. length and max. length cannot be zero";
 		if (
 			!(
 				minLength.match(positiveNumRegex) &&
 				maxLength.match(positiveNumRegex)
 			)
 		) {
-			return "Min. length and max. length must be positive integers or zero";
+			return "Min. length and max. length must be positive integers";
 		}
-		if (minNum > 999999999 || maxNum > 999999999) {
-			return "Please enter a smaller number";
+		if (maxNum > 99999) {
+			return "Please enter a smaller max. length";
+		}
+		if (minNum > 99999) {
+			return "Please enter a smaller min. length";
 		}
 		if (maxNum < minNum && maxLength) {
 			return "Max. length must be greater than or equal to min. length";

@@ -24,7 +24,7 @@ export default function DropdownComponent({ props } : { props: DropdownProps}) {
       <CardContent>
         <Select>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="" />
+            <SelectValue placeholder="Select Item" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

@@ -26,6 +26,7 @@ import ToolbarButton from "./ToolbarButton";
 import MCQGridIcon from "../../../public/icons/mcq_grid.svg";
 import PlusIcon from "../../../public/icons/plus.svg";
 import SaveIcon from "../../../public/icons/save.svg";
+import { v4 as uuidv4 } from 'uuid';
 
 const Toolbar = () => {
 	const { formItems, setFormItems, debounceRefs, focusedIdRef } =
@@ -128,7 +129,7 @@ const Toolbar = () => {
 	);
 
 	function handleAddElement(type: typesEnum) {
-		const newId = crypto.randomUUID();
+		const newId = uuidv4();
 		const newItem = {
 			id: newId,
 			props: { ...returnTypeProps(type, newId) },
@@ -144,7 +145,7 @@ const Toolbar = () => {
 				return {
 					...constants.defaultDropdownProps,
 					items: new Array({
-						id: crypto.randomUUID(),
+						id: uuidv4(),
 						parentId: parentId,
 						value: "Option 1",
 					}),
@@ -153,7 +154,7 @@ const Toolbar = () => {
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array({
-						id: crypto.randomUUID(),
+						id: uuidv4(),
 						parentId: parentId,
 						value: "Option 1",
 					}),
@@ -162,12 +163,12 @@ const Toolbar = () => {
 				return {
 					...constants.defaultMultipleChoiceGridProps,
 					columns: new Array({
-						id: crypto.randomUUID(),
+						id: uuidv4(),
 						parentId: parentId,
 						value: "Column 1",
 					}),
 					rows: new Array({
-						id: crypto.randomUUID(),
+						id: uuidv4(),
 						parentId: parentId,
 						value: "Row 1",
 					}),
