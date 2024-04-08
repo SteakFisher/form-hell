@@ -53,7 +53,6 @@ const TextInputPropsObj: TextInputProps = {
 	maxLength: 0,
 	placeholder: "",
 	regex: "",
-	regexFlags: "m",
 	regexMethod: "contains",
 	required: false,
 	title: "",

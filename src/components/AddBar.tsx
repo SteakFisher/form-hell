@@ -1,19 +1,4 @@
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import FormItem from "@/interfaces/FormItem";
-import { propsTypes } from "@/interfaces/propsTypes";
-import { typesEnum } from "@/misc/typesEnum";
-import {
-	CalendarIcon,
-	CheckCircledIcon,
-	DropdownMenuIcon,
-	PlusCircledIcon,
-	SliderIcon,
-	TextIcon,
-} from "@radix-ui/react-icons";
-import { useContext } from "react";
-import { v4 as uuidv4 } from 'uuid';
-import MCQGridIcon from "../../public/icons/mcq_grid.svg";
+import React, { useContext } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,6 +6,20 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { typesEnum } from "@/misc/typesEnum";
+import MCQGridIcon from "../../public/icons/mcq_grid.svg";
+import {
+	CheckCircledIcon,
+	DropdownMenuIcon,
+	SliderIcon,
+	TextIcon,
+	CalendarIcon,
+	PlusCircledIcon,
+} from "@radix-ui/react-icons";
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { propsTypes } from "@/interfaces/propsTypes";
+import FormItem from "@/interfaces/FormItem";
 
 function AddBar({ id }: { id: string }) {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -111,7 +110,7 @@ function AddBar({ id }: { id: string }) {
 	);
 
 	function handleAddElement(type: typesEnum) {
-		const newId = uuidv4();
+		const newId = crypto.randomUUID();
 		const newItem = {
 			id: newId,
 			props: { ...returnTypeProps(type, newId) },
@@ -136,7 +135,7 @@ function AddBar({ id }: { id: string }) {
 				return {
 					...constants.defaultDropdownProps,
 					items: new Array({
-						id: uuidv4(),
+						id: crypto.randomUUID(),
 						parentId: parentId,
 						value: "Option 1",
 					}),
@@ -145,7 +144,7 @@ function AddBar({ id }: { id: string }) {
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array({
-						id: uuidv4(),
+						id: crypto.randomUUID(),
 						parentId: parentId,
 						value: "Option 1",
 					}),
@@ -154,12 +153,12 @@ function AddBar({ id }: { id: string }) {
 				return {
 					...constants.defaultMultipleChoiceGridProps,
 					columns: new Array({
-						id: uuidv4(),
+						id: crypto.randomUUID(),
 						parentId: parentId,
 						value: "Column 1",
 					}),
 					rows: new Array({
-						id: uuidv4(),
+						id: crypto.randomUUID(),
 						parentId: parentId,
 						value: "Row 1",
 					}),

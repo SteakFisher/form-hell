@@ -24,7 +24,6 @@ import {
 import { memo, useContext, useRef, useState } from "react";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
-import { v4 as uuidv4 } from 'uuid';
 
 function Dropdown({
 	id,
@@ -129,7 +128,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 
 	function handleAddItemClick() {
 		const newItem = {
-			id: uuidv4(),
+			id: crypto.randomUUID(),
 			parentId: id,
 			value: "",
 		};

@@ -31,7 +31,6 @@ import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
 import { Textarea } from "@/components/ui/textarea";
 import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { v4 as uuidv4 } from 'uuid';
 
 function MultipleChoice({
 	id,
@@ -200,7 +199,7 @@ function FocusedMultipleChoice({
 
 	function handleAddItemClick() {
 		const newItem = {
-			id: uuidv4(),
+			id: crypto.randomUUID(),
 			parentId: id,
 			value: "",
 		};
