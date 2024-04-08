@@ -5,6 +5,7 @@ import {useState} from "react";
 import {z, ZodError} from "zod";
 
 export default function TextInputComponent({props}: {props: TextInputProps}) {
+
   const [error, setError] = useState<string | null>();
   return (
     <Card className={"w-10/12 self-center mb-4"}>

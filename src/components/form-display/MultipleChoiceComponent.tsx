@@ -19,7 +19,9 @@ export default function MultipleChoiceComponent({
 			</CardHeader>
 			<CardContent>
 				{isRadio ? (
-					<RadioGroup defaultValue={props.items[0].value}>
+					<RadioGroup onValueChange={(value) => {
+
+					}} defaultValue={props.items[0].value}>
 						{props.items.map((item, index) => {
 							return (
 								<div className="flex items-center space-x-2" key={item.id}>
@@ -28,6 +30,14 @@ export default function MultipleChoiceComponent({
 								</div>
 							);
 						})}
+						{
+							props.hasOther ? (
+								<div className="flex items-center space-x-2" key={props.items[0].parentId}>
+									<RadioGroupItem value={"other"} id={props.items[0].parentId + "-other"} />
+									<Label htmlFor={props.items[0].parentId + "-other"}>{"other"}</Label>
+								</div>
+							) : null
+						}
 					</RadioGroup>
 				) : (
 					<>
