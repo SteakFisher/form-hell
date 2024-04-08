@@ -1,4 +1,4 @@
 export default interface MultipleChoiceResponse {
-  selected: string;
+  selected: Set<string>;
   type: "multiple-choice";
 }

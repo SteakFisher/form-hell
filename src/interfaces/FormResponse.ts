@@ -9,6 +9,6 @@ TextInputResponse
 | DateResponse
 | MultipleChoiceResponse;
 
-export default interface FormResponse {
-  [id: string] : Response;
+export default interface FormResponse <T extends Response> {
+  [id: string] : T;
 }

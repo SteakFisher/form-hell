@@ -1,11 +1,12 @@
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {z, ZodError} from "zod";
+import {FormRendererContext} from "@/contexts/FormRendererContext";
 
-export default function TextInputComponent({props}: {props: TextInputProps}) {
-
+export default function TextInputComponent({props, id }: {props: TextInputProps, id: string}) {
+  const { formResponses } = useContext(FormRendererContext)
   const [error, setError] = useState<string | null>();
   return (
     <Card className={"w-10/12 self-center mb-4"}>
@@ -24,7 +25,8 @@ export default function TextInputComponent({props}: {props: TextInputProps}) {
 
 
           try {
-            const yea = input.parse(e.target.value)
+            const parsedInput = input.parse(e.target.value)
+            formResponses[id] = { input: parsedInput, type: "text-input" }
             setError(null)
           } catch (e) {
             if (e instanceof ZodError) {

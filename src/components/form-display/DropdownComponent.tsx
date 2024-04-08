@@ -13,7 +13,7 @@ import {Label} from "@/components/ui/label";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 
-export default function DropdownComponent({ props } : { props: DropdownProps}) {
+export default function DropdownComponent({ props, id } : { id: string; props: DropdownProps}) {
   return (
     <Card className={"w-10/12 self-center mb-4"}>
       <CardHeader>
