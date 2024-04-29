@@ -55,45 +55,49 @@ export function SortableItem<T extends propsTypes>({
 
 	return (
 		<>
-			<div
-				ref={setNodeRef}
-				style={style}
-				id={id}
-				onFocus={handleOnFocus}
-				onBlur={handleOnBlur}
-				tabIndex={0}
-				className="custom-focus"
-			>
-				<Card
-					className={cn(
-						"custom-focus flex select-none overflow-hidden pl-3",
-						isFocused && "border-ring",
-					)}
+			<div ref={setNodeRef} style={style}>
+				<div
+					onFocus={handleOnFocus}
+					id={id}
+					onBlur={handleOnBlur}
+					tabIndex={0}
+					className="custom-focus"
 				>
-					{isFocused ? (
-						<FocusedSortableItem
-							id={id}
-							props={props}
-							SortableItemChild={SortableItemChild}
-						/>
-					) : (
-						<SortableItemChild id={id} props={props} isFocused={false} />
-					)}
-					<div
-						id="drag-handle"
-						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
-						{...attributes}
-						{...listeners}
-						onMouseDown={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-						}}
+					<Card
+						className={cn(
+							"custom-focus flex select-none overflow-hidden pl-3",
+							isFocused && "border-ring",
+						)}
 					>
-						<DragHandleDots2Icon className="size-7 text-black" />
-					</div>
-				</Card>
+						{isFocused ? (
+							<FocusedSortableItem
+								id={id}
+								props={props}
+								SortableItemChild={SortableItemChild}
+							/>
+						) : (
+							<SortableItemChild
+								id={id}
+								props={props}
+								isFocused={false}
+							/>
+						)}
+						<div
+							id="drag-handle"
+							className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
+							{...attributes}
+							{...listeners}
+							onMouseDown={(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+							}}
+						>
+							<DragHandleDots2Icon className="size-7 text-black" />
+						</div>
+					</Card>
+				</div>
+				<AddBar id={id} />
 			</div>
-			<AddBar id={id} />
 		</>
 	);
 
