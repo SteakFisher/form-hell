@@ -23,7 +23,7 @@ const NewFormPage = () => {
 				setFormItems: setFormItems,
 			}}
 		>
-			<div className="flex w-full justify-center pb-72 pt-32">
+			<div className="flex w-full justify-center py-20">
 				<FormBuilder />
 			</div>
 			<Toolbar />

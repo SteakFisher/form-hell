@@ -45,7 +45,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 
 	return (
 		<CardHeader
-			className="mx-6 border-b px-0"
+			className="mx-6 border-b mb-6 px-0"
 			tabIndex={-1}
 			onFocus={() => (focusedIdRef.current = "0")}
 		>
