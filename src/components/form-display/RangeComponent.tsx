@@ -3,7 +3,7 @@ import {Input} from "@/components/ui/input";
 import {RangeProps} from "@/interfaces/form-component-interfaces/RangeProps";
 import {Slider} from "@/components/ui/slider";
 
-export default function RangeComponent({ props } : { props: RangeProps }) {
+export default function RangeComponent({ props, id } : { id: string; props: RangeProps }) {
   console.log(props)
   return (
     <Card className={"w-10/12 self-center mb-4"}>

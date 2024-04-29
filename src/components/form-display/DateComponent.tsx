@@ -13,7 +13,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function DateComponent({ props }: { props: DateProps }) {
+export default function DateComponent({ props, id }: { id: string; props: DateProps }) {
 	const [date, setDate] = useState<Date>();
 
 	return (
