@@ -11,8 +11,14 @@ import {
 	SliderIcon,
 	TextIcon,
 } from "@radix-ui/react-icons";
-import { useContext } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import {
+	MutableRefObject,
+	RefObject,
+	useContext,
+	useRef,
+	useState,
+} from "react";
+import { v4 as uuidv4 } from "uuid";
 import MCQGridIcon from "../../public/icons/mcq_grid.svg";
 import {
 	DropdownMenu,
@@ -21,26 +27,48 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
-function AddBar({ id }: { id: string }) {
+function AddBar({
+	addMenuRef,
+	id,
+	isFocused,
+	setIsFocused,
+}: {
+	id: string;
+	addMenuRef: RefObject<HTMLDivElement>;
+	isFocused: boolean;
+	setIsFocused: (value: boolean) => void;
+}) {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	
+	// workaround for weird dropdown animation flashing when focused
+	const [isFocusedWhenOpen, setIsFocusedWhenOpen] = useState(false);
 
 	return (
-		<div className="flex h-8 w-full items-center px-2 opacity-85">
-			<div className="h-[1px] flex-grow bg-white" />
-			<DropdownMenu>
+		<div className="flex h-8 w-full items-center px-2 -z-10">
+			<div className="h-[1px] flex-grow bg-addbar" />
+			<DropdownMenu
+				onOpenChange={(isOpen) => isOpen && setIsFocusedWhenOpen(isFocused)}
+			>
 				<DropdownMenuTrigger className="custom-focus">
-					<PlusCircledIcon className="mx-1.5 size-6" />
+					<PlusCircledIcon className="mx-1.5 size-6 text-addbar" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
-					className="w-56"
-					side="bottom"
 					align="center"
+					className={cn(
+						"w-56",
+						isFocusedWhenOpen && "data-[state=closed]:duration-0",
+					)}
+					data-addmenu
+					onCloseAutoFocus={(e) => e.preventDefault()}
+					ref={addMenuRef}
+					side="bottom"
 					sideOffset={9}
 				>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
+						onSelect={(e) => {
 							handleAddElement(typesEnum["text-input"]);
 						}}
 					>
@@ -106,7 +134,7 @@ function AddBar({ id }: { id: string }) {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<div className="h-[1px] flex-grow bg-white" />
+			<div className="h-[1px] flex-grow bg-addbar" />
 		</div>
 	);
 
@@ -126,6 +154,7 @@ function AddBar({ id }: { id: string }) {
 		});
 
 		setFormItems(newFormItems);
+		setIsFocused(false);
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {

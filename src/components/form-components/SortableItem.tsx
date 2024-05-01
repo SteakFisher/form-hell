@@ -10,7 +10,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DragHandleDots2Icon, PlusCircledIcon } from "@radix-ui/react-icons";
 import autosize from "autosize";
-import {
+import React, {
 	ComponentType,
 	memo,
 	ReactNode,
@@ -48,6 +48,8 @@ export function SortableItem<T extends propsTypes>({
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
 
+	const addMenuRef = useRef<HTMLDivElement>(null);
+
 	const style = {
 		transform: CSS.Translate.toString(transform),
 		transition,
@@ -55,71 +57,74 @@ export function SortableItem<T extends propsTypes>({
 
 	return (
 		<>
-			<div ref={setNodeRef} style={style}>
-				<div
-					onFocus={handleOnFocus}
-					id={id}
-					onBlur={handleOnBlur}
-					tabIndex={0}
-					className="custom-focus"
+			<div
+				className="custom-focus z-50"
+				id={id}
+				onBlur={handleOnBlur}
+				onFocus={handleOnFocus}
+				ref={setNodeRef}
+				style={style}
+				tabIndex={0}
+			>
+				<Card
+					className={cn(
+						"custom-focus flex select-none overflow-hidden pl-3",
+						isFocused && "border-ring",
+					)}
 				>
-					<Card
-						className={cn(
-							"custom-focus flex select-none overflow-hidden pl-3",
-							isFocused && "border-ring",
-						)}
+					{isFocused ? (
+						<FocusedSortableItem
+							id={id}
+							props={props}
+							SortableItemChild={SortableItemChild}
+						/>
+					) : (
+						<SortableItemChild id={id} props={props} isFocused={false} />
+					)}
+					<div
+						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
+						{...attributes}
+						{...listeners}
+						onMouseDown={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+						}}
 					>
-						{isFocused ? (
-							<FocusedSortableItem
-								id={id}
-								props={props}
-								SortableItemChild={SortableItemChild}
-							/>
-						) : (
-							<SortableItemChild
-								id={id}
-								props={props}
-								isFocused={false}
-							/>
-						)}
-						<div
-							id="drag-handle"
-							className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
-							{...attributes}
-							{...listeners}
-							onMouseDown={(e) => {
-								e.stopPropagation();
-								e.preventDefault();
-							}}
-						>
-							<DragHandleDots2Icon className="size-7 text-black" />
-						</div>
-					</Card>
-				</div>
-				<AddBar id={id} />
+						<DragHandleDots2Icon className="size-7 text-black" />
+					</div>
+				</Card>
 			</div>
+			<AddBar
+				addMenuRef={addMenuRef}
+				id={id}
+				isFocused={isFocused}
+				setIsFocused={setIsFocused}
+			/>
 		</>
 	);
 
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
-		const relatedTarget = e.relatedTarget;
-		if (relatedTarget?.id === "drag-handle") return;
-		if (e.currentTarget.contains(e.relatedTarget)) return;
+		const focusedElement = e.relatedTarget;
+		if (e.currentTarget.contains(focusedElement)) return;
+		if (focusedElement?.getAttribute("data-addmenu")) return;
+		if (addMenuRef.current?.contains(focusedElement)) return;
 
 		const refs = debounceRefs.get(id);
 
-		if (!refs) {
-			setIsFocused(false);
-			return;
+		if (refs) {
+			refs.forEach((ref, key) => {
+				ref.flush();
+			});
 		}
-		refs.forEach((ref, key) => {
-			ref.flush();
-		});
 
 		setIsFocused(false);
 	}
 
-	function handleOnFocus() {
+	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
+		const focusedElement = e.target;
+		if (focusedElement.getAttribute("data-addmenu")) return;
+		if (addMenuRef.current?.contains(focusedElement)) return;
+
 		focusedIdRef.current = id;
 		setIsFocused(true);
 	}
