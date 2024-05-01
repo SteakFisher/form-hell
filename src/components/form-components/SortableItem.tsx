@@ -14,6 +14,7 @@ import React, {
 	ComponentType,
 	memo,
 	ReactNode,
+	RefObject,
 	useContext,
 	useEffect,
 	useRef,
@@ -23,7 +24,7 @@ import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
 import AddBar from "../AddBar";
 
-interface FocusedSortableItemProps<T extends propsTypes> {
+interface SortableItemProps<T extends propsTypes> {
 	className?: string;
 	SortableItemChild: ComponentType<{
 		props: T;
@@ -34,8 +35,10 @@ interface FocusedSortableItemProps<T extends propsTypes> {
 	props: T;
 }
 
-interface SortableItemProps<T extends propsTypes>
-	extends FocusedSortableItemProps<T> {}
+interface FocusedSortableItemProps<T extends propsTypes>
+	extends SortableItemProps<T> {
+	sortableItemRef: RefObject<HTMLDivElement>;
+}
 
 export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
@@ -49,6 +52,7 @@ export function SortableItem<T extends propsTypes>({
 	const [isFocused, setIsFocused] = useState(false);
 
 	const addMenuRef = useRef<HTMLDivElement>(null);
+	const sortableItemRef = useRef<HTMLDivElement>(null);
 
 	const style = {
 		transform: CSS.Translate.toString(transform),
@@ -71,9 +75,11 @@ export function SortableItem<T extends propsTypes>({
 						"custom-focus flex select-none overflow-hidden pl-3",
 						isFocused && "border-ring",
 					)}
+					ref={sortableItemRef}
 				>
 					{isFocused ? (
 						<FocusedSortableItem
+							sortableItemRef={sortableItemRef}
 							id={id}
 							props={props}
 							SortableItemChild={SortableItemChild}
@@ -121,20 +127,22 @@ export function SortableItem<T extends propsTypes>({
 	}
 
 	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
-		const focusedElement = e.target;
-		if (focusedElement.getAttribute("data-addmenu")) return;
-		if (addMenuRef.current?.contains(focusedElement)) return;
+		if (e.target.getAttribute("data-addmenu")) return;
+		if (addMenuRef.current?.contains(e.target)) return;
 
 		focusedIdRef.current = id;
 		setIsFocused(true);
+
+		const focusedElement = e.currentTarget as HTMLDivElement;
 	}
 }
 
-const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
-	SortableItemChild,
+function FocusedSortableItem<T extends propsTypes>({
 	className,
 	id,
 	props,
+	SortableItemChild,
+	sortableItemRef,
 }: FocusedSortableItemProps<T>) {
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const { formItems, setFormItems, debounceRefs } =
@@ -160,6 +168,24 @@ const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
 		refs
 			.set("required", handleRequiredChange)
 			.set("title", handleTitleChange);
+
+		const focusedElement = sortableItemRef.current;
+		if (focusedElement == null) return;
+		const rect = focusedElement.getBoundingClientRect();
+		const isVisible =
+			rect.top >= 0 &&
+			rect.bottom <=
+				(window.innerHeight || document.documentElement.clientHeight);
+		if (!isVisible) {
+			console.log("not fully visible");
+			const verticalPadding = 60;
+			const scrollTopPx =
+				rect.top < 0
+					? rect.top - verticalPadding
+					: rect.bottom - window.innerHeight + verticalPadding;
+
+			window.scrollBy({ left: 0, top: scrollTopPx, behavior: "smooth" });
+		}
 	}, []);
 
 	return (
@@ -204,4 +230,4 @@ const FocusedSortableItem = function FocusedSortableItem<T extends propsTypes>({
 			...formItems.slice(itemIndex + 1),
 		]);
 	}
-};
+}
