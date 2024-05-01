@@ -36,30 +36,22 @@ function AddBar({
 	setIsFocused,
 }: {
 	id: string;
-	addMenuRef: RefObject<HTMLDivElement>;
+	addMenuRef?: RefObject<HTMLDivElement>;
 	isFocused: boolean;
 	setIsFocused: (value: boolean) => void;
 }) {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
-	
-	// workaround for weird dropdown animation flashing when focused
-	const [isFocusedWhenOpen, setIsFocusedWhenOpen] = useState(false);
 
 	return (
-		<div className="flex h-8 w-full items-center px-2 -z-10">
-			<div className="h-[1px] flex-grow bg-addbar" />
-			<DropdownMenu
-				onOpenChange={(isOpen) => isOpen && setIsFocusedWhenOpen(isFocused)}
-			>
+		<div className="-z-10 flex h-8 w-full items-center px-2">
+			<div className="bg-addbar h-[1px] flex-grow" />
+			<DropdownMenu onOpenChange={handleOpenChange}>
 				<DropdownMenuTrigger className="custom-focus">
-					<PlusCircledIcon className="mx-1.5 size-6 text-addbar" />
+					<PlusCircledIcon className="text-addbar mx-1.5 size-6" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="center"
-					className={cn(
-						"w-56",
-						isFocusedWhenOpen && "data-[state=closed]:duration-0",
-					)}
+					className="w-56"
 					data-addmenu
 					onCloseAutoFocus={(e) => e.preventDefault()}
 					ref={addMenuRef}
@@ -134,11 +126,12 @@ function AddBar({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<div className="h-[1px] flex-grow bg-addbar" />
+			<div className="bg-addbar h-[1px] flex-grow" />
 		</div>
 	);
 
-	function handleAddElement(type: typesEnum) {
+	async function handleAddElement(type: typesEnum) {
+		await sleep(150);
 		const newId = uuidv4();
 		const newItem = {
 			id: newId,
@@ -154,7 +147,13 @@ function AddBar({
 		});
 
 		setFormItems(newFormItems);
-		setIsFocused(false);
+	}
+
+	async function handleOpenChange(isOpen: boolean) {
+		if (!isOpen) {
+			await sleep(150);
+			setIsFocused(false);
+		}
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
@@ -201,6 +200,10 @@ function AddBar({
 				return constants.defaultTitleProps;
 		}
 	}
+}
+
+function sleep(ms = 0) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default AddBar;
