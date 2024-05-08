@@ -4,28 +4,26 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
+import FormItem from "@/interfaces/FormItem";
 import { propsTypes } from "@/interfaces/propsTypes";
 import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { DragHandleDots2Icon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import React, {
 	ComponentType,
-	memo,
-	ReactNode,
 	RefObject,
 	useContext,
 	useEffect,
 	useRef,
-	useState,
+	useState
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
 import AddBar from "../AddBar";
 import AutoHeight from "../AutoHeight";
-import { SortableItemContext } from "@/contexts/SortableItemContext";
-import FormItem from "@/interfaces/FormItem";
 
 interface SortableItemProps<T extends propsTypes> {
 	accordionOpen?: boolean;
@@ -183,23 +181,6 @@ function FocusedSortableItem<T extends propsTypes>({
 		refs
 			.set("required", handleRequiredChange)
 			.set("title", handleTitleChange);
-
-		const focusedElement = sortableItemRef.current;
-		if (focusedElement == null) return;
-		const rect = focusedElement.getBoundingClientRect();
-		const isVisible =
-			rect.top >= 0 &&
-			rect.bottom <=
-				(window.innerHeight || document.documentElement.clientHeight);
-		if (!isVisible) {
-			const verticalPadding = 60;
-			const scrollTopPx =
-				rect.top < 0
-					? rect.top - verticalPadding
-					: rect.bottom - window.innerHeight + verticalPadding;
-
-			window.scrollBy({ left: 0, top: scrollTopPx, behavior: "smooth" });
-		}
 	}, []);
 
 	return (

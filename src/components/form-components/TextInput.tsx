@@ -40,7 +40,6 @@ export const TextInput = memo(function TextInput({
 			accordionOpen={accordionOpen}
 			id={id}
 			props={props}
-			key={id}
 			SortableItemChild={({ id, isFocused, props }) =>
 				TextInputWrapper({
 					id,

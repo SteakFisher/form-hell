@@ -3,6 +3,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
@@ -25,13 +26,12 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
-import { Textarea } from "@/components/ui/textarea";
-import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { v4 as uuidv4 } from 'uuid';
 
 function MultipleChoice({
 	id,
@@ -49,7 +49,7 @@ function MultipleChoice({
 	);
 }
 
-const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
+function MultipleChoiceWrapper({
 	id,
 	props,
 	isFocused,
@@ -74,7 +74,7 @@ const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
 			)}
 		</>
 	);
-});
+}	
 
 function FocusedMultipleChoice({
 	id,
@@ -107,8 +107,7 @@ function FocusedMultipleChoice({
 	);
 
 	useEffect(() => {
-		const refs =
-			debounceRefs.get(id);
+		const refs = debounceRefs.get(id);
 		if (!refs) return;
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
@@ -120,7 +119,7 @@ function FocusedMultipleChoice({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef} tabIndex={-1}>
+		<CardContent ref={contentRef}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox
