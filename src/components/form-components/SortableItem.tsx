@@ -23,13 +23,16 @@ import React, {
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
 import AddBar from "../AddBar";
+import AutoHeight from "../AutoHeight";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 
 interface SortableItemProps<T extends propsTypes> {
+	accordionOpen?: boolean;
 	className?: string;
 	SortableItemChild: ComponentType<{
-		props: T;
 		id: string;
 		isFocused: boolean;
+		props: T;
 	}>;
 	id: string;
 	props: T;
@@ -41,8 +44,9 @@ interface FocusedSortableItemProps<T extends propsTypes>
 }
 
 export function SortableItem<T extends propsTypes>({
-	SortableItemChild,
+	accordionOpen,
 	id,
+	SortableItemChild,
 	props,
 }: SortableItemProps<T>) {
 	const { debounceRefs, focusedIdRef } = useContext(FormBuilderContext);
@@ -53,6 +57,7 @@ export function SortableItem<T extends propsTypes>({
 
 	const addMenuRef = useRef<HTMLDivElement>(null);
 	const sortableItemRef = useRef<HTMLDivElement>(null);
+	const accordionContentRef = useRef<HTMLDivElement>(null);
 
 	const style = {
 		transform: CSS.Translate.toString(transform),
@@ -60,7 +65,9 @@ export function SortableItem<T extends propsTypes>({
 	};
 
 	return (
-		<>
+		<SortableItemContext.Provider
+			value={{ accordionContentRef: accordionContentRef }}
+		>
 			<div
 				className="custom-focus z-50"
 				id={id}
@@ -72,21 +79,32 @@ export function SortableItem<T extends propsTypes>({
 			>
 				<Card
 					className={cn(
-						"custom-focus flex select-none overflow-hidden pl-3",
+						"custom-focus flex w-full select-none overflow-hidden pl-3 transition-all",
 						isFocused && "border-ring",
 					)}
 					ref={sortableItemRef}
 				>
-					{isFocused ? (
-						<FocusedSortableItem
-							sortableItemRef={sortableItemRef}
-							id={id}
-							props={props}
-							SortableItemChild={SortableItemChild}
-						/>
-					) : (
-						<SortableItemChild id={id} props={props} isFocused={false} />
-					)}
+					<AutoHeight
+						accordionContentRef={accordionContentRef}
+						accordionOpen={accordionOpen}
+						isFocused={isFocused}
+						sortableItemRef={sortableItemRef}
+					>
+						{isFocused ? (
+							<FocusedSortableItem
+								id={id}
+								props={props}
+								SortableItemChild={SortableItemChild}
+								sortableItemRef={sortableItemRef}
+							/>
+						) : (
+							<SortableItemChild
+								id={id}
+								props={props}
+								isFocused={false}
+							/>
+						)}
+					</AutoHeight>
 					<div
 						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
 						{...attributes}
@@ -106,13 +124,12 @@ export function SortableItem<T extends propsTypes>({
 				isFocused={isFocused}
 				setIsFocused={setIsFocused}
 			/>
-		</>
+		</SortableItemContext.Provider>
 	);
 
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
 		const focusedElement = e.relatedTarget;
 		if (e.currentTarget.contains(focusedElement)) return;
-		if (focusedElement?.getAttribute("data-addmenu")) return;
 		if (addMenuRef.current?.contains(focusedElement)) return;
 
 		const refs = debounceRefs.get(id);
@@ -127,13 +144,10 @@ export function SortableItem<T extends propsTypes>({
 	}
 
 	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
-		if (e.target.getAttribute("data-addmenu")) return;
 		if (addMenuRef.current?.contains(e.target)) return;
 
 		focusedIdRef.current = id;
 		setIsFocused(true);
-
-		const focusedElement = e.currentTarget as HTMLDivElement;
 	}
 }
 
@@ -177,7 +191,6 @@ function FocusedSortableItem<T extends propsTypes>({
 			rect.bottom <=
 				(window.innerHeight || document.documentElement.clientHeight);
 		if (!isVisible) {
-			console.log("not fully visible");
 			const verticalPadding = 60;
 			const scrollTopPx =
 				rect.top < 0

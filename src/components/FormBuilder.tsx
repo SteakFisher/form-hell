@@ -29,6 +29,7 @@ import MultipleChoice from "@/components/form-components/multiple-choice/Multipl
 import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 import Date from "./form-components/Date";
+import AddBar from "./AddBar";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
@@ -57,6 +58,7 @@ const FormBuilder = () => {
 						items={formItems}
 						strategy={verticalListSortingStrategy}
 					>
+						<AddBar id={"0"} isFocused={false} setIsFocused={() => {}} />
 						{formItems.map((formItem) => {
 							switch (formItem.props.type) {
 								case "date":

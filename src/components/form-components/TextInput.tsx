@@ -29,6 +29,14 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import { SortableItem } from "./SortableItem";
 import { Checkbox } from "../ui/checkbox";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { cn } from "@/lib/utils";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "../ui/collapsible";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 
 export const TextInput = memo(function TextInput({
 	id,
@@ -37,21 +45,36 @@ export const TextInput = memo(function TextInput({
 	id: string;
 	props: TextInputProps;
 }) {
+	const [accordionOpen, setAccordionOpen] = useState(false);
+
 	return (
 		<SortableItem
+			accordionOpen={accordionOpen}
 			id={id}
 			props={props}
 			key={id}
-			SortableItemChild={TextInputWrapper}
+			SortableItemChild={({ id, isFocused, props }) =>
+				TextInputWrapper({
+					id,
+					isFocused,
+					props,
+					accordionOpen,
+					setAccordionOpen,
+				})
+			}
 		/>
 	);
 });
 
-const TextInputWrapper = memo(function TextInputWrapper({
+function TextInputWrapper({
+	accordionOpen,
+	setAccordionOpen,
 	id,
 	props,
 	isFocused,
 }: {
+	accordionOpen: boolean;
+	setAccordionOpen: (value: boolean) => void;
 	id: string;
 	isFocused: boolean;
 	props: TextInputProps;
@@ -59,18 +82,30 @@ const TextInputWrapper = memo(function TextInputWrapper({
 	return (
 		<>
 			{isFocused ? (
-				<FocusedTextInput id={id} props={props} />
+				<FocusedTextInput
+					accordionOpen={accordionOpen}
+					setAccordionOpen={setAccordionOpen}
+					id={id}
+					props={props}
+				/>
 			) : (
-				<UnfocusedTextInput props={props} />
+				<UnfocusedTextInput
+					props={props}
+					setAccordionOpen={setAccordionOpen}
+				/>
 			)}
 		</>
 	);
-});
+}
 
 function FocusedTextInput({
-	props,
+	accordionOpen,
 	id,
+	props,
+	setAccordionOpen,
 }: {
+	accordionOpen: boolean;
+	setAccordionOpen: (value: boolean) => void;
 	props: TextInputProps;
 	id: string;
 }) {
@@ -78,6 +113,7 @@ function FocusedTextInput({
 	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const { accordionContentRef } = useContext(SortableItemContext);
 
 	const regexRef = useRef<HTMLInputElement>(null);
 	const lengthsRef = useRef({
@@ -85,7 +121,6 @@ function FocusedTextInput({
 		maxLength: props.maxLength ? props.maxLength.toString() : "",
 	});
 
-	const [accordionItem, setAccordionItem] = useState("");
 	const [lengthError, setLengthError] = useState("");
 	const [regexError, setRegexError] = useState("");
 
@@ -120,7 +155,6 @@ function FocusedTextInput({
 	const handlePlaceholderChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			props.placeholder = e.target.value;
-			console.log("placeholder updated");
 		},
 		constants.debounceWait,
 	);
@@ -168,117 +202,119 @@ function FocusedTextInput({
 					/>
 				</div>
 			</div>
-			<Accordion
-				type="single"
-				collapsible
-				value={accordionItem}
-				onValueChange={handleAccordionToggle}
-			>
-				<AccordionItem value="item-1" className="border-b-0">
-					{/* extra div for straight border-b */}
-					<AccordionTrigger className="custom-focus mt-2 rounded-sm px-1 hover:no-underline">
-						Advanced
-					</AccordionTrigger>
-					<Separator />
 
-					<AccordionContent className="mt-5 px-[1px]">
-						<div className="text-base font-semibold">
-							<u>Length</u>
-						</div>
+			{/* "accordion" */}
+			<div>
+				<div
+					data-state={accordionOpen ? "open" : "closed"}
+					onClick={handleAccordionToggle}
+					className="custom-focus mt-2 flex w-full cursor-pointer items-center justify-between px-1 py-4 text-sm font-medium transition-all [&[data-state=open]>svg]:rotate-180"
+				>
+					Advanced
+					<ChevronDownIcon className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+				</div>
+				<Separator />
 
-						<div className="mt-3 flex w-full space-x-6">
-							<div className="flex">
-								<div className="flex h-9 items-center">
-									<Label htmlFor="min-length">Min. Length</Label>
-								</div>
-								<Input
-									defaultValue={props.minLength || ""}
-									className="ml-2 w-24"
-									id="min-length"
-									onChange={handleMinLengthChange}
-									placeholder="0"
-								/>
-							</div>
-							<div className="flex">
-								<div className="flex h-9 items-center">
-									<Label htmlFor="max-length">Max. Length</Label>
-								</div>
-								<Input
-									defaultValue={props.maxLength || ""}
-									className="ml-2 w-24"
-									id="max-length"
-									onChange={handleMaxLengthChange}
-								/>
-							</div>
-							<Select
-								defaultValue={props.lengthType}
-								onValueChange={handleLengthTypeChange}
-							>
-								<SelectTrigger className="w-36">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="characters">
-										Characters
-									</SelectItem>
-									<SelectItem value="words">Words</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-						{lengthError && <div className="error">{lengthError}</div>}
+				<div
+					ref={accordionContentRef}
+					className={
+						"overflow-hidden px-[1px] pt-5 text-sm transition-all"
+					}
+				>
+					<div className="text-base font-semibold">
+						<u>Length</u>
+					</div>
 
-						<div className="mt-5 text-base font-semibold">
-							<u>Regex</u>
+					<div className="flex w-full space-x-6 pt-3">
+						<div className="flex">
+							<div className="flex h-9 items-center">
+								<Label htmlFor="min-length">Min. Length</Label>
+							</div>
+							<Input
+								defaultValue={props.minLength || ""}
+								className="ml-2 w-24"
+								id="min-length"
+								onChange={handleMinLengthChange}
+								placeholder="0"
+							/>
 						</div>
-						<div className="mt-4 flex items-center space-x-6">
-							<Select
-								defaultValue={props.regexMethod}
-								onValueChange={handleRegexMethodChange}
-							>
-								<SelectTrigger className="w-36">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="contains">Contains</SelectItem>
-									<SelectItem value="doesnt-contain">
-										{"Doesn't contain"}
-									</SelectItem>
-									<SelectItem value="matches">Matches</SelectItem>
-									<SelectItem value="doesnt-match">
-										{"Doesn't match"}
-									</SelectItem>
-								</SelectContent>
-							</Select>
+						<div className="flex">
+							<div className="flex h-9 items-center">
+								<Label htmlFor="max-length">Max. Length</Label>
+							</div>
+							<Input
+								defaultValue={props.maxLength || ""}
+								className="ml-2 w-24"
+								id="max-length"
+								onChange={handleMaxLengthChange}
+							/>
+						</div>
+						<Select
+							defaultValue={props.lengthType}
+							onValueChange={handleLengthTypeChange}
+						>
+							<SelectTrigger className="w-36">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="characters">Characters</SelectItem>
+								<SelectItem value="words">Words</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="error">{lengthError}</div>
 
-							<div className="flex items-center space-x-2">
-								<Label htmlFor="regex">Regex pattern</Label>
-								<Input
-									className="w-56"
-									id="regex"
-									ref={regexRef}
-									defaultValue={props.regex.toString()}
-									onChange={handleRegexChange}
-									maxLength={1000}
-								/>
-							</div>
-							<div className="flex items-center space-x-2">
-								<Label htmlFor="ignore-case">Ignore case</Label>
-								<Checkbox
-									id="ignore-case"
-									defaultChecked={props.regexFlags === "mi"}
-									onCheckedChange={handleIgnoreCaseChange}
-								/>
-							</div>
+					<div className="text-base font-semibold">
+						<u>Regex</u>
+					</div>
+					<div className="flex items-center space-x-6 pt-4">
+						<Select
+							defaultValue={props.regexMethod}
+							onValueChange={handleRegexMethodChange}
+						>
+							<SelectTrigger className="w-36">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="contains">Contains</SelectItem>
+								<SelectItem value="doesnt-contain">
+									{"Doesn't contain"}
+								</SelectItem>
+								<SelectItem value="matches">Matches</SelectItem>
+								<SelectItem value="doesnt-match">
+									{"Doesn't match"}
+								</SelectItem>
+							</SelectContent>
+						</Select>
+
+						<div className="flex items-center space-x-2">
+							<Label htmlFor="regex">Regex pattern</Label>
+							<Input
+								className="w-56"
+								id="regex"
+								ref={regexRef}
+								defaultValue={props.regex.toString()}
+								onChange={handleRegexChange}
+								maxLength={1000}
+							/>
 						</div>
-						{regexError && <div className="error">{regexError}</div>}
-					</AccordionContent>
-				</AccordionItem>
-			</Accordion>
+						<div className="flex items-center space-x-2">
+							<Label htmlFor="ignore-case">Ignore case</Label>
+							<Checkbox
+								id="ignore-case"
+								defaultChecked={props.regexFlags === "mi"}
+								onCheckedChange={handleIgnoreCaseChange}
+							/>
+						</div>
+					</div>
+					<div className="error">{regexError}</div>
+				</div>
+			</div>
 		</CardContent>
 	);
 
 	function handleAccordionToggle() {
-		setAccordionItem(accordionItem ? "" : "item-1");
+		setAccordionOpen(!accordionOpen);
 	}
 
 	function handleInputTypeChange(inputType: string) {
@@ -357,7 +393,17 @@ function FocusedTextInput({
 	}
 }
 
-function UnfocusedTextInput({ props }: { props: TextInputProps }) {
+function UnfocusedTextInput({
+	props,
+	setAccordionOpen,
+}: {
+	props: TextInputProps;
+	setAccordionOpen: (value: boolean) => void;
+}) {
+	useEffect(() => {
+		setAccordionOpen(false);
+	}, [setAccordionOpen]);
+
 	return (
 		<div className="h-min w-full whitespace-pre-wrap">
 			<CardHeader>

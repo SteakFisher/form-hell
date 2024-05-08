@@ -61,7 +61,7 @@
 }
 
 .error {
-	@apply relative my-2 flex justify-center rounded border border-red-400 bg-red-100 px-2 py-2 text-red-700;
+	@apply text-red-500 text-sm h-7 py-2 truncate flex items-center justify-center;
 }
 
 .borderless-input {

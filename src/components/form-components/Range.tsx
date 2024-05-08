@@ -16,19 +16,9 @@ import { constants } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 
-function Range({
-	id,
-	props
-}: {
-	id: string;
-	props: RangeProps;
-}) {
+function Range({ id, props }: { id: string; props: RangeProps }) {
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			SortableItemChild={RangeWrapper}
-		/>
+		<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
 	);
 }
 
@@ -91,8 +81,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	);
 
 	useEffect(() => {
-		const refs =
-			debounceRefs.get(id);
+		const refs = debounceRefs.get(id);
 		if (!refs) return;
 		refs
 			.set("max", handleMaxChange)
@@ -101,7 +90,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	});
 
 	return (
-		<CardContent className="w-full justify-center">
+		<CardContent className="w-full justify-center pb-2">
 			<div className="mt-3 flex w-min space-x-6 ">
 				<div className="flex">
 					<div className="flex h-9 items-center">
@@ -140,7 +129,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 					/>
 				</div>
 			</div>
-			{rangeError && <div className="error">{rangeError}</div>}
+			<div className="error">{rangeError}</div>
 		</CardContent>
 	);
 
