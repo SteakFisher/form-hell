@@ -27,36 +27,37 @@ const AutoHeight = ({
 	const contentDiv = useRef<HTMLDivElement | null>(null);
 	const autoScrollFlagRef = useRef<boolean>(false);
 
-	const calcHeightToRemove = useCallback(
-		function calcHeightToRemove(): number {
-			if (!accordionContentRef?.current) return 0;
-			return isFocused
-				? accordionOpen
-					? 0
-					: accordionContentRef.current.scrollHeight
-				: 0;
-		},
-		[accordionContentRef, accordionOpen, isFocused],
-	);
-
 	const autoScroll = useCallback(
 		function autoScroll(newHeight: number) {
 			const focusedElement = sortableItemRef.current;
 			if (focusedElement == null) return;
 			const rect = focusedElement.getBoundingClientRect();
 			const newBottom = rect.top + newHeight;
-			const isVisible =
-				rect.top >= 0 &&
-				newBottom <=
-					(window.innerHeight || document.documentElement.clientHeight);
-			if (!isVisible) {
-				const verticalPadding = 60;
-				const scrollTopPx =
-					rect.top < 0
-						? rect.top - verticalPadding
-						: newBottom - window.innerHeight + verticalPadding;
+			const isTopVisible = rect.top >= 0;
+			const isBottomVisible = newBottom <= window.innerHeight;
+			const verticalPadding = 30;
 
-				window.scrollBy({ left: 0, top: scrollTopPx, behavior: "smooth" });
+			if (!isTopVisible) {
+				if (isBottomVisible) {
+					const scrollTopPx = rect.top - verticalPadding;
+					window.scrollBy({
+						left: 0,
+						top: scrollTopPx,
+						behavior: "smooth",
+					});
+				}
+			} else {
+				if (!isBottomVisible) {
+					const scrollTopPx =
+						newHeight + verticalPadding < window.innerHeight
+							? newBottom - window.innerHeight + verticalPadding
+							: rect.top - verticalPadding;
+					window.scrollBy({
+						left: 0,
+						top: scrollTopPx,
+						behavior: "smooth",
+					});
+				}
 			}
 
 			autoScrollFlagRef.current = false;
@@ -72,21 +73,19 @@ const AutoHeight = ({
 
 	useEffect(() => {
 		const element = contentDiv.current as HTMLDivElement;
-		const newHeight = element.clientHeight - calcHeightToRemove();
-		setHeight(newHeight);
 
 		if (autoScrollFlagRef.current) {
-			autoScroll(newHeight);
+			autoScroll(newHeight(element));
 		}
 
 		const resizeObserver = new ResizeObserver(() => {
-			setHeight(newHeight);
+			setHeight(newHeight(element));
 		});
 
 		resizeObserver.observe(element);
 
 		return () => resizeObserver.disconnect();
-	}, [calcHeightToRemove, autoScroll]);
+	}, [isFocused, accordionOpen, autoScroll]);
 
 	return (
 		<AnimateHeight
@@ -100,6 +99,18 @@ const AutoHeight = ({
 			{children}
 		</AnimateHeight>
 	);
+
+	function newHeight(element: HTMLDivElement): number {
+		if (!accordionContentRef?.current) return element.scrollHeight;
+		return (
+			element.scrollHeight -
+			(isFocused
+				? accordionOpen
+					? 0
+					: accordionContentRef.current.scrollHeight
+				: 0)
+		);
+	}
 };
 
 export default AutoHeight;
