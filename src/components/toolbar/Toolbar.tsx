@@ -26,10 +26,10 @@ import ToolbarButton from "./ToolbarButton";
 import MCQGridIcon from "../../../public/icons/mcq_grid.svg";
 import PlusIcon from "../../../public/icons/plus.svg";
 import SaveIcon from "../../../public/icons/save.svg";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs, focusedIdRef } =
+	const { formItems, setFormItems, debounceRefs, focusedItemRef } =
 		useContext(FormBuilderContext);
 	const router = useRouter();
 
@@ -183,7 +183,7 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
-		debounceRefs.get(focusedIdRef.current)?.forEach((ref) => {
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
 			ref.flush();
 		});
 

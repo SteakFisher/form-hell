@@ -12,11 +12,8 @@ import {
 	TextIcon,
 } from "@radix-ui/react-icons";
 import {
-	MutableRefObject,
 	RefObject,
-	useContext,
-	useRef,
-	useState,
+	useContext
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import MCQGridIcon from "../../public/icons/mcq_grid.svg";
@@ -27,27 +24,22 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 
 function AddBar({
 	addMenuRef,
 	id,
-	isFocused,
-	setIsFocused,
 }: {
 	id: string;
 	addMenuRef?: RefObject<HTMLDivElement>;
-	isFocused: boolean;
-	setIsFocused: (value: boolean) => void;
 }) {
-	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const { formItems, focusedItemRef, setFormItems} = useContext(FormBuilderContext);
 
 	return (
 		<div className="-z-10 flex h-8 w-full items-center px-2">
-			<div className="bg-addbar h-[1px] flex-grow" />
+			<div className="h-[1px] flex-grow bg-addbar" />
 			<DropdownMenu onOpenChange={handleOpenChange}>
 				<DropdownMenuTrigger className="custom-focus">
-					<PlusCircledIcon className="text-addbar mx-1.5 size-6" />
+					<PlusCircledIcon className="mx-1.5 size-6 text-addbar" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="center"
@@ -126,12 +118,11 @@ function AddBar({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<div className="bg-addbar h-[1px] flex-grow" />
+			<div className="h-[1px] flex-grow bg-addbar" />
 		</div>
 	);
 
 	async function handleAddElement(type: typesEnum) {
-		await sleep(150);
 		const newId = uuidv4();
 		const newItem = {
 			id: newId,
@@ -151,8 +142,7 @@ function AddBar({
 
 	async function handleOpenChange(isOpen: boolean) {
 		if (!isOpen) {
-			await sleep(150);
-			setIsFocused(false);
+			focusedItemRef.current.blurItem();
 		}
 	}
 
@@ -200,10 +190,6 @@ function AddBar({
 				return constants.defaultTitleProps;
 		}
 	}
-}
-
-function sleep(ms = 0) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default AddBar;

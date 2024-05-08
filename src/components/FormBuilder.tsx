@@ -58,7 +58,7 @@ const FormBuilder = () => {
 						items={formItems}
 						strategy={verticalListSortingStrategy}
 					>
-						<AddBar id={"0"} isFocused={false} setIsFocused={() => {}} />
+						<AddBar id={"0"} />
 						{formItems.map((formItem) => {
 							switch (formItem.props.type) {
 								case "date":

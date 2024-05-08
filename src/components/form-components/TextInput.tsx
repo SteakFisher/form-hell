@@ -1,9 +1,3 @@
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +11,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
 	ChangeEvent,
 	memo,
@@ -27,16 +23,8 @@ import {
 	useState,
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { SortableItem } from "./SortableItem";
 import { Checkbox } from "../ui/checkbox";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { cn } from "@/lib/utils";
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "../ui/collapsible";
-import { SortableItemContext } from "@/contexts/SortableItemContext";
+import { SortableItem } from "./SortableItem";
 
 export const TextInput = memo(function TextInput({
 	id,

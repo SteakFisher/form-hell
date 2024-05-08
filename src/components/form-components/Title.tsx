@@ -8,8 +8,7 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 const Title = ({ props }: { props: TitleProps }) => {
-	const { debounceRefs, focusedIdRef } =
-		useContext(FormBuilderContext);
+	const { debounceRefs, focusedItemRef } = useContext(FormBuilderContext);
 
 	const descriptionRef = useRef(null);
 	const formTitleRef = useRef(null);
@@ -45,9 +44,11 @@ const Title = ({ props }: { props: TitleProps }) => {
 
 	return (
 		<CardHeader
-			className="mx-6 border-b mb-6 px-0"
+			className="mx-6 mb-6 border-b px-0"
 			tabIndex={-1}
-			onFocus={() => (focusedIdRef.current = "0")}
+			onFocus={() =>
+				(focusedItemRef.current = { id: "0", blurItem: () => {} })
+			}
 		>
 			<Textarea
 				ref={formTitleRef}

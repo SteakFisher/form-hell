@@ -9,7 +9,7 @@ import { constants } from "@/constants";
 
 const NewFormPage = () => {
 	let debounceRefs = useMemo(() => new Map(), []);
-	let focusedIdRef = useRef("0");
+	let focusedItemRef = useRef({ id: "0", blurItem: () => {} });
 	const [formItems, setFormItems] = useState<FormItem[]>([
 		{ id: "0", props: constants.defaultTitleProps },
 	]);
@@ -18,7 +18,7 @@ const NewFormPage = () => {
 		<FormBuilderContext.Provider
 			value={{
 				debounceRefs: debounceRefs,
-				focusedIdRef: focusedIdRef,
+				focusedItemRef: focusedItemRef,
 				formItems: formItems,
 				setFormItems: setFormItems,
 			}}

@@ -25,6 +25,7 @@ import DeleteIcon from "../../../public/icons/delete.svg";
 import AddBar from "../AddBar";
 import AutoHeight from "../AutoHeight";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
+import FormItem from "@/interfaces/FormItem";
 
 interface SortableItemProps<T extends propsTypes> {
 	accordionOpen?: boolean;
@@ -49,7 +50,7 @@ export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
 	props,
 }: SortableItemProps<T>) {
-	const { debounceRefs, focusedIdRef } = useContext(FormBuilderContext);
+	const { debounceRefs, focusedItemRef } = useContext(FormBuilderContext);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
@@ -118,12 +119,7 @@ export function SortableItem<T extends propsTypes>({
 					</div>
 				</Card>
 			</div>
-			<AddBar
-				addMenuRef={addMenuRef}
-				id={id}
-				isFocused={isFocused}
-				setIsFocused={setIsFocused}
-			/>
+			<AddBar addMenuRef={addMenuRef} id={id} />
 		</SortableItemContext.Provider>
 	);
 
@@ -131,7 +127,12 @@ export function SortableItem<T extends propsTypes>({
 		const focusedElement = e.relatedTarget;
 		if (e.currentTarget.contains(focusedElement)) return;
 		if (addMenuRef.current?.contains(focusedElement)) return;
+		if (focusedElement?.getAttribute("data-addmenu")) return;
 
+		blurItem();
+	}
+
+	function blurItem() {
 		const refs = debounceRefs.get(id);
 
 		if (refs) {
@@ -146,7 +147,7 @@ export function SortableItem<T extends propsTypes>({
 	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
 		if (addMenuRef.current?.contains(e.target)) return;
 
-		focusedIdRef.current = id;
+		focusedItemRef.current = { id: id, blurItem: blurItem };
 		setIsFocused(true);
 	}
 }
@@ -234,13 +235,12 @@ function FocusedSortableItem<T extends propsTypes>({
 	);
 
 	function handleDeleteClick() {
-		const itemIndex = formItems.findIndex((formItem) => formItem.id === id);
+		const newFormItems: FormItem[] = [];
+		formItems.forEach((formItem) => {
+			if (!(formItem.id === id)) newFormItems.push(formItem);
+		});
+		setFormItems(newFormItems);
 
 		debounceRefs.delete(id);
-
-		setFormItems([
-			...formItems.slice(0, itemIndex),
-			...formItems.slice(itemIndex + 1),
-		]);
 	}
 }
