@@ -11,10 +11,10 @@ const NewFormPage = () => {
 	let debounceRefs = useMemo(() => new Map(), []);
 	let focusedItemRef = useRef({ id: "0", blurItem: () => {} });
 	let heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
-	const [formItems, setFormItems] = useState<FormItem[]>([
-		{ id: "0", props: constants.defaultTitleProps },
-	]);
-	
+	const [formItems, setFormItems] = useState<FormItem[]>(
+		constants.defaultFormItems,
+	);
+
 	return (
 		<FormBuilderContext.Provider
 			value={{
