@@ -121,7 +121,7 @@ function FocusedMultipleChoiceGrid({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef} tabIndex={-1}>
+		<CardContent ref={contentRef}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox

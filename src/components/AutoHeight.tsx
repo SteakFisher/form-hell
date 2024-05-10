@@ -1,6 +1,8 @@
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import React, {
 	RefObject,
 	useCallback,
+	useContext,
 	useEffect,
 	useRef,
 	useState,
@@ -23,9 +25,11 @@ const AutoHeight = ({
 	sortableItemRef,
 	...props
 }: AutoHeightProps) => {
+	const { heightDiffRef } = useContext(FormBuilderContext);
 	const [height, setHeight] = useState<Height>("auto");
-	const contentDiv = useRef<HTMLDivElement | null>(null);
+
 	const autoScrollFlagRef = useRef<boolean>(false);
+	const contentDiv = useRef<HTMLDivElement>(null);
 
 	const autoScroll = useCallback(
 		function autoScroll(newHeight: number) {
@@ -48,18 +52,32 @@ const AutoHeight = ({
 				}
 			} else {
 				if (!isBottomVisible) {
-					const scrollTopPx =
-						newHeight + verticalPadding < window.innerHeight
-							? newBottom - window.innerHeight + verticalPadding
-							: rect.top - verticalPadding;
-					window.scrollBy({
-						left: 0,
-						top: scrollTopPx,
-						behavior: "smooth",
-					});
+					if (newHeight + verticalPadding < window.innerHeight) {
+						const heightDiff = heightDiffRef.current.shouldScroll
+							? heightDiffRef.current.heightDiff
+							: 0;
+						const scrollTopPx =
+							newBottom -
+							window.innerHeight +
+							verticalPadding +
+							heightDiff;
+						window.scrollBy({
+							left: 0,
+							top: scrollTopPx,
+							behavior: "smooth",
+						});
+					} else {
+						const scrollTopPx = rect.top - verticalPadding;
+						window.scrollBy({
+							left: 0,
+							top: scrollTopPx,
+							behavior: "smooth",
+						});
+					}
 				}
 			}
 
+			heightDiffRef.current.shouldScroll = false;
 			autoScrollFlagRef.current = false;
 		},
 		[sortableItemRef],
@@ -89,12 +107,12 @@ const AutoHeight = ({
 
 	return (
 		<AnimateHeight
-			{...props}
 			className="w-full"
-			height={height}
 			contentRef={contentDiv}
 			disableDisplayNone
-			duration={250}
+			duration={225}
+			height={height}
+			{...props}
 		>
 			{children}
 		</AnimateHeight>

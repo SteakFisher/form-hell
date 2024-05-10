@@ -18,7 +18,7 @@ import React, {
 	useContext,
 	useEffect,
 	useRef,
-	useState
+	useState,
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
@@ -39,7 +39,7 @@ interface SortableItemProps<T extends propsTypes> {
 
 interface FocusedSortableItemProps<T extends propsTypes>
 	extends SortableItemProps<T> {
-	sortableItemRef: RefObject<HTMLDivElement>;
+	focusedSortableItemRef: RefObject<HTMLDivElement>;
 }
 
 export function SortableItem<T extends propsTypes>({
@@ -48,15 +48,20 @@ export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
 	props,
 }: SortableItemProps<T>) {
-	const { debounceRefs, focusedItemRef } = useContext(FormBuilderContext);
+	const { debounceRefs, focusedItemRef, heightDiffRef } =
+		useContext(FormBuilderContext);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
 
-	const addMenuRef = useRef<HTMLDivElement>(null);
-	const sortableItemRef = useRef<HTMLDivElement>(null);
 	const accordionContentRef = useRef<HTMLDivElement>(null);
+	const addMenuRef = useRef<HTMLDivElement>(null);
+	const focusedHeightRef = useRef(0);
+	const focusingElementIdRef = useRef("");
+	const focusedSortableItemRef = useRef<HTMLDivElement>(null);
+	const measureDivRef = useRef<HTMLDivElement>(null);
+	const sortableItemRef = useRef<HTMLDivElement>(null);
 
 	const style = {
 		transform: CSS.Translate.toString(transform),
@@ -69,6 +74,7 @@ export function SortableItem<T extends propsTypes>({
 		>
 			<div
 				className="custom-focus z-50"
+				data-error="false"
 				id={id}
 				onBlur={handleOnBlur}
 				onFocus={handleOnFocus}
@@ -83,27 +89,31 @@ export function SortableItem<T extends propsTypes>({
 					)}
 					ref={sortableItemRef}
 				>
-					<AutoHeight
-						accordionContentRef={accordionContentRef}
-						accordionOpen={accordionOpen}
-						isFocused={isFocused}
-						sortableItemRef={sortableItemRef}
-					>
-						{isFocused ? (
-							<FocusedSortableItem
-								id={id}
-								props={props}
-								SortableItemChild={SortableItemChild}
-								sortableItemRef={sortableItemRef}
-							/>
-						) : (
-							<SortableItemChild
-								id={id}
-								props={props}
-								isFocused={false}
-							/>
-						)}
-					</AutoHeight>
+					<div className="flex w-full" ref={measureDivRef}>
+						<AutoHeight
+							accordionContentRef={accordionContentRef}
+							accordionOpen={accordionOpen}
+							isFocused={isFocused}
+							sortableItemRef={sortableItemRef}
+						>
+							{isFocused ? (
+								<FocusedSortableItem
+									focusedSortableItemRef={focusedSortableItemRef}
+									id={id}
+									props={props}
+									SortableItemChild={SortableItemChild}
+								/>
+							) : (
+								<UnfocusedSortableItem
+									focusedHeightRef={focusedHeightRef}
+									focusingElementIdRef={focusingElementIdRef}
+									id={id}
+									props={props}
+									SortableItemChild={SortableItemChild}
+								/>
+							)}
+						</AutoHeight>
+					</div>
 					<div
 						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
 						{...attributes}
@@ -127,6 +137,16 @@ export function SortableItem<T extends propsTypes>({
 		if (addMenuRef.current?.contains(focusedElement)) return;
 		if (focusedElement?.getAttribute("data-addmenu")) return;
 
+		if (focusedElement?.getAttribute("data-error")) {
+			if (!measureDivRef.current) return;
+			focusedHeightRef.current = measureDivRef.current.clientHeight;
+
+			focusingElementIdRef.current = focusedElement?.id ?? "";
+			heightDiffRef.current.shouldScroll = true;
+		} else {
+			heightDiffRef.current.shouldScroll = false;
+		}
+
 		blurItem();
 	}
 
@@ -134,7 +154,7 @@ export function SortableItem<T extends propsTypes>({
 		const refs = debounceRefs.get(id);
 
 		if (refs) {
-			refs.forEach((ref, key) => {
+			refs.forEach((ref) => {
 				ref.flush();
 			});
 		}
@@ -145,17 +165,64 @@ export function SortableItem<T extends propsTypes>({
 	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
 		if (addMenuRef.current?.contains(e.target)) return;
 
-		focusedItemRef.current = { id: id, blurItem: blurItem };
+		focusedItemRef.current = {
+			...focusedItemRef.current,
+			id: id,
+			blurItem: blurItem,
+		};
+
 		setIsFocused(true);
 	}
 }
 
-function FocusedSortableItem<T extends propsTypes>({
-	className,
+function UnfocusedSortableItem<T extends propsTypes>({
+	focusingElementIdRef,
+	focusedHeightRef,
 	id,
 	props,
 	SortableItemChild,
-	sortableItemRef,
+}: {
+	focusingElementIdRef: RefObject<string>;
+	focusedHeightRef: RefObject<number>;
+} & SortableItemProps<T>) {
+	const { formItems, heightDiffRef } = useContext(FormBuilderContext);
+	const unfocusedSortableItemRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (
+			unfocusedSortableItemRef.current &&
+			focusedHeightRef.current &&
+			heightDiffRef.current.shouldScroll
+		) {
+			const shouldScroll = () => {
+				for (const formItem of formItems) {
+					if (formItem.id === id) return true;
+					if (formItem.id === focusingElementIdRef.current) return false;
+				}
+				return false;
+			};
+			heightDiffRef.current = {
+				heightDiff:
+					unfocusedSortableItemRef.current.scrollHeight -
+					focusedHeightRef.current,
+				shouldScroll: shouldScroll(),
+			};
+		}
+	}, []);
+
+	return (
+		<div ref={unfocusedSortableItemRef}>
+			<SortableItemChild id={id} props={props} isFocused={false} />
+		</div>
+	);
+}
+
+function FocusedSortableItem<T extends propsTypes>({
+	className,
+	focusedSortableItemRef,
+	id,
+	props,
+	SortableItemChild,
 }: FocusedSortableItemProps<T>) {
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const { formItems, setFormItems, debounceRefs } =
@@ -184,7 +251,7 @@ function FocusedSortableItem<T extends propsTypes>({
 	}, []);
 
 	return (
-		<div className={cn("w-full", className)}>
+		<div className={cn("w-full", className)} ref={focusedSortableItemRef}>
 			<CardHeader>
 				<div className="flex justify-between">
 					<CardTitle>
