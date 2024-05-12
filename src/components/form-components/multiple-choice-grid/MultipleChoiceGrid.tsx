@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
@@ -25,23 +24,25 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { CircleIcon } from "@radix-ui/react-icons";
 import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
-import { Separator } from "@/components/ui/separator";
-import { CircleIcon } from "@radix-ui/react-icons";
-import { v4 as uuidv4 } from 'uuid';
 
 function MultipleChoiceGrid({
 	id,
+	index,
 	props,
 }: {
 	id: string;
+	index: number;
 	props: MultipleChoiceGridProps;
 }) {
 	return (
 		<SortableItem
+			index={index}
 			id={id}
 			props={props}
 			SortableItemChild={MultipleChoiceGridWrapper}

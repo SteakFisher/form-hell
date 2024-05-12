@@ -1,4 +1,7 @@
-import React, {
+import { constants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
+import {
 	ChangeEvent,
 	memo,
 	useContext,
@@ -6,19 +9,29 @@ import React, {
 	useRef,
 	useState,
 } from "react";
-import { SortableItem } from "./SortableItem";
-import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Slider } from "../ui/slider";
-import { constants } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Slider } from "../ui/slider";
+import { SortableItem } from "./SortableItem";
 
-function Range({ id, props }: { id: string; props: RangeProps }) {
+function Range({
+	id,
+	index,
+	props,
+}: {
+	id: string;
+	index: number;
+	props: RangeProps;
+}) {
 	return (
-		<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
+		<SortableItem
+			index={index}
+			id={id}
+			props={props}
+			SortableItemChild={RangeWrapper}
+		/>
 	);
 }
 

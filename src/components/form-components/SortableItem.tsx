@@ -14,6 +14,7 @@ import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import React, {
 	ComponentType,
+	MutableRefObject,
 	RefObject,
 	useContext,
 	useEffect,
@@ -37,17 +38,13 @@ interface SortableItemProps<T extends propsTypes> {
 	props: T;
 }
 
-interface FocusedSortableItemProps<T extends propsTypes>
-	extends SortableItemProps<T> {
-	focusedSortableItemRef: RefObject<HTMLDivElement>;
-}
-
 export function SortableItem<T extends propsTypes>({
 	accordionOpen,
 	id,
+	index,
 	SortableItemChild,
 	props,
-}: SortableItemProps<T>) {
+}: { index: number } & SortableItemProps<T>) {
 	const { debounceRefs, focusedItemRef, heightDiffRef } =
 		useContext(FormBuilderContext);
 
@@ -58,7 +55,7 @@ export function SortableItem<T extends propsTypes>({
 	const accordionContentRef = useRef<HTMLDivElement>(null);
 	const addMenuRef = useRef<HTMLDivElement>(null);
 	const focusedHeightRef = useRef(0);
-	const focusingElementIdRef = useRef("");
+	const focusingElementIndexRef = useRef("");
 	const focusedSortableItemRef = useRef<HTMLDivElement>(null);
 	const measureDivRef = useRef<HTMLDivElement>(null);
 	const sortableItemRef = useRef<HTMLDivElement>(null);
@@ -74,6 +71,7 @@ export function SortableItem<T extends propsTypes>({
 		>
 			<div
 				className="custom-focus z-50"
+				data-index={index}
 				data-error="false"
 				id={id}
 				onBlur={handleOnBlur}
@@ -106,8 +104,9 @@ export function SortableItem<T extends propsTypes>({
 							) : (
 								<UnfocusedSortableItem
 									focusedHeightRef={focusedHeightRef}
-									focusingElementIdRef={focusingElementIdRef}
+									focusingElementIndexRef={focusingElementIndexRef}
 									id={id}
+									index={index}
 									props={props}
 									SortableItemChild={SortableItemChild}
 								/>
@@ -137,11 +136,13 @@ export function SortableItem<T extends propsTypes>({
 		if (addMenuRef.current?.contains(focusedElement)) return;
 		if (focusedElement?.getAttribute("data-addmenu")) return;
 
-		if (focusedElement?.getAttribute("data-error")) {
+		const focusedElementIndex =
+			focusedElement?.getAttribute("data-index") ?? "";
+		if (focusedElementIndex) {
 			if (!measureDivRef.current) return;
 			focusedHeightRef.current = measureDivRef.current.clientHeight;
 
-			focusingElementIdRef.current = focusedElement?.id ?? "";
+			focusingElementIndexRef.current = focusedElementIndex;
 			heightDiffRef.current.shouldScroll = true;
 		} else {
 			heightDiffRef.current.shouldScroll = false;
@@ -176,30 +177,27 @@ export function SortableItem<T extends propsTypes>({
 }
 
 function UnfocusedSortableItem<T extends propsTypes>({
-	focusingElementIdRef,
+	focusingElementIndexRef,
 	focusedHeightRef,
 	id,
+	index,
 	props,
 	SortableItemChild,
 }: {
-	focusingElementIdRef: RefObject<string>;
-	focusedHeightRef: RefObject<number>;
+	focusingElementIndexRef: MutableRefObject<string>;
+	focusedHeightRef: MutableRefObject<number>;
+	index: number;
 } & SortableItemProps<T>) {
-	const { formItems, heightDiffRef } = useContext(FormBuilderContext);
+	const { heightDiffRef } = useContext(FormBuilderContext);
 	const unfocusedSortableItemRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (
 			unfocusedSortableItemRef.current &&
-			focusedHeightRef.current &&
 			heightDiffRef.current.shouldScroll
 		) {
 			const shouldScroll = () => {
-				for (const formItem of formItems) {
-					if (formItem.id === id) return true;
-					if (formItem.id === focusingElementIdRef.current) return false;
-				}
-				return false;
+				return index < Number(focusingElementIndexRef.current)
 			};
 			heightDiffRef.current = {
 				heightDiff:
@@ -223,7 +221,9 @@ function FocusedSortableItem<T extends propsTypes>({
 	id,
 	props,
 	SortableItemChild,
-}: FocusedSortableItemProps<T>) {
+}: {
+	focusedSortableItemRef: RefObject<HTMLDivElement>;
+} & SortableItemProps<T>) {
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const { formItems, setFormItems, debounceRefs } =
 		useContext(FormBuilderContext);
