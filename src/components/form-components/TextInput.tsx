@@ -28,18 +28,15 @@ import { SortableItem } from "./SortableItem";
 
 export const TextInput = memo(function TextInput({
 	id,
-	index,
 	props,
 }: {
 	id: string;
-	index: number;
 	props: TextInputProps;
 }) {
 	const [accordionOpen, setAccordionOpen] = useState(false);
 
 	return (
 		<SortableItem
-			index={index}
 			accordionOpen={accordionOpen}
 			id={id}
 			props={props}

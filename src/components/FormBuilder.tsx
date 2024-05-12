@@ -59,13 +59,12 @@ const FormBuilder = () => {
 						strategy={verticalListSortingStrategy}
 					>
 						<AddBar id={"0"} />
-						{formItems.map((formItem, index) => {
+						{formItems.map((formItem) => {
 							switch (formItem.props.type) {
 								case "date":
 									return (
 										<Date
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>
@@ -74,7 +73,6 @@ const FormBuilder = () => {
 									return (
 										<Dropdown
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>
@@ -83,7 +81,6 @@ const FormBuilder = () => {
 									return (
 										<MultipleChoice
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>
@@ -92,7 +89,6 @@ const FormBuilder = () => {
 									return (
 										<MultipleChoiceGrid
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>
@@ -101,7 +97,6 @@ const FormBuilder = () => {
 									return (
 										<Range
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>
@@ -110,7 +105,6 @@ const FormBuilder = () => {
 									return (
 										<TextInput
 											id={formItem.id}
-											index={index}
 											key={formItem.id}
 											props={formItem.props}
 										/>

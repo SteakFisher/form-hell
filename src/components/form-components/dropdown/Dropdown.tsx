@@ -22,22 +22,19 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { memo, useContext, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
 function Dropdown({
 	id,
-	index,
 	props,
 }: {
 	id: string;
-	index: number;
 	props: DropdownProps;
 }) {
 	return (
 		<SortableItem
-			index={index}
 			id={id}
 			props={props}
 			SortableItemChild={DropdownWrapper}

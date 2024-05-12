@@ -5,22 +5,9 @@ import { Button } from "../ui/button";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import { SortableItem } from "./SortableItem";
 
-function Date({
-	id,
-	index,
-	props,
-}: {
-	id: string;
-	index: number;
-	props: DateProps;
-}) {
+function Date({ id, props }: { id: string; props: DateProps }) {
 	return (
-		<SortableItem
-			index={index}
-			id={id}
-			props={props}
-			SortableItemChild={DateWrapper}
-		/>
+		<SortableItem id={id} props={props} SortableItemChild={DateWrapper} />
 	);
 }
 

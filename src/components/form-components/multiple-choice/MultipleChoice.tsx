@@ -35,16 +35,13 @@ import MultipleChoiceItem from "./MultipleChoiceItem";
 
 function MultipleChoice({
 	id,
-	index,
 	props,
 }: {
 	id: string;
-	index: number;
 	props: MultipleChoiceProps;
 }) {
 	return (
 		<SortableItem
-			index={index}
 			id={id}
 			props={props}
 			SortableItemChild={MultipleChoiceWrapper}
@@ -77,7 +74,7 @@ function MultipleChoiceWrapper({
 			)}
 		</>
 	);
-}
+}	
 
 function FocusedMultipleChoice({
 	id,

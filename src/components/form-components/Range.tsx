@@ -16,22 +16,9 @@ import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
 import { SortableItem } from "./SortableItem";
 
-function Range({
-	id,
-	index,
-	props,
-}: {
-	id: string;
-	index: number;
-	props: RangeProps;
-}) {
+function Range({ id, props }: { id: string; props: RangeProps }) {
 	return (
-		<SortableItem
-			index={index}
-			id={id}
-			props={props}
-			SortableItemChild={RangeWrapper}
-		/>
+		<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
 	);
 }
 
