@@ -1,3 +1,4 @@
+import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import React, {
 	RefObject,
@@ -10,26 +11,27 @@ import React, {
 import AnimateHeight, { Height } from "react-animate-height";
 
 interface AutoHeightProps {
-	accordionContentRef?: RefObject<HTMLDivElement>;
-	accordionOpen?: boolean;
+	autoHeightChildRef: RefObject<HTMLDivElement>;
 	children: React.ReactNode;
 	isFocused: boolean;
 	sortableItemRef: RefObject<HTMLDivElement>;
 }
 
 const AutoHeight = ({
-	accordionContentRef,
-	accordionOpen,
+	autoHeightChildRef,
 	children,
 	isFocused,
 	sortableItemRef,
 	...props
 }: AutoHeightProps) => {
 	const { heightDiffRef } = useContext(FormBuilderContext);
+
+	const [duration, setDuration] = useState<number>(
+		constants.autoHeightDuration,
+	);
 	const [height, setHeight] = useState<Height>("auto");
 
-	const autoScrollFlagRef = useRef<boolean>(false);
-	const contentDiv = useRef<HTMLDivElement>(null);
+	const isFocusingRef = useRef<boolean>(false);
 
 	const autoScroll = useCallback(
 		function autoScroll(newHeight: number) {
@@ -43,7 +45,10 @@ const AutoHeight = ({
 
 			if (!isTopVisible) {
 				if (isBottomVisible) {
-					const scrollTopPx = rect.top - verticalPadding;
+					const heightDiff = heightDiffRef.current.shouldScroll
+						? heightDiffRef.current.heightDiff
+						: 0;
+					const scrollTopPx = rect.top - verticalPadding + heightDiff;
 					window.scrollBy({
 						left: 0,
 						top: scrollTopPx,
@@ -78,57 +83,49 @@ const AutoHeight = ({
 			}
 
 			heightDiffRef.current.shouldScroll = false;
-			autoScrollFlagRef.current = false;
+			isFocusingRef.current = false;
 		},
 		[sortableItemRef],
 	);
 
 	useEffect(() => {
 		if (isFocused) {
-			autoScrollFlagRef.current = true;
+			isFocusingRef.current = true;
 		}
+		setDuration(constants.autoHeightDuration);
 	}, [isFocused]);
 
 	useEffect(() => {
-		const element = contentDiv.current as HTMLDivElement;
+		const element = autoHeightChildRef.current as HTMLDivElement;
 
-		if (autoScrollFlagRef.current) {
-			autoScroll(newHeight(element));
+		if (isFocusingRef.current) {
+			autoScroll(element.scrollHeight);
 		}
 
 		const resizeObserver = new ResizeObserver(() => {
-			setHeight(newHeight(element));
+			setHeight(element.scrollHeight);
 		});
 
 		resizeObserver.observe(element);
 
 		return () => resizeObserver.disconnect();
-	}, [isFocused, accordionOpen, autoScroll]);
+	}, [isFocused, autoScroll]);
 
 	return (
 		<AnimateHeight
 			className="w-full"
-			contentRef={contentDiv}
+			contentRef={autoHeightChildRef}
 			disableDisplayNone
-			duration={225}
+			duration={duration}
 			height={height}
 			{...props}
+			onHeightAnimationEnd={() => {
+				setDuration(0);
+			}}
 		>
 			{children}
 		</AnimateHeight>
 	);
-
-	function newHeight(element: HTMLDivElement): number {
-		if (!accordionContentRef?.current) return element.scrollHeight;
-		return (
-			element.scrollHeight -
-			(isFocused
-				? accordionOpen
-					? 0
-					: accordionContentRef.current.scrollHeight
-				: 0)
-		);
-	}
 };
 
 export default AutoHeight;

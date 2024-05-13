@@ -68,6 +68,7 @@ const TitlePropsObj: TitleProps = {
 };
 
 export const constants = Object.freeze({
+	autoHeightDuration: 225,
 	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
 	defaultFormItems: [{ id: "0", props: TitlePropsObj }],

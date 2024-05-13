@@ -1,41 +1,24 @@
-import React, { memo } from "react";
-import { SortableItem } from "./SortableItem";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import DateProps from "@/interfaces/form-component-interfaces/DateProps";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
+import { memo } from "react";
+import { Button } from "../ui/button";
+import { CardContent, CardHeader, CardTitle } from "../ui/card";
+import { SortableItem } from "./SortableItem";
 
-function Date({
-	props,
-	id,
-}: {
-	props: DateProps;
-	id: string;
-}) {
+function Date({ id, props }: { id: string; props: DateProps }) {
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			SortableItemChild={DateWrapper}
-		/>
+		<SortableItem id={id} props={props} SortableItemChild={DateWrapper} />
 	);
 }
 
 const DateWrapper = memo(function DateWrapper({
-	id,
 	props,
 	isFocused,
 }: {
-	id: string;
 	isFocused: boolean;
 	props: DateProps;
 }) {
-
-	return <>
-		{isFocused ? <FocusedDate /> : <UnfocusedDate props={props} />}
-	</>
+	return <>{isFocused ? <FocusedDate /> : <UnfocusedDate props={props} />}</>;
 });
 
 function FocusedDate() {

@@ -1,5 +1,9 @@
 "use client";
 
+import { TextInput } from "@/components/form-components/TextInput";
+import Title from "@/components/form-components/Title";
+import Dropdown from "@/components/form-components/dropdown/Dropdown";
+import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	DndContext,
@@ -20,16 +24,12 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Fragment, useContext, useRef } from "react";
+import { useContext, useRef } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
-import { TextInput } from "@/components/form-components/TextInput";
-import Title from "@/components/form-components/Title";
-import Dropdown from "@/components/form-components/dropdown/Dropdown";
-import MultipleChoice from "@/components/form-components/multiple-choice/MultipleChoice";
+import AddBar from "./AddBar";
+import Date from "./form-components/Date";
 import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
-import Date from "./form-components/Date";
-import AddBar from "./AddBar";
 
 const FormBuilder = () => {
 	const { formItems, setFormItems } = useContext(FormBuilderContext);
