@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { SortableItemContext } from "@/contexts/SortableItemContext";
 import FormItem from "@/interfaces/FormItem";
 import { propsTypes } from "@/interfaces/propsTypes";
 import { cn } from "@/lib/utils";
@@ -15,11 +14,10 @@ import autosize from "autosize";
 import React, {
 	ComponentType,
 	MutableRefObject,
-	RefObject,
 	useContext,
 	useEffect,
 	useRef,
-	useState,
+	useState
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
@@ -27,7 +25,6 @@ import AddBar from "../AddBar";
 import AutoHeight from "../AutoHeight";
 
 interface SortableItemProps<T extends propsTypes> {
-	accordionOpen?: boolean;
 	className?: string;
 	SortableItemChild: ComponentType<{
 		id: string;
@@ -40,11 +37,9 @@ interface SortableItemProps<T extends propsTypes> {
 
 interface FocusedSortableItemProps<T extends propsTypes>
 	extends SortableItemProps<T> {
-	focusedSortableItemRef: RefObject<HTMLDivElement>;
 }
 
 export function SortableItem<T extends propsTypes>({
-	accordionOpen,
 	id,
 	SortableItemChild,
 	props,
@@ -56,12 +51,10 @@ export function SortableItem<T extends propsTypes>({
 		useSortable({ id: id });
 	const [isFocused, setIsFocused] = useState(false);
 
-	const accordionContentRef = useRef<HTMLDivElement>(null);
 	const addMenuRef = useRef<HTMLDivElement>(null);
 	const focusedHeightRef = useRef(0);
 	const focusingElementIdRef = useRef("");
-	const focusedSortableItemRef = useRef<HTMLDivElement>(null);
-	const measureDivRef = useRef<HTMLDivElement>(null);
+	const autoHeightChildRef = useRef<HTMLDivElement>(null);
 	const sortableItemRef = useRef<HTMLDivElement>(null);
 
 	const style = {
@@ -70,9 +63,7 @@ export function SortableItem<T extends propsTypes>({
 	};
 
 	return (
-		<SortableItemContext.Provider
-			value={{ accordionContentRef: accordionContentRef }}
-		>
+		<>
 			<div
 				className="custom-focus z-50"
 				data-error="false"
@@ -90,16 +81,14 @@ export function SortableItem<T extends propsTypes>({
 					)}
 					ref={sortableItemRef}
 				>
-					<div className="flex w-full" ref={measureDivRef}>
+					<div className="flex w-full" ref={autoHeightChildRef}>
 						<AutoHeight
-							accordionContentRef={accordionContentRef}
-							accordionOpen={accordionOpen}
+							autoHeightChildRef={autoHeightChildRef}
 							isFocused={isFocused}
 							sortableItemRef={sortableItemRef}
 						>
 							{isFocused ? (
 								<FocusedSortableItem
-									focusedSortableItemRef={focusedSortableItemRef}
 									id={id}
 									props={props}
 									SortableItemChild={SortableItemChild}
@@ -129,7 +118,7 @@ export function SortableItem<T extends propsTypes>({
 				</Card>
 			</div>
 			<AddBar addMenuRef={addMenuRef} id={id} />
-		</SortableItemContext.Provider>
+		</>
 	);
 
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
@@ -139,8 +128,8 @@ export function SortableItem<T extends propsTypes>({
 		if (focusedElement?.getAttribute("data-addmenu")) return;
 
 		if (focusedElement?.getAttribute("data-error")) {
-			if (!measureDivRef.current) return;
-			focusedHeightRef.current = measureDivRef.current.clientHeight;
+			if (!autoHeightChildRef.current) return;
+			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
 
 			focusingElementIdRef.current = focusedElement?.id ?? "";
 			heightDiffRef.current.shouldScroll = true;
@@ -219,7 +208,6 @@ function UnfocusedSortableItem<T extends propsTypes>({
 
 function FocusedSortableItem<T extends propsTypes>({
 	className,
-	focusedSortableItemRef,
 	id,
 	props,
 	SortableItemChild,
@@ -251,7 +239,7 @@ function FocusedSortableItem<T extends propsTypes>({
 	}, []);
 
 	return (
-		<div className={cn("w-full", className)} ref={focusedSortableItemRef}>
+		<div className={cn("w-full", className)}>
 			<CardHeader>
 				<div className="flex justify-between">
 					<CardTitle>
