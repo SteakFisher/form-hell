@@ -1,6 +1,6 @@
 import {createContext} from "react";
 import FormItem from "@/interfaces/FormItem";
-import FormResponse from "@/interfaces/FormResponse";
+import {FormResponse} from "@/interfaces/FormResponse";
 
 interface FormRendererContextInterface {
   formResponses: FormResponse<any>

@@ -5,9 +5,9 @@ import {useContext, useState} from "react";
 import {z, ZodError} from "zod";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
 
-export default function TextInputComponent({props, id }: {props: TextInputProps, id: string}) {
+export default function TextInputComponent({props, id, e }: {props: TextInputProps, id: string, e?: string | null}) {
   const { formResponses } = useContext(FormRendererContext)
-  const [error, setError] = useState<string | null>();
+  const [error, setError] = useState(e);
   return (
     <Card className={"w-10/12 self-center mb-4"}>
       <CardHeader>

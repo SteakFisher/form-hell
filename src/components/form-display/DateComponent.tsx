@@ -10,11 +10,13 @@ import {
 
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { cn } from "@/lib/utils";
+import {FormRendererContext} from "@/contexts/FormRendererContext";
 
 export default function DateComponent({ props, id }: { id: string; props: DateProps }) {
 	const [date, setDate] = useState<Date>();
+	const { formResponses } = useContext(FormRendererContext)
 
 	return (
 		<Card className={"mb-4 w-10/12 self-center"}>
@@ -39,7 +41,10 @@ export default function DateComponent({ props, id }: { id: string; props: DatePr
 						<Calendar
 							mode="single"
 							selected={date}
-							onSelect={setDate}
+							onSelect={(date) => {
+								setDate(date)
+								formResponses[id] = { date: date, type: "date" }
+							}}
 							initialFocus
 						/>
 					</PopoverContent>
