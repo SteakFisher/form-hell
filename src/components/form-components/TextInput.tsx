@@ -229,7 +229,7 @@ function FocusedTextInput({
 								</SelectContent>
 							</Select>
 						</div>
-						{lengthError && <div className="error">{lengthError}</div>}
+						<div className="error">{lengthError}</div>
 
 						<div className="mt-5 text-base font-semibold">
 							<u>Regex</u>
@@ -274,7 +274,7 @@ function FocusedTextInput({
 								/>
 							</div>
 						</div>
-						{regexError && <div className="error">{regexError}</div>}
+						<div className="error">{regexError}</div>
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
@@ -289,6 +289,8 @@ function FocusedTextInput({
 			handleRegexChange.flush();
 		}
 		setAccordionItem(value);
+		setLengthError("");
+		setRegexError("");
 	}
 
 	function handleInputTypeChange(inputType: string) {
