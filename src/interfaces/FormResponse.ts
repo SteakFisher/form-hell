@@ -3,12 +3,12 @@ import DropdownResponse from "@/interfaces/form-component-response-interfaces/Dr
 import DateResponse from "@/interfaces/form-component-response-interfaces/DateResponse";
 import MultipleChoiceResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 
-type Response =
+export type Response =
 TextInputResponse
 | DropdownResponse
 | DateResponse
 | MultipleChoiceResponse;
 
-export default interface FormResponse <T extends Response> {
+export interface FormResponse <T extends Response> {
   [id: string] : T;
 }
