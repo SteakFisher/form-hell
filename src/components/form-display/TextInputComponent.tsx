@@ -28,9 +28,10 @@ export default function TextInputComponent({props, id, e }: {props: TextInputPro
             const parsedInput = input.parse(e.target.value)
             formResponses[id] = { input: parsedInput, type: "text-input" }
             setError(null)
-          } catch (e) {
-            if (e instanceof ZodError) {
-              setError(e.errors[0].message)
+          } catch (err) {
+            if (err instanceof ZodError) {
+              formResponses[id] = { input: e.target.value, type: "text-input" }
+              setError(err.errors[0].message)
             }
           }
         }} />

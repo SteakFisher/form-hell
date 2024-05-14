@@ -2,11 +2,14 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {RangeProps} from "@/interfaces/form-component-interfaces/RangeProps";
 import {Slider} from "@/components/ui/slider";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
 
 export default function RangeComponent({ props, id } : { id: string; props: RangeProps }) {
   const { formResponses } = useContext(FormRendererContext)
+  useEffect(() => {
+    formResponses[id] = { range: props.min, type: "range" }
+  })
 
   console.log(props)
   return (
@@ -21,7 +24,7 @@ export default function RangeComponent({ props, id } : { id: string; props: Rang
           onValueChange={(value) => {
             formResponses[id] = { range: value, type: "range" }
           }}
-          defaultValue={[0]}
+          defaultValue={[props.min]}
           max={props.max}
           min={props.min}
           step={props.step}
