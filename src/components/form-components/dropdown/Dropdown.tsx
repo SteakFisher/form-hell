@@ -22,23 +22,13 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { memo, useContext, useRef, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
-function Dropdown({
-	id,
-	props,
-}: {
-	id: string;
-	props: DropdownProps;
-}) {
+function Dropdown({ id, props }: { id: string; props: DropdownProps }) {
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			SortableItemChild={DropdownWrapper}
-		/>
+		<SortableItem id={id} props={props} SortableItemChild={DropdownWrapper} />
 	);
 }
 
@@ -76,7 +66,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent ref={contentRef} tabIndex={-1}>
 			<div>
 				<DndContext
 					id={`${id}dropdown-context`}

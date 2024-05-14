@@ -74,7 +74,7 @@ function MultipleChoiceWrapper({
 			)}
 		</>
 	);
-}	
+}
 
 function FocusedMultipleChoice({
 	id,
@@ -112,14 +112,10 @@ function FocusedMultipleChoice({
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
 
-	useEffect(() => {
-		contentRef.current?.focus();
-	}, [isRadio]);
-
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox

@@ -27,7 +27,7 @@ import {
 import { CircleIcon } from "@radix-ui/react-icons";
 import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
 
@@ -112,14 +112,10 @@ function FocusedMultipleChoiceGrid({
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
 
-	useEffect(() => {
-		contentRef.current?.focus();
-	}, [isRadio]);
-
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox
