@@ -24,7 +24,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import AddBar from "./AddBar";
 import Date from "./form-components/Date";
@@ -32,7 +32,8 @@ import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 
 const FormBuilder = () => {
-	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const { firstRenderRef, formItems, setFormItems } =
+		useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -40,6 +41,10 @@ const FormBuilder = () => {
 		}),
 	);
 	const formBuilderRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		firstRenderRef.current = false;
+	}, []);
 
 	return (
 		<Card className="w-[800px] [overflow-anchor:none]">

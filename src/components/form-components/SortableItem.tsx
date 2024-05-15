@@ -17,7 +17,7 @@ import React, {
 	useContext,
 	useEffect,
 	useRef,
-	useState
+	useState,
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
@@ -37,6 +37,7 @@ interface SortableItemProps<T extends propsTypes> {
 
 interface FocusedSortableItemProps<T extends propsTypes>
 	extends SortableItemProps<T> {
+	setDeleteClicked: (value: boolean) => void;
 }
 
 export function SortableItem<T extends propsTypes>({
@@ -44,11 +45,17 @@ export function SortableItem<T extends propsTypes>({
 	SortableItemChild,
 	props,
 }: SortableItemProps<T>) {
-	const { debounceRefs, focusedItemRef, heightDiffRef } =
-		useContext(FormBuilderContext);
+	const {
+		debounceRefs,
+		formItems,
+		focusedItemRef,
+		heightDiffRef,
+		setFormItems,
+	} = useContext(FormBuilderContext);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: id });
+	const [deleteClicked, setDeleteClicked] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 
 	const addMenuRef = useRef<HTMLDivElement>(null);
@@ -76,36 +83,37 @@ export function SortableItem<T extends propsTypes>({
 			>
 				<Card
 					className={cn(
-						"custom-focus flex w-full select-none overflow-hidden pl-3 transition-all",
+						"custom-focus relative flex w-full select-none overflow-hidden pl-3 pr-7 transition-all",
 						isFocused && "border-ring",
 					)}
 					ref={sortableItemRef}
 				>
-					<div className="flex w-full" ref={autoHeightChildRef}>
-						<AutoHeight
-							autoHeightChildRef={autoHeightChildRef}
-							isFocused={isFocused}
-							sortableItemRef={sortableItemRef}
-						>
-							{isFocused ? (
-								<FocusedSortableItem
-									id={id}
-									props={props}
-									SortableItemChild={SortableItemChild}
-								/>
-							) : (
-								<UnfocusedSortableItem
-									focusedHeightRef={focusedHeightRef}
-									focusingElementIdRef={focusingElementIdRef}
-									id={id}
-									props={props}
-									SortableItemChild={SortableItemChild}
-								/>
-							)}
-						</AutoHeight>
-					</div>
+					<AutoHeight
+						autoHeightChildRef={autoHeightChildRef}
+						deleteClicked={deleteClicked}
+						deleteItem={deleteItem}
+						isFocused={isFocused}
+						sortableItemRef={sortableItemRef}
+					>
+						{isFocused ? (
+							<FocusedSortableItem
+								id={id}
+								props={props}
+								setDeleteClicked={setDeleteClicked}
+								SortableItemChild={SortableItemChild}
+							/>
+						) : (
+							<UnfocusedSortableItem
+								focusedHeightRef={focusedHeightRef}
+								focusingElementIdRef={focusingElementIdRef}
+								id={id}
+								props={props}
+								SortableItemChild={SortableItemChild}
+							/>
+						)}
+					</AutoHeight>
 					<div
-						className="ml-3 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
+						className="absolute inset-y-0 right-0 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
 						{...attributes}
 						{...listeners}
 						onMouseDown={(e) => {
@@ -121,7 +129,18 @@ export function SortableItem<T extends propsTypes>({
 		</>
 	);
 
+	function deleteItem() {
+		const newFormItems: FormItem[] = [];
+		formItems.forEach((formItem) => {
+			if (!(formItem.id === id)) newFormItems.push(formItem);
+		});
+		setFormItems(newFormItems);
+
+		debounceRefs.delete(id);
+	}
+
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
+		if (deleteClicked) return;
 		const focusedElement = e.relatedTarget;
 		if (e.currentTarget.contains(focusedElement)) return;
 		if (addMenuRef.current?.contains(focusedElement)) return;
@@ -210,11 +229,11 @@ function FocusedSortableItem<T extends propsTypes>({
 	className,
 	id,
 	props,
+	setDeleteClicked,
 	SortableItemChild,
 }: FocusedSortableItemProps<T>) {
 	const titleRef = useRef<HTMLTextAreaElement>(null);
-	const { formItems, setFormItems, debounceRefs } =
-		useContext(FormBuilderContext);
+	const { debounceRefs } = useContext(FormBuilderContext);
 
 	const handleRequiredChange = useDebouncedCallback((isChecked: boolean) => {
 		props.required = isChecked;
@@ -271,12 +290,6 @@ function FocusedSortableItem<T extends propsTypes>({
 	);
 
 	function handleDeleteClick() {
-		const newFormItems: FormItem[] = [];
-		formItems.forEach((formItem) => {
-			if (!(formItem.id === id)) newFormItems.push(formItem);
-		});
-		setFormItems(newFormItems);
-
-		debounceRefs.delete(id);
+		setDeleteClicked(true);
 	}
 }

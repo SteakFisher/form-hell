@@ -4,6 +4,7 @@ import FormItem from "../interfaces/FormItem";
 
 interface FormBuilderContextInterface {
 	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;
+	firstRenderRef: MutableRefObject<boolean>;
 	focusedItemRef: MutableRefObject<{ id: string; blurItem: () => void }>;
 	formItems: FormItem[];
 	heightDiffRef: MutableRefObject<{
@@ -15,6 +16,7 @@ interface FormBuilderContextInterface {
 
 export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	debounceRefs: new Map(),
+	firstRenderRef: { current: true },
 	focusedItemRef: { current: { id: "", blurItem: () => {} } },
 	formItems: [],
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },

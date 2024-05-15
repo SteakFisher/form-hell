@@ -13,6 +13,8 @@ import AnimateHeight, { Height } from "react-animate-height";
 interface AutoHeightProps {
 	autoHeightChildRef: RefObject<HTMLDivElement>;
 	children: React.ReactNode;
+	deleteClicked: boolean;
+	deleteItem: () => void;
 	isFocused: boolean;
 	sortableItemRef: RefObject<HTMLDivElement>;
 }
@@ -20,16 +22,25 @@ interface AutoHeightProps {
 const AutoHeight = ({
 	autoHeightChildRef,
 	children,
+	deleteClicked,
+	deleteItem,
 	isFocused,
 	sortableItemRef,
 	...props
 }: AutoHeightProps) => {
-	const { heightDiffRef } = useContext(FormBuilderContext);
+	const { firstRenderRef, heightDiffRef } = useContext(FormBuilderContext);
 
 	const [duration, setDuration] = useState<number>(
 		constants.autoHeightDuration,
 	);
-	const [height, setHeight] = useState<Height>("auto");
+	const [height, setHeight] = useState<Height>(0);
+
+	useEffect(() => {
+		if (!firstRenderRef.current) {
+			setDuration(constants.autoHeightDuration);
+			setHeight(0);
+		}
+	}, [deleteClicked, firstRenderRef]);
 
 	const isFocusingRef = useRef<boolean>(false);
 
@@ -96,20 +107,19 @@ const AutoHeight = ({
 	}, [isFocused]);
 
 	useEffect(() => {
-		const element = autoHeightChildRef.current as HTMLDivElement;
+		const autoHeightChild = autoHeightChildRef.current as HTMLDivElement;
 
 		if (isFocusingRef.current) {
-			autoScroll(element.scrollHeight);
+			autoScroll(autoHeightChild.scrollHeight);
 		}
 
 		const resizeObserver = new ResizeObserver(() => {
-			setHeight(element.scrollHeight);
+			setHeight(autoHeightChild.scrollHeight);
 		});
 
-		resizeObserver.observe(element);
-
+		resizeObserver.observe(autoHeightChild);
 		return () => resizeObserver.disconnect();
-	}, [isFocused, autoScroll]);
+	}, [autoScroll, autoHeightChildRef]);
 
 	return (
 		<AnimateHeight
@@ -119,13 +129,19 @@ const AutoHeight = ({
 			duration={duration}
 			height={height}
 			{...props}
-			onHeightAnimationEnd={() => {
-				setDuration(0);
-			}}
+			onHeightAnimationEnd={handleAnimationEnd}
 		>
 			{children}
 		</AnimateHeight>
 	);
+
+	function handleAnimationEnd(newHeight: Height) {
+		if (newHeight === 0 && !firstRenderRef.current) {
+			deleteItem();
+		} else {
+			setDuration(0);
+		}
+	}
 };
 
 export default AutoHeight;

@@ -9,6 +9,7 @@ import { useMemo, useRef, useState } from "react";
 
 const NewFormPage = () => {
 	let debounceRefs = useMemo(() => new Map(), []);
+	let firstRenderRef = useRef(false);
 	let focusedItemRef = useRef({ id: "0", blurItem: () => {} });
 	let heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const [formItems, setFormItems] = useState<FormItem[]>(
@@ -19,13 +20,14 @@ const NewFormPage = () => {
 		<FormBuilderContext.Provider
 			value={{
 				debounceRefs,
+				firstRenderRef,
 				focusedItemRef,
 				formItems,
 				heightDiffRef,
 				setFormItems,
 			}}
 		>
-			<div className="flex w-full justify-center pt-20 pb-32">
+			<div className="flex w-full justify-center pb-32 pt-20">
 				<FormBuilder />
 			</div>
 			<Toolbar />
