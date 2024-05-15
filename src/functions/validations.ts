@@ -24,8 +24,20 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
     if (formResponses[item.id] && responses.type === "text-input" && item.props.type === "text-input") {
       let input = z.string()
 
-      if (item.props.maxLength) input = input.max(item.props.maxLength, { message: `Input can't be longer than ${item.props.maxLength} characters!`})
-      if (item.props.minLength) input = input.min(item.props.minLength, {message: `Input can't be shorter than ${item.props.minLength} characters!`})
+      if (item.props.lengthType === "characters") {
+        if (item.props.maxLength) input = input.max(item.props.maxLength, { message: `Input can't be longer than ${item.props.maxLength} characters!`})
+        if (item.props.minLength) input = input.min(item.props.minLength, {message: `Input can't be shorter than ${item.props.minLength} characters!`})
+      }
+
+      else if (item.props.lengthType === "words") {
+        if (item.props.maxLength && item.props.maxLength < responses.input.split(" ").length) {
+          errors[item.id] =`Input can't be longer than ${item.props.maxLength} words!`
+        }
+        if (item.props.minLength && item.props.minLength > responses.input.split(" ").length) {
+          errors[item.id] =`Input can't be longer than ${item.props.maxLength} words!`
+        }
+      }
+
       if (item.props.regex) input = input.regex(new RegExp(item.props.regex, item.props.regexFlags), {message: `Input doesn't match the regex ${item.props.regex}`})
 
       try {

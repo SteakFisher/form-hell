@@ -1,5 +1,4 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
 import {RangeProps} from "@/interfaces/form-component-interfaces/RangeProps";
 import {Slider} from "@/components/ui/slider";
 import {useContext, useEffect} from "react";

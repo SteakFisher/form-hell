@@ -19,8 +19,20 @@ export default function TextInputComponent({props, id, e }: {props: TextInputPro
         <Input placeholder={props.placeholder} onChange={(e) => {
           let input = z.string()
 
-          if (props.maxLength) input = input.max(props.maxLength, { message: `Input can't be longer than ${props.maxLength} characters!`})
-          if (props.minLength) input = input.min(props.minLength, {message: `Input can't be shorter than ${props.minLength} characters!`})
+          if (props.lengthType === "characters") {
+            if (props.maxLength) input = input.max(props.maxLength, { message: `Input can't be longer than ${props.maxLength} characters!`})
+            if (props.minLength) input = input.min(props.minLength, {message: `Input can't be shorter than ${props.minLength} characters!`})
+          } else if (props.lengthType === "words") {
+            if (props.maxLength && props.maxLength < e.target.value.split(" ").length) {
+              setError(`Input can't be longer than ${props.maxLength} words!`)
+              return
+            }
+            if (props.minLength && props.minLength > e.target.value.split(" ").length) {
+              setError(`Input can't be shorter than ${props.minLength} words!`)
+              return
+            }
+          }
+
           if (props.regex) input = input.regex(new RegExp(props.regex, props.regexFlags), {message: `Input doesn't match the regex ${props.regex}`})
 
 
