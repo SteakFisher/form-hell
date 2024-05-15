@@ -42,7 +42,6 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
 
       try {
         input.parse(responses.input)
-        console.log(responses.input)
       } catch (e) {
         if (e instanceof ZodError) {
           errors[item.id] = e.errors[0].message
