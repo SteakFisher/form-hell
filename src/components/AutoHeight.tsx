@@ -5,7 +5,6 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useRef,
 	useState,
 } from "react";
 import AnimateHeight, { Height } from "react-animate-height";
@@ -41,8 +40,6 @@ const AutoHeight = ({
 			setHeight(0);
 		}
 	}, [deleteClicked, firstRenderRef]);
-
-	const isFocusingRef = useRef<boolean>(false);
 
 	const autoScroll = useCallback(
 		function autoScroll(newHeight: number) {
@@ -94,24 +91,20 @@ const AutoHeight = ({
 			}
 
 			heightDiffRef.current.shouldScroll = false;
-			isFocusingRef.current = false;
 		},
 		[sortableItemRef],
 	);
 
 	useEffect(() => {
 		if (isFocused) {
-			isFocusingRef.current = true;
+			const autoHeightChild = autoHeightChildRef.current as HTMLDivElement;
+			autoScroll(autoHeightChild.scrollHeight);
 		}
 		setDuration(constants.autoHeightDuration);
-	}, [isFocused]);
+	}, [autoHeightChildRef, autoScroll, isFocused]);
 
 	useEffect(() => {
 		const autoHeightChild = autoHeightChildRef.current as HTMLDivElement;
-
-		if (isFocusingRef.current) {
-			autoScroll(autoHeightChild.scrollHeight);
-		}
 
 		const resizeObserver = new ResizeObserver(() => {
 			setHeight(autoHeightChild.scrollHeight);
@@ -119,7 +112,7 @@ const AutoHeight = ({
 
 		resizeObserver.observe(autoHeightChild);
 		return () => resizeObserver.disconnect();
-	}, [autoScroll, autoHeightChildRef]);
+	}, [autoHeightChildRef]);
 
 	return (
 		<AnimateHeight
