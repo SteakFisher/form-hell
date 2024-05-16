@@ -5,11 +5,17 @@ import { Button } from "../ui/button";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import { SortableItem } from "./SortableItem";
 
-function Date({ id, props }: { id: string; props: DateProps }) {
+const Date = memo(function Date({
+	id,
+	props,
+}: {
+	id: string;
+	props: DateProps;
+}) {
 	return (
 		<SortableItem id={id} props={props} SortableItemChild={DateWrapper} />
 	);
-}
+});
 
 const DateWrapper = memo(function DateWrapper({
 	props,

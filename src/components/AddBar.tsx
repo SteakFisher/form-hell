@@ -60,7 +60,6 @@ function AddBar({
 				<DropdownMenuContent
 					align="center"
 					className="w-56"
-					data-addmenu
 					onCloseAutoFocus={(e) => e.preventDefault()}
 					ref={addMenuRef}
 					side="bottom"

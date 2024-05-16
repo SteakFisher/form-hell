@@ -31,7 +31,7 @@ import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
 
-function MultipleChoiceGrid({
+const MultipleChoiceGrid = memo(function MultipleChoiceGrid({
 	id,
 	props,
 }: {
@@ -45,7 +45,7 @@ function MultipleChoiceGrid({
 			SortableItemChild={MultipleChoiceGridWrapper}
 		/>
 	);
-}
+});
 
 const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 	id,
@@ -142,7 +142,7 @@ function FocusedMultipleChoiceGrid({
 								items={rowsState}
 								strategy={verticalListSortingStrategy}
 							>
-								{rowsState.map((item, index) => {
+								{rowsState.map((item) => {
 									return (
 										<MultipleChoiceGridItem
 											key={item.id}

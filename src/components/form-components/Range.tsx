@@ -16,11 +16,17 @@ import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
 import { SortableItem } from "./SortableItem";
 
-function Range({ id, props }: { id: string; props: RangeProps }) {
+const Range = memo(function Range({
+	id,
+	props,
+}: {
+	id: string;
+	props: RangeProps;
+}) {
 	return (
 		<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
 	);
-}
+});
 
 const RangeWrapper = memo(function RangeWrapper({
 	id,
@@ -56,7 +62,11 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.max = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.max = +rangeRef.current.max;
+			if (!_error) {
+				props.min = +rangeRef.current.min;
+				props.max = +rangeRef.current.max;
+				props.step = +rangeRef.current.step;
+			}
 		},
 		constants.debounceWait,
 	);
@@ -65,7 +75,11 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.min = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.min = +rangeRef.current.min;
+			if (!_error) {
+				props.min = +rangeRef.current.min;
+				props.max = +rangeRef.current.max;
+				props.step = +rangeRef.current.step;
+			}
 		},
 		constants.debounceWait,
 	);
@@ -75,7 +89,11 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			rangeRef.current.step = e.target.value;
 			const _error = validateRange();
 			setRangeError(_error);
-			if (!_error) props.step = +rangeRef.current.step;
+			if (!_error) {
+				props.min = +rangeRef.current.min;
+				props.max = +rangeRef.current.max;
+				props.step = +rangeRef.current.step;
+			}
 		},
 		constants.debounceWait,
 	);
@@ -156,7 +174,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 		}
 		const range = (maxNum - minNum) / stepNum;
 		if (range < 1 || range > 50) {
-			return "Range must be between 1 and 50";
+			return "Step count must be between 1 and 50";
 		}
 
 		return "";

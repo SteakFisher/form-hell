@@ -41,18 +41,12 @@ export const TextInput = memo(function TextInput({
 		<SortableItem
 			id={id}
 			props={props}
-			SortableItemChild={({ id, isFocused, props }) =>
-				TextInputWrapper({
-					id,
-					isFocused,
-					props,
-				})
-			}
+			SortableItemChild={TextInputWrapper}
 		/>
 	);
 });
 
-function TextInputWrapper({
+const TextInputWrapper = memo(function TextInputWrapper({
 	id,
 	props,
 	isFocused,
@@ -70,7 +64,7 @@ function TextInputWrapper({
 			)}
 		</>
 	);
-}
+});
 
 function FocusedTextInput({
 	id,

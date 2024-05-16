@@ -26,11 +26,17 @@ import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
-function Dropdown({ id, props }: { id: string; props: DropdownProps }) {
+const Dropdown = memo(function Dropdown({
+	id,
+	props,
+}: {
+	id: string;
+	props: DropdownProps;
+}) {
 	return (
 		<SortableItem id={id} props={props} SortableItemChild={DropdownWrapper} />
 	);
-}
+});
 
 const DropdownWrapper = memo(function DropdownWrapper({
 	id,
@@ -79,7 +85,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 						items={itemsState}
 						strategy={verticalListSortingStrategy}
 					>
-						{itemsState.map((item, index) => {
+						{itemsState.map((item) => {
 							return (
 								<DropdownItem
 									props={item}

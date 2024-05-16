@@ -27,13 +27,13 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
 
-function MultipleChoice({
+const MultipleChoice = memo(function MultipleChoice({
 	id,
 	props,
 }: {
@@ -47,9 +47,9 @@ function MultipleChoice({
 			SortableItemChild={MultipleChoiceWrapper}
 		/>
 	);
-}
+});
 
-function MultipleChoiceWrapper({
+const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
 	id,
 	props,
 	isFocused,
@@ -74,7 +74,7 @@ function MultipleChoiceWrapper({
 			)}
 		</>
 	);
-}
+});
 
 function FocusedMultipleChoice({
 	id,
@@ -136,7 +136,7 @@ function FocusedMultipleChoice({
 						items={itemsState}
 						strategy={verticalListSortingStrategy}
 					>
-						{itemsState.map((item, index) => {
+						{itemsState.map((item) => {
 							return (
 								<MultipleChoiceItem
 									isRadio={isRadio}

@@ -156,7 +156,7 @@ export function SortableItem<T extends propsTypes>({
 		const focusedElement = e.relatedTarget;
 
 		if (e.currentTarget.contains(focusedElement)) return;
-		if (focusedElement?.getAttribute("data-addmenu")) {
+		if (addMenuRef.current?.contains(focusedElement)) {
 			if (!autoHeightChildRef.current) return;
 
 			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
