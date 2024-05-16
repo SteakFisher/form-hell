@@ -61,6 +61,7 @@ export default function Form() {
                   case "dropdown":
                     return <DropdownComponent key={item.id} id={item.id} props={item.props}/>;
                   case "range":
+                    formResponses[item.id] = formResponses[item.id] ?? { range: item.props.min, type: "range" }
                     return <RangeComponent key={item.id} id={item.id} props={item.props}/>;
                   case "multiple-choice-grid":
                     return <MultipleChoiceGridComponent key={item.id} id={item.id} props={item.props}/>;

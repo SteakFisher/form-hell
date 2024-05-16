@@ -63,6 +63,7 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
         errors[item.id] = "Selecting other limits you to only one option"
       }
       if (responses.selected.size === 0 && item.props.required) {
+        
         errors[item.id] = "This field is required"
       }
     }
