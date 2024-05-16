@@ -1,8 +1,8 @@
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { FormItemTypes } from "@/contexts/FormItemTypes";
 import FormItem from "@/interfaces/FormItem";
 import { propsTypes } from "@/interfaces/propsTypes";
-import { typesEnum } from "@/misc/typesEnum";
 import {
 	CalendarIcon,
 	CheckCircledIcon,
@@ -70,7 +70,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["text-input"]);
+							handleAddElement(e, "text-input");
 						}}
 					>
 						Text
@@ -83,7 +83,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["multiple-choice"]);
+							handleAddElement(e, "multiple-choice");
 						}}
 					>
 						Multiple choice
@@ -96,7 +96,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["dropdown"]);
+							handleAddElement(e, "dropdown");
 						}}
 					>
 						Dropdown
@@ -109,7 +109,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["range"]);
+							handleAddElement(e, "range");
 						}}
 					>
 						Range
@@ -122,7 +122,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["multiple-choice-grid"]);
+							handleAddElement(e, "multiple-choice-grid");
 						}}
 					>
 						Multiple choice grid
@@ -135,7 +135,7 @@ function AddBar({
 						onPointerLeave={preventPointerEvent}
 						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(e, typesEnum["date"]);
+							handleAddElement(e, "date");
 						}}
 					>
 						Date
@@ -155,7 +155,7 @@ function AddBar({
 		}
 	}
 
-	function handleAddElement(e: Event, type: typesEnum) {
+	function handleAddElement(e: Event, type: FormItemTypes) {
 		e.preventDefault();
 		didSelectRef.current = true;
 
@@ -187,11 +187,11 @@ function AddBar({
 		setIsOpen(newIsOpen);
 	}
 
-	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
+	function returnTypeProps(type: FormItemTypes, parentId: string): propsTypes {
 		switch (type) {
-			case typesEnum["date"]:
+			case "date":
 				return constants.defaultDateProps;
-			case typesEnum["dropdown"]:
+			case "dropdown":
 				return {
 					...constants.defaultDropdownProps,
 					items: new Array({
@@ -200,7 +200,7 @@ function AddBar({
 						value: "Option 1",
 					}),
 				};
-			case typesEnum["multiple-choice"]:
+			case "multiple-choice":
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array({
@@ -209,7 +209,7 @@ function AddBar({
 						value: "Option 1",
 					}),
 				};
-			case typesEnum["multiple-choice-grid"]:
+			case "multiple-choice-grid":
 				return {
 					...constants.defaultMultipleChoiceGridProps,
 					columns: new Array({
@@ -223,11 +223,11 @@ function AddBar({
 						value: "Row 1",
 					}),
 				};
-			case typesEnum["range"]:
+			case "range":
 				return constants.defaultRangeProps;
-			case typesEnum["text-input"]:
+			case "text-input":
 				return constants.defaultTextInputProps;
-			case typesEnum["title"]:
+			case "title":
 				return constants.defaultTitleProps;
 		}
 	}
