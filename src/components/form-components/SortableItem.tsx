@@ -47,6 +47,7 @@ export function SortableItem<T extends propsTypes>({
 }: SortableItemProps<T>) {
 	const {
 		debounceRefs,
+		firstRenderRef,
 		formItems,
 		focusedItemRef,
 		heightDiffRef,
@@ -60,7 +61,7 @@ export function SortableItem<T extends propsTypes>({
 
 	const addMenuRef = useRef<HTMLDivElement>(null);
 	const focusedHeightRef = useRef(0);
-	const focusingElementIdRef = useRef("");
+	const focusingItemIdRef = useRef("");
 	const autoHeightChildRef = useRef<HTMLDivElement>(null);
 	const sortableItemRef = useRef<HTMLDivElement>(null);
 
@@ -69,12 +70,16 @@ export function SortableItem<T extends propsTypes>({
 		transition,
 	};
 
+	useEffect(() => {
+		if (!firstRenderRef.current) {
+			sortableItemRef.current?.focus({ preventScroll: true });
+		}
+	}, [firstRenderRef]);
+
 	return (
 		<>
 			<div
 				className="custom-focus z-50"
-				data-error="false"
-				id={id}
 				onBlur={handleOnBlur}
 				onFocus={handleOnFocus}
 				ref={setNodeRef}
@@ -86,6 +91,9 @@ export function SortableItem<T extends propsTypes>({
 						"custom-focus relative flex w-full select-none overflow-hidden pl-3 pr-7 transition-all",
 						isFocused && "border-ring",
 					)}
+					data-error="false"
+					id={id}
+					tabIndex={-1}
 					ref={sortableItemRef}
 				>
 					<AutoHeight
@@ -105,7 +113,7 @@ export function SortableItem<T extends propsTypes>({
 						) : (
 							<UnfocusedSortableItem
 								focusedHeightRef={focusedHeightRef}
-								focusingElementIdRef={focusingElementIdRef}
+								focusingItemIdRef={focusingItemIdRef}
 								id={id}
 								props={props}
 								SortableItemChild={SortableItemChild}
@@ -125,7 +133,11 @@ export function SortableItem<T extends propsTypes>({
 					</div>
 				</Card>
 			</div>
-			<AddBar addMenuRef={addMenuRef} id={id} />
+			<AddBar
+				addMenuRef={addMenuRef}
+				focusingItemIdRef={focusingItemIdRef}
+				id={id}
+			/>
 		</>
 	);
 
@@ -142,15 +154,21 @@ export function SortableItem<T extends propsTypes>({
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
 		if (deleteClicked) return;
 		const focusedElement = e.relatedTarget;
+
 		if (e.currentTarget.contains(focusedElement)) return;
-		if (addMenuRef.current?.contains(focusedElement)) return;
-		if (focusedElement?.getAttribute("data-addmenu")) return;
+		if (focusedElement?.getAttribute("data-addmenu")) {
+			if (!autoHeightChildRef.current) return;
+
+			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
+			heightDiffRef.current.shouldScroll = true;
+			return;
+		}
 
 		if (focusedElement?.getAttribute("data-error")) {
 			if (!autoHeightChildRef.current) return;
 			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
 
-			focusingElementIdRef.current = focusedElement?.id ?? "";
+			focusingItemIdRef.current = focusedElement?.id ?? "";
 			heightDiffRef.current.shouldScroll = true;
 		} else {
 			heightDiffRef.current.shouldScroll = false;
@@ -185,13 +203,13 @@ export function SortableItem<T extends propsTypes>({
 }
 
 function UnfocusedSortableItem<T extends propsTypes>({
-	focusingElementIdRef,
+	focusingItemIdRef,
 	focusedHeightRef,
 	id,
 	props,
 	SortableItemChild,
 }: {
-	focusingElementIdRef: MutableRefObject<string>;
+	focusingItemIdRef: MutableRefObject<string>;
 	focusedHeightRef: MutableRefObject<number>;
 } & SortableItemProps<T>) {
 	const { formItems, heightDiffRef } = useContext(FormBuilderContext);
@@ -200,12 +218,13 @@ function UnfocusedSortableItem<T extends propsTypes>({
 	useEffect(() => {
 		if (
 			unfocusedSortableItemRef.current &&
-			heightDiffRef.current.shouldScroll
+			heightDiffRef.current.shouldScroll &&
+			focusingItemIdRef.current
 		) {
 			const shouldScroll = () => {
 				for (const formItem of formItems) {
 					if (formItem.id === id) return true;
-					if (formItem.id === focusingElementIdRef.current) return false;
+					if (formItem.id === focusingItemIdRef.current) return false;
 				}
 				return false;
 			};

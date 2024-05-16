@@ -12,8 +12,12 @@ import {
 	TextIcon,
 } from "@radix-ui/react-icons";
 import {
+	MutableRefObject,
 	RefObject,
-	useContext
+	useContext,
+	useEffect,
+	useRef,
+	useState,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import MCQGridIcon from "../../public/icons/mcq_grid.svg";
@@ -27,17 +31,29 @@ import {
 
 function AddBar({
 	addMenuRef,
+	focusingItemIdRef,
 	id,
 }: {
-	id: string;
 	addMenuRef?: RefObject<HTMLDivElement>;
+	focusingItemIdRef?: MutableRefObject<string>;
+	id: string;
 }) {
-	const { formItems, focusedItemRef, setFormItems} = useContext(FormBuilderContext);
+	const { formItems, focusedItemRef, setFormItems } =
+		useContext(FormBuilderContext);
+	const [isOpen, setIsOpen] = useState(false);
+
+	const didSelectRef = useRef(false);
+
+	useEffect(() => {
+		if (isOpen) {
+			didSelectRef.current = false;
+		}
+	}, [isOpen]);
 
 	return (
 		<div className="-z-10 flex h-8 w-full items-center px-2">
 			<div className="h-[1px] flex-grow bg-addbar" />
-			<DropdownMenu onOpenChange={handleOpenChange}>
+			<DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
 				<DropdownMenuTrigger className="custom-focus">
 					<PlusCircledIcon className="mx-1.5 size-6 text-addbar" />
 				</DropdownMenuTrigger>
@@ -52,8 +68,10 @@ function AddBar({
 				>
 					<DropdownMenuItem
 						className="h-10 text-sm"
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(typesEnum["text-input"]);
+							handleAddElement(e, typesEnum["text-input"]);
 						}}
 					>
 						Text
@@ -63,8 +81,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["multiple-choice"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, typesEnum["multiple-choice"]);
 						}}
 					>
 						Multiple choice
@@ -74,8 +94,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["dropdown"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, typesEnum["dropdown"]);
 						}}
 					>
 						Dropdown
@@ -85,8 +107,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["range"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, typesEnum["range"]);
 						}}
 					>
 						Range
@@ -96,8 +120,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["multiple-choice-grid"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, typesEnum["multiple-choice-grid"]);
 						}}
 					>
 						Multiple choice grid
@@ -107,8 +133,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["date"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, typesEnum["date"]);
 						}}
 					>
 						Date
@@ -122,8 +150,19 @@ function AddBar({
 		</div>
 	);
 
-	async function handleAddElement(type: typesEnum) {
+	function preventPointerEvent(e: React.PointerEvent<HTMLDivElement>) {
+		if (didSelectRef.current) {
+			e.preventDefault();
+		}
+	}
+
+	function handleAddElement(e: Event, type: typesEnum) {
+		e.preventDefault();
+		didSelectRef.current = true;
+
 		const newId = uuidv4();
+		if (focusingItemIdRef) focusingItemIdRef.current = newId;
+
 		const newItem = {
 			id: newId,
 			props: { ...returnTypeProps(type, newId) },
@@ -137,13 +176,16 @@ function AddBar({
 			}
 		});
 
+		focusedItemRef.current.blurItem();
+		setIsOpen(false);
 		setFormItems(newFormItems);
 	}
 
-	async function handleOpenChange(isOpen: boolean) {
-		if (!isOpen) {
+	function handleOpenChange(newIsOpen: boolean) {
+		if (!newIsOpen) {
 			focusedItemRef.current.blurItem();
 		}
+		setIsOpen(newIsOpen);
 	}
 
 	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {

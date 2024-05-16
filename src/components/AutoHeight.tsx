@@ -35,7 +35,7 @@ const AutoHeight = ({
 	const [height, setHeight] = useState<Height>(0);
 
 	useEffect(() => {
-		if (!firstRenderRef.current) {
+		if (!firstRenderRef.current && deleteClicked) {
 			setDuration(constants.autoHeightDuration);
 			setHeight(0);
 		}
@@ -65,7 +65,8 @@ const AutoHeight = ({
 				}
 			} else {
 				if (!isBottomVisible) {
-					if (newHeight + verticalPadding < window.innerHeight) {
+					const totalHeight = newHeight + verticalPadding;
+					if (totalHeight < window.innerHeight) {
 						const heightDiff = heightDiffRef.current.shouldScroll
 							? heightDiffRef.current.heightDiff
 							: 0;
@@ -79,8 +80,8 @@ const AutoHeight = ({
 							top: scrollTopPx,
 							behavior: "smooth",
 						});
-					} else {
-						const scrollTopPx = rect.top - verticalPadding;
+					} else if (totalHeight === window.innerHeight) {
+						const scrollTopPx = rect.top;
 						window.scrollBy({
 							left: 0,
 							top: scrollTopPx,
@@ -92,7 +93,7 @@ const AutoHeight = ({
 
 			heightDiffRef.current.shouldScroll = false;
 		},
-		[sortableItemRef],
+		[heightDiffRef, sortableItemRef],
 	);
 
 	useEffect(() => {

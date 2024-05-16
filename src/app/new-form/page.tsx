@@ -5,7 +5,7 @@ import Toolbar from "@/components/toolbar/Toolbar";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const NewFormPage = () => {
 	let debounceRefs = useMemo(() => new Map(), []);
@@ -15,6 +15,10 @@ const NewFormPage = () => {
 	const [formItems, setFormItems] = useState<FormItem[]>(
 		constants.defaultFormItems,
 	);
+
+	useEffect(() => {
+		firstRenderRef.current = false;
+	}, []);
 
 	return (
 		<FormBuilderContext.Provider
