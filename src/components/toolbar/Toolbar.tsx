@@ -5,7 +5,6 @@ import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import CrossIcon from "../../../public/icons/cross.svg";
-import DeleteIcon from "../../../public/icons/delete.svg";
 import SaveIcon from "../../../public/icons/save.svg";
 import {
 	AlertDialog,
@@ -21,8 +20,14 @@ import {
 import ToolbarButton from "./ToolbarButton";
 
 const Toolbar = () => {
-	const { formItems, setFormItems, debounceRefs, focusedItemRef } =
-		useContext(FormBuilderContext);
+	const {
+		debounceRefs,
+		focusedItemRef,
+		formBuilderRef,
+		formItems,
+		isSavingRef,
+		setFormItems,
+	} = useContext(FormBuilderContext);
 	const router = useRouter();
 
 	return (
@@ -45,7 +50,9 @@ const Toolbar = () => {
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={handleClearClick}>Clear</AlertDialogAction>
+						<AlertDialogAction onClick={handleClearClick}>
+							Clear
+						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
@@ -58,7 +65,6 @@ const Toolbar = () => {
 					<SaveIcon />
 				</div>
 			</ToolbarButton>
-
 		</div>
 	);
 
@@ -67,12 +73,35 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
+		isSavingRef.current = true;
+		const errorElement = formBuilderRef.current?.querySelector(
+			'[data-error="true"]',
+		);
+		if (errorElement) {
+			const errorHTMLElement = errorElement as HTMLElement;
+			const rect = errorHTMLElement.getBoundingClientRect();
+			if (rect.top < 0 || rect.bottom > window.innerHeight) {
+				// extra scroll fixes scrollintoview issues idk why
+				requestAnimationFrame(() => {
+					window.scrollBy({ top: -30, behavior: "instant" });
+				});
+				requestAnimationFrame(() =>
+					errorHTMLElement.scrollIntoView({
+						behavior: "smooth",
+						block: "center",
+					}),
+				);
+			}
+			errorHTMLElement.focus({ preventScroll: true });
+			return;
+		}
+
 		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
 			ref.flush();
 		});
 
 		localStorage.setItem("formItems", JSON.stringify(formItems));
-
+		isSavingRef.current = false;
 		router.push("../../new-form/save");
 	}
 };

@@ -8,10 +8,13 @@ import FormItem from "@/interfaces/FormItem";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const NewFormPage = () => {
-	let debounceRefs = useMemo(() => new Map(), []);
-	let firstRenderRef = useRef(false);
-	let focusedItemRef = useRef({ id: "0", blurItem: () => {} });
-	let heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
+	const debounceRefs = useMemo(() => new Map(), []);
+	const firstRenderRef = useRef(false);
+	const focusedItemRef = useRef({ id: "0", blurItem: () => {} });
+	const formBuilderRef = useRef<HTMLDivElement>(null);
+	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
+	const isSavingRef = useRef(false);
+
 	const [formItems, setFormItems] = useState<FormItem[]>(
 		constants.defaultFormItems,
 	);
@@ -26,8 +29,10 @@ const NewFormPage = () => {
 				debounceRefs,
 				firstRenderRef,
 				focusedItemRef,
+				formBuilderRef,
 				formItems,
 				heightDiffRef,
+				isSavingRef,
 				setFormItems,
 			}}
 		>

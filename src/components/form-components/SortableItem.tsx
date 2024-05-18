@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import FormItem from "@/interfaces/FormItem";
 import { propsTypes } from "@/interfaces/propsTypes";
 import { cn } from "@/lib/utils";
@@ -59,7 +60,6 @@ export function SortableItem<T extends propsTypes>({
 	const [deleteClicked, setDeleteClicked] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 
-	const addMenuRef = useRef<HTMLDivElement>(null);
 	const focusedHeightRef = useRef(0);
 	const focusingItemIdRef = useRef("");
 	const autoHeightChildRef = useRef<HTMLDivElement>(null);
@@ -77,9 +77,9 @@ export function SortableItem<T extends propsTypes>({
 	}, [firstRenderRef]);
 
 	return (
-		<>
+		<SortableItemContext.Provider value={{ sortableItemRef }}>
 			<div
-				className="custom-focus z-50"
+				className="custom-focus z-50 bg-card"
 				onBlur={handleOnBlur}
 				onFocus={handleOnFocus}
 				ref={setNodeRef}
@@ -88,8 +88,9 @@ export function SortableItem<T extends propsTypes>({
 			>
 				<Card
 					className={cn(
-						"custom-focus relative flex w-full select-none overflow-hidden pl-3 pr-7 transition-all",
+						"custom-focus relative flex w-full select-none overflow-hidden scroll-smooth border-[1.5px] bg-none pl-3 pr-7 transition-all duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-7 before:bg-accent",
 						isFocused && "border-ring",
+						"data-[error=true]:border-red-800",
 					)}
 					data-error="false"
 					id={id}
@@ -121,7 +122,9 @@ export function SortableItem<T extends propsTypes>({
 						)}
 					</AutoHeight>
 					<div
-						className="absolute inset-y-0 right-0 flex cursor-move items-center rounded-r-xl bg-accent focus-visible:opacity-50 focus-visible:outline-none"
+						// bg is simulated by parent cus corners dont line up
+						// why is css
+						className="absolute inset-y-0 right-0 flex cursor-move items-center focus-visible:opacity-50 focus-visible:outline-none"
 						{...attributes}
 						{...listeners}
 						onMouseDown={(e) => {
@@ -133,12 +136,8 @@ export function SortableItem<T extends propsTypes>({
 					</div>
 				</Card>
 			</div>
-			<AddBar
-				addMenuRef={addMenuRef}
-				focusingItemIdRef={focusingItemIdRef}
-				id={id}
-			/>
-		</>
+			<AddBar focusingItemIdRef={focusingItemIdRef} id={id} />
+		</SortableItemContext.Provider>
 	);
 
 	function deleteItem() {
@@ -154,9 +153,9 @@ export function SortableItem<T extends propsTypes>({
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
 		if (deleteClicked) return;
 		const focusedElement = e.relatedTarget;
-
+		
 		if (e.currentTarget.contains(focusedElement)) return;
-		if (addMenuRef.current?.contains(focusedElement)) {
+		if (focusedElement?.getAttribute("data-addmenu")) {
 			if (!autoHeightChildRef.current) return;
 
 			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
@@ -189,9 +188,7 @@ export function SortableItem<T extends propsTypes>({
 		setIsFocused(false);
 	}
 
-	function handleOnFocus(e: React.FocusEvent<HTMLDivElement>) {
-		if (addMenuRef.current?.contains(e.target)) return;
-
+	function handleOnFocus() {
 		focusedItemRef.current = {
 			...focusedItemRef.current,
 			id: id,

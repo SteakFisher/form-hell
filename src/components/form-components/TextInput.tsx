@@ -11,10 +11,13 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {
 	ChangeEvent,
+	createContext,
 	memo,
+	MutableRefObject,
 	useContext,
 	useEffect,
 	useRef,
@@ -30,6 +33,27 @@ import {
 import { Checkbox } from "../ui/checkbox";
 import { SortableItem } from "./SortableItem";
 
+interface TextInputContextInterface {
+	lengthError: string;
+	lengthsRef: MutableRefObject<{
+		minLength: string;
+		maxLength: string;
+	}>;
+	regexError: string;
+	regexRef: MutableRefObject<string>;
+	setLengthError: (value: string) => void;
+	setRegexError: (value: string) => void;
+}
+
+const TextInputContext = createContext<TextInputContextInterface>({
+	lengthError: "",
+	lengthsRef: { current: { minLength: "", maxLength: "" } },
+	regexError: "",
+	regexRef: { current: "" },
+	setLengthError: () => {},
+	setRegexError: () => {},
+});
+
 export const TextInput = memo(function TextInput({
 	id,
 	props,
@@ -37,12 +61,32 @@ export const TextInput = memo(function TextInput({
 	id: string;
 	props: TextInputProps;
 }) {
+	const [lengthError, setLengthError] = useState("");
+	const [regexError, setRegexError] = useState("");
+
+	const lengthsRef = useRef({
+		minLength: String(props.minLength || ""),
+		maxLength: String(props.maxLength || ""),
+	});
+	const regexRef = useRef(props.regex || "");
+
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			SortableItemChild={TextInputWrapper}
-		/>
+		<TextInputContext.Provider
+			value={{
+				lengthError,
+				lengthsRef,
+				regexError,
+				regexRef,
+				setLengthError,
+				setRegexError,
+			}}
+		>
+			<SortableItem
+				id={id}
+				props={props}
+				SortableItemChild={TextInputWrapper}
+			/>
+		</TextInputContext.Provider>
 	);
 });
 
@@ -55,6 +99,16 @@ const TextInputWrapper = memo(function TextInputWrapper({
 	isFocused: boolean;
 	props: TextInputProps;
 }) {
+	const { lengthError, regexError } = useContext(TextInputContext);
+	const { sortableItemRef } = useContext(SortableItemContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			lengthError || regexError ? "true" : "false",
+		);
+	}, [isFocused, lengthError, regexError, sortableItemRef]);
+
 	return (
 		<>
 			{isFocused ? (
@@ -70,23 +124,25 @@ function FocusedTextInput({
 	id,
 	props,
 }: {
-	props: TextInputProps;
 	id: string;
+	props: TextInputProps;
 }) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const {
+		lengthError,
+		lengthsRef,
+		regexError,
+		regexRef,
+		setLengthError,
+		setRegexError,
+	} = useContext(TextInputContext);
+
 	const [accordionItem, setAccordionItem] = useState("");
 
-	const regexRef = useRef<HTMLInputElement>(null);
-	const lengthsRef = useRef({
-		minLength: props.minLength ? props.minLength.toString() : "",
-		maxLength: props.maxLength ? props.maxLength.toString() : "",
-	});
-
-	const [lengthError, setLengthError] = useState("");
-	const [regexError, setRegexError] = useState("");
+	const regexInputRef = useRef<HTMLInputElement>(null);
 
 	const handleIgnoreCaseChange = useDebouncedCallback((isChecked: boolean) => {
 		props.regexFlags = isChecked ? "mi" : "m";
@@ -96,7 +152,10 @@ function FocusedTextInput({
 			lengthsRef.current.maxLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.maxLength = Number(lengthsRef.current.maxLength);
+			if (!_error) {
+				props.minLength = +lengthsRef.current.minLength;
+				props.maxLength = +lengthsRef.current.maxLength;
+			}
 		},
 		constants.debounceWait,
 	);
@@ -105,14 +164,17 @@ function FocusedTextInput({
 			lengthsRef.current.minLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.minLength = Number(lengthsRef.current.minLength);
+
+			if (!_error) {
+				props.minLength = +lengthsRef.current.minLength;
+				props.maxLength = +lengthsRef.current.maxLength;
+			}
 		},
 		constants.debounceWait,
 	);
 	const handleRegexChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
-			const newRegex = e.target.value;
-			setRegex(newRegex);
+			setRegex(e.target.value);
 		},
 		constants.debounceWait,
 	);
@@ -190,7 +252,7 @@ function FocusedTextInput({
 									<Label htmlFor="min-length">Min. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.minLength || ""}
+									defaultValue={lengthsRef.current.minLength || ""}
 									className="ml-2 w-24"
 									id="min-length"
 									onChange={handleMinLengthChange}
@@ -202,7 +264,7 @@ function FocusedTextInput({
 									<Label htmlFor="max-length">Max. Length</Label>
 								</div>
 								<Input
-									defaultValue={props.maxLength || ""}
+									defaultValue={lengthsRef.current.maxLength || ""}
 									className="ml-2 w-24"
 									id="max-length"
 									onChange={handleMaxLengthChange}
@@ -253,8 +315,8 @@ function FocusedTextInput({
 								<Input
 									className="w-56"
 									id="regex"
-									ref={regexRef}
-									defaultValue={props.regex.toString()}
+									ref={regexInputRef}
+									defaultValue={regexRef.current}
 									onChange={handleRegexChange}
 									maxLength={1000}
 								/>
@@ -283,8 +345,6 @@ function FocusedTextInput({
 			handleRegexChange.flush();
 		}
 		setAccordionItem(value);
-		setLengthError("");
-		setRegexError("");
 	}
 
 	function handleInputTypeChange(inputType: string) {
@@ -321,6 +381,7 @@ function FocusedTextInput({
 	}
 
 	function setRegex(newRegex: string) {
+		regexRef.current = newRegex;
 		newRegex = newRegex.trim();
 
 		try {
@@ -331,8 +392,8 @@ function FocusedTextInput({
 			setRegexError("Enter a valid regex pattern");
 		}
 
-		if (regexRef.current == null) return;
-		regexRef.current.value = newRegex;
+		if (regexInputRef.current == null) return;
+		regexInputRef.current.value = newRegex;
 	}
 
 	function validateLength(): string {

@@ -64,7 +64,6 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 				<FocusedMultipleChoiceGrid
 					id={id}
 					props={props}
-					isRadio={isRadio}
 					setIsRadio={setIsRadio}
 				/>
 			) : (
@@ -76,12 +75,10 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 
 function FocusedMultipleChoiceGrid({
 	id,
-	isRadio,
 	props,
 	setIsRadio,
 }: {
 	id: string;
-	isRadio: boolean;
 	props: MultipleChoiceGridProps;
 	setIsRadio: (value: boolean) => void;
 }) {

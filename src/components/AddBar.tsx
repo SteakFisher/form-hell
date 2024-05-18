@@ -1,7 +1,7 @@
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { FormItemTypes } from "@/contexts/FormItemTypes";
 import FormItem from "@/interfaces/FormItem";
+import { FormItemTypes } from "@/interfaces/FormItemTypes";
 import { propsTypes } from "@/interfaces/propsTypes";
 import {
 	CalendarIcon,
@@ -13,7 +13,6 @@ import {
 } from "@radix-ui/react-icons";
 import {
 	MutableRefObject,
-	RefObject,
 	useContext,
 	useEffect,
 	useRef,
@@ -30,11 +29,9 @@ import {
 } from "./ui/dropdown-menu";
 
 function AddBar({
-	addMenuRef,
 	focusingItemIdRef,
 	id,
 }: {
-	addMenuRef?: RefObject<HTMLDivElement>;
 	focusingItemIdRef?: MutableRefObject<string>;
 	id: string;
 }) {
@@ -60,8 +57,8 @@ function AddBar({
 				<DropdownMenuContent
 					align="center"
 					className="w-56"
+					data-addmenu
 					onCloseAutoFocus={(e) => e.preventDefault()}
-					ref={addMenuRef}
 					side="bottom"
 					sideOffset={9}
 				>

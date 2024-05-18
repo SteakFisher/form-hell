@@ -27,7 +27,8 @@ const AutoHeight = ({
 	sortableItemRef,
 	...props
 }: AutoHeightProps) => {
-	const { firstRenderRef, heightDiffRef } = useContext(FormBuilderContext);
+	const { firstRenderRef, heightDiffRef, isSavingRef } =
+		useContext(FormBuilderContext);
 
 	const [duration, setDuration] = useState<number>(
 		constants.autoHeightDuration,
@@ -47,12 +48,17 @@ const AutoHeight = ({
 			if (focusedElement == null) return;
 			const rect = focusedElement.getBoundingClientRect();
 			const newBottom = rect.top + newHeight;
-			const isTopVisible = rect.top >= 0;
-			const isBottomVisible = newBottom <= window.innerHeight;
+			const isTopBelowStart = rect.top >= 0;
+			const isBottomAboveEnd = newBottom <= window.innerHeight;
 			const verticalPadding = 30;
 
-			if (!isTopVisible) {
-				if (isBottomVisible) {
+			if (isSavingRef.current) {
+				isSavingRef.current = false;
+				heightDiffRef.current.shouldScroll = false;
+				return;
+			}
+			if (!isTopBelowStart) {
+				if (isBottomAboveEnd) {
 					const heightDiff = heightDiffRef.current.shouldScroll
 						? heightDiffRef.current.heightDiff
 						: 0;
@@ -64,7 +70,7 @@ const AutoHeight = ({
 					});
 				}
 			} else {
-				if (!isBottomVisible) {
+				if (!isBottomAboveEnd) {
 					const totalHeight = newHeight + verticalPadding;
 					if (totalHeight < window.innerHeight) {
 						const heightDiff = heightDiffRef.current.shouldScroll
@@ -93,7 +99,7 @@ const AutoHeight = ({
 
 			heightDiffRef.current.shouldScroll = false;
 		},
-		[heightDiffRef, sortableItemRef],
+		[heightDiffRef, isSavingRef, sortableItemRef],
 	);
 
 	useEffect(() => {

@@ -78,5 +78,5 @@ export const constants = Object.freeze({
 	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
 	debounceWait: 500,
-	intRegex: /^(-)?((0+)|[1-9]\d*)?$/,
+	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
 });

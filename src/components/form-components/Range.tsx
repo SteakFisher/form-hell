@@ -1,9 +1,12 @@
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import {
 	ChangeEvent,
+	createContext,
 	memo,
+	MutableRefObject,
 	useContext,
 	useEffect,
 	useRef,
@@ -16,6 +19,22 @@ import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
 import { SortableItem } from "./SortableItem";
 
+interface RangeContextInterface {
+	rangeError: string;
+	rangeRef: MutableRefObject<{
+		min: string;
+		max: string;
+		step: string;
+	}>;
+	setRangeError: (value: string) => void;
+}
+
+const RangeContext = createContext<RangeContextInterface>({
+	rangeError: "",
+	rangeRef: { current: { min: "", max: "", step: "" } },
+	setRangeError: () => {},
+});
+
 const Range = memo(function Range({
 	id,
 	props,
@@ -23,8 +42,17 @@ const Range = memo(function Range({
 	id: string;
 	props: RangeProps;
 }) {
+	const rangeRef = useRef({
+		min: String(props.min),
+		max: String(props.max),
+		step: String(props.step),
+	});
+	const [rangeError, setRangeError] = useState("");
+
 	return (
-		<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
+		<RangeContext.Provider value={{ rangeError, rangeRef, setRangeError }}>
+			<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
+		</RangeContext.Provider>
 	);
 });
 
@@ -37,6 +65,16 @@ const RangeWrapper = memo(function RangeWrapper({
 	isFocused: boolean;
 	props: RangeProps;
 }) {
+	const { rangeError } = useContext(RangeContext);
+	const { sortableItemRef } = useContext(SortableItemContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			rangeError ? "true" : "false",
+		);
+	}, [isFocused, rangeError, sortableItemRef]);
+
 	return (
 		<>
 			{isFocused ? (
@@ -50,12 +88,8 @@ const RangeWrapper = memo(function RangeWrapper({
 
 function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
-	const rangeRef = useRef({
-		min: String(props.min),
-		max: String(props.max),
-		step: String(props.step),
-	});
-	const [rangeError, setRangeError] = useState("");
+	const { rangeError, rangeRef, setRangeError } = useContext(RangeContext);
+	const { sortableItemRef } = useContext(SortableItemContext);
 
 	const handleMaxChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +139,14 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 			.set("max", handleMaxChange)
 			.set("min", handleMinChange)
 			.set("step", handleStepChange);
-	});
+	}, []);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			rangeError ? "true" : "false",
+		);
+	}, [rangeError, sortableItemRef]);
 
 	return (
 		<CardContent className="w-full justify-center pb-2">
@@ -115,11 +156,10 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 						<Label htmlFor="min">Min.</Label>
 					</div>
 					<Input
-						defaultValue={props.min}
+						defaultValue={rangeRef.current.min}
 						className="ml-2 w-24"
 						id="min"
 						onChange={handleMinChange}
-						placeholder="0"
 					/>
 				</div>
 				<div className="flex">
@@ -127,11 +167,10 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 						<Label htmlFor="max">Max.</Label>
 					</div>
 					<Input
-						defaultValue={props.max}
+						defaultValue={rangeRef.current.max}
 						className="ml-2 w-24"
 						id="max"
 						onChange={handleMaxChange}
-						placeholder="1"
 					/>
 				</div>
 				<div className="flex">
@@ -139,11 +178,10 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 						<Label htmlFor="step">Step</Label>
 					</div>
 					<Input
-						defaultValue={props.step}
+						defaultValue={rangeRef.current.step}
 						className="ml-2 w-24"
 						id="step"
 						onChange={handleStepChange}
-						placeholder="1"
 					/>
 				</div>
 			</div>
@@ -156,9 +194,9 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 		const max = rangeRef.current.max;
 		const step = rangeRef.current.step;
 
-		const minNum = min ? Number(min) : 0;
-		const maxNum = max ? Number(max) : 1;
-		const stepNum = step ? Number(step) : 1;
+		const minNum = Number(min);
+		const maxNum = Number(max);
+		const stepNum = Number(step);
 
 		if (
 			!(
