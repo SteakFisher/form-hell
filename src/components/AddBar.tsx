@@ -36,7 +36,7 @@ function AddBar({
 	focusingItemIdRef?: MutableRefObject<string>;
 	id: string;
 }) {
-	const { formItems, focusedItemRef, setFormItems } =
+	const { formItems, setFormItems } =
 		useContext(FormBuilderContext);
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -186,15 +186,11 @@ function AddBar({
 			}
 		});
 
-		focusedItemRef.current.blurItem();
 		setIsOpen(false);
 		setFormItems(newFormItems);
 	}
 
 	function handleOpenChange(newIsOpen: boolean) {
-		if (!newIsOpen) {
-			focusedItemRef.current.blurItem();
-		}
 		setIsOpen(newIsOpen);
 	}
 

@@ -82,7 +82,6 @@ export function SortableItem<T extends propsTypes>({
 		<SortableItemContext.Provider value={{ sortableItemRef }}>
 			<div
 				className="custom-focus z-50 bg-card"
-				onBlur={handleOnBlur}
 				onFocus={handleOnFocus}
 				ref={setNodeRef}
 				style={style}
@@ -153,40 +152,6 @@ export function SortableItem<T extends propsTypes>({
 		debounceRefs.delete(id);
 	}
 
-	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
-		if (deleteClicked) return;
-		const focusedElement = e.relatedTarget;
-		const currentTarget = e.currentTarget;
-
-		checkIframe().then((el) => {
-			if (currentTarget.contains(focusedElement)) return;
-			if (focusedElement?.getAttribute("data-addmenu")) {
-				if (!autoHeightChildRef.current) return;
-
-				focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
-				heightDiffRef.current.shouldScroll = true;
-				return;
-			}
-
-			if (document.activeElement?.id === `yt-player-${id}`) {
-				sortableItemRef.current?.focus({ preventScroll: true });
-				return;
-			}
-
-			if (focusedElement?.getAttribute("data-error")) {
-				if (!autoHeightChildRef.current) return;
-				focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
-
-				focusingItemIdRef.current = focusedElement?.id ?? "";
-				heightDiffRef.current.shouldScroll = true;
-			} else {
-				heightDiffRef.current.shouldScroll = false;
-			}
-
-			blurItem();
-		});
-	}
-
 	function blurItem() {
 		const refs = debounceRefs.get(id);
 
@@ -200,6 +165,7 @@ export function SortableItem<T extends propsTypes>({
 	}
 
 	function handleOnFocus() {
+		focusedItemRef.current.blurItem();
 		focusedItemRef.current = {
 			...focusedItemRef.current,
 			id: id,
