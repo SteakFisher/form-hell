@@ -115,7 +115,7 @@ function FocusedMultipleChoice({
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef} tabIndex={-1}>
+		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox

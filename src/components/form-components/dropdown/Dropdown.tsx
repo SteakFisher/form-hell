@@ -72,7 +72,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef} tabIndex={-1}>
+		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
 			<div>
 				<DndContext
 					id={`${id}dropdown-context`}

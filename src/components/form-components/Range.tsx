@@ -149,7 +149,7 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 	}, [rangeError, sortableItemRef]);
 
 	return (
-		<CardContent className="w-full justify-center pb-2">
+		<CardContent className="mt-5 w-full justify-center pb-2">
 			<div className="mt-3 flex w-min space-x-6 ">
 				<div className="flex">
 					<div className="flex h-9 items-center">

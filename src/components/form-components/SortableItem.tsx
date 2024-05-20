@@ -253,7 +253,7 @@ function FocusedSortableItem<T extends propsTypes>({
 
 	return (
 		<div className={cn("w-full", className)}>
-			<CardHeader>
+			<CardHeader className="pb-0">
 				<div className="flex justify-between">
 					<CardTitle>
 						<Textarea

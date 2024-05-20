@@ -29,7 +29,7 @@ const DateWrapper = memo(function DateWrapper({
 
 function FocusedDate() {
 	return (
-		<CardContent>
+		<CardContent className="mt-5">
 			<Button
 				disabled
 				variant="outline"
