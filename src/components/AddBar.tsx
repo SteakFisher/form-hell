@@ -36,8 +36,7 @@ function AddBar({
 	focusingItemIdRef?: MutableRefObject<string>;
 	id: string;
 }) {
-	const { formItems, setFormItems } =
-		useContext(FormBuilderContext);
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
 	const [isOpen, setIsOpen] = useState(false);
 
 	const didSelectRef = useRef(false);
@@ -204,7 +203,7 @@ function AddBar({
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Option 1",
+						value: "",
 					}),
 				};
 			case "media":
@@ -215,7 +214,7 @@ function AddBar({
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Option 1",
+						value: "",
 					}),
 				};
 			case "multiple-choice-grid":
@@ -224,12 +223,12 @@ function AddBar({
 					columns: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Column 1",
+						value: "",
 					}),
 					rows: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Row 1",
+						value: "",
 					}),
 				};
 			case "range":

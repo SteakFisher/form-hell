@@ -58,7 +58,13 @@ const DropdownWrapper = memo(function DropdownWrapper({
 	);
 });
 
-function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
+const FocusedDropdown = memo(function FocusedDropdown({
+	props,
+	id,
+}: {
+	props: DropdownProps;
+	id: string;
+}) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -67,6 +73,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 		}),
 	);
 
+	const [hideDelete, setHideDelete] = useState(props.items.length === 1);
 	const [itemsState, setItemsState] = useState([...props.items]);
 
 	const contentRef = useRef<HTMLDivElement>(null);
@@ -85,9 +92,11 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 						items={itemsState}
 						strategy={verticalListSortingStrategy}
 					>
-						{itemsState.map((item) => {
+						{itemsState.map((item, index) => {
 							return (
 								<DropdownItem
+									hideDelete={hideDelete}
+									index={index + 1}
 									props={item}
 									key={item.id}
 									onDelete={handleDeleteClick}
@@ -131,6 +140,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 		};
 		props.items.push(newItem);
 		setItemsState([...props.items]);
+		setHideDelete(false);
 	}
 
 	function handleDeleteClick(idToDelete: string) {
@@ -141,13 +151,18 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 			...props.items.slice(itemIndex + 1),
 		];
 		setItemsState(props.items);
+		if (props.items.length === 1) setHideDelete(true);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function UnfocusedDropdown({ props }: { props: DropdownProps }) {
+const UnfocusedDropdown = memo(function UnfocusedDropdown({
+	props,
+}: {
+	props: DropdownProps;
+}) {
 	return (
 		<div className="h-min w-full whitespace-pre-wrap leading-snug">
 			<CardHeader>
@@ -162,12 +177,14 @@ function UnfocusedDropdown({ props }: { props: DropdownProps }) {
 				{props.items.map((item, index) => (
 					<p className="flex" key={index + 1}>
 						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
-						<span className="flex-1">{item.value}</span>
+						<span className="flex-1">
+							{item.value || `Option ${index + 1}`}
+						</span>
 					</p>
 				))}
 			</CardContent>
 		</div>
 	);
-}
+});
 
 export default Dropdown;

@@ -73,7 +73,7 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 	);
 });
 
-function FocusedMultipleChoiceGrid({
+const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 	id,
 	props,
 	setIsRadio,
@@ -92,6 +92,10 @@ function FocusedMultipleChoiceGrid({
 
 	const [rowsState, setRowsState] = useState([...props.rows]);
 	const [columnsState, setColumnsState] = useState([...props.columns]);
+	const [hideRowDelete, setHideRowDelete] = useState(rowsState.length === 1);
+	const [hideColumnDelete, setHideColumnDelete] = useState(
+		columnsState.length === 1,
+	);
 	const [showAddRow, setShowAddRow] = useState(rowsState.length < 10);
 	const [showAddColumn, setShowAddColumn] = useState(columnsState.length < 10);
 
@@ -139,13 +143,15 @@ function FocusedMultipleChoiceGrid({
 								items={rowsState}
 								strategy={verticalListSortingStrategy}
 							>
-								{rowsState.map((item) => {
+								{rowsState.map((item, index) => {
 									return (
 										<MultipleChoiceGridItem
+											hideDelete={hideRowDelete}
 											key={item.id}
 											onDelete={(idToDelete) =>
 												handleDeleteClick(idToDelete, "row")
 											}
+											placeholder={`Row ${index + 1}`}
 											props={item}
 										/>
 									);
@@ -186,10 +192,12 @@ function FocusedMultipleChoiceGrid({
 								{columnsState.map((item, index) => {
 									return (
 										<MultipleChoiceGridItem
+											hideDelete={hideColumnDelete}
 											key={item.id}
 											onDelete={(idToDelete) =>
 												handleDeleteClick(idToDelete, "column")
 											}
+											placeholder={`Column ${index + 1}`}
 											props={item}
 										/>
 									);
@@ -252,10 +260,14 @@ function FocusedMultipleChoiceGrid({
 		if (type === "row") {
 			props.rows.push(newItem);
 			if (props.rows.length === 10) setShowAddRow(false);
+			else setHideRowDelete(false);
+
 			setRowsState([...props.rows]);
 		} else {
 			props.columns.push(newItem);
 			if (props.columns.length === 10) setShowAddColumn(false);
+			else setHideColumnDelete(false);
+
 			setColumnsState([...props.columns]);
 		}
 	}
@@ -273,7 +285,8 @@ function FocusedMultipleChoiceGrid({
 					break;
 				}
 			}
-			if (props.rows.length < 10) setShowAddRow(true);
+			if (props.rows.length === 1) setHideRowDelete(true);
+			else if (props.rows.length < 10) setShowAddRow(true);
 		} else {
 			for (const [index, column] of props.columns.entries()) {
 				if (column.id === idToDelete) {
@@ -286,14 +299,15 @@ function FocusedMultipleChoiceGrid({
 					break;
 				}
 			}
-			if (props.columns.length < 10) setShowAddColumn(true);
+			if (props.columns.length === 1) setHideColumnDelete(true);
+			else if (props.columns.length < 10) setShowAddColumn(true);
 		}
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function UnfocusedMultipleChoiceGrid({
+const UnfocusedMultipleChoiceGrid = memo(function UnfocusedMultipleChoiceGrid({
 	props,
 	isRadio,
 }: {
@@ -315,7 +329,7 @@ function UnfocusedMultipleChoiceGrid({
 					<div className="flex-1" />
 					{props.columns.map((column, index) => (
 						<span key={index} className="flex-1 truncate text-center">
-							{column.value}
+							{column.value || `Column ${index + 1}`}
 						</span>
 					))}
 				</div>
@@ -325,7 +339,9 @@ function UnfocusedMultipleChoiceGrid({
 							className="flex min-h-8 items-center space-x-2"
 							key={index}
 						>
-							<span className="flex-1 truncate">{row.value}</span>
+							<span className="flex-1 truncate">
+								{row.value || `Row ${index + 1}`}
+							</span>
 							{props.columns.map((column, index) => (
 								<div
 									key={index}
@@ -347,6 +363,6 @@ function UnfocusedMultipleChoiceGrid({
 			</CardContent>
 		</div>
 	);
-}
+});
 
 export default MultipleChoiceGrid;

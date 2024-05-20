@@ -76,7 +76,7 @@ const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
 	);
 });
 
-function FocusedMultipleChoice({
+const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 	id,
 	isRadio,
 	props,
@@ -96,6 +96,9 @@ function FocusedMultipleChoice({
 	);
 
 	const [hasOther, setHasOther] = useState(props.hasOther);
+	const [hideDelete, setHideDelete] = useState(
+		props.items.length + +hasOther === 1,
+	);
 	const [itemsState, setItemsState] = useState([...props.items]);
 
 	const handleAllowMultipleClick = useDebouncedCallback(
@@ -136,9 +139,11 @@ function FocusedMultipleChoice({
 						items={itemsState}
 						strategy={verticalListSortingStrategy}
 					>
-						{itemsState.map((item) => {
+						{itemsState.map((item, index) => {
 							return (
 								<MultipleChoiceItem
+									hideDelete={hideDelete}
+									index={index + 1}
 									isRadio={isRadio}
 									key={item.id}
 									onDelete={handleDeleteClick}
@@ -200,6 +205,7 @@ function FocusedMultipleChoice({
 			value: "",
 		};
 		props.items.push(newItem);
+		setHideDelete(false);
 		setItemsState([...props.items]);
 	}
 
@@ -216,6 +222,7 @@ function FocusedMultipleChoice({
 			...props.items.slice(0, itemIndex),
 			...props.items.slice(itemIndex + 1),
 		];
+		if (props.items.length === 1) setHideDelete(true);
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
@@ -228,9 +235,9 @@ function FocusedMultipleChoice({
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function MultipleChoiceOtherItem({
+const MultipleChoiceOtherItem = memo(function MultipleChoiceOtherItem({
 	isRadio,
 	onDelete,
 }: {
@@ -266,9 +273,9 @@ function MultipleChoiceOtherItem({
 			</div>
 		</div>
 	);
-}
+});
 
-function UnfocusedMultipleChoice({
+const UnfocusedMultipleChoice = memo(function UnfocusedMultipleChoice({
 	props,
 	isRadio,
 }: {
@@ -297,7 +304,7 @@ function UnfocusedMultipleChoice({
 									className="mr-2 disabled:cursor-default disabled:opacity-100"
 								/>
 							)}
-							{item.value}
+							{item.value || `Option ${index + 1}`}
 						</div>
 					);
 				})}
@@ -321,6 +328,6 @@ function UnfocusedMultipleChoice({
 			</CardContent>
 		</div>
 	);
-}
+});
 
 export default MultipleChoice;

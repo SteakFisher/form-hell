@@ -1,34 +1,29 @@
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { MultipleChoiceItemProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceItemProps";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { useSortable } from "@dnd-kit/sortable";
-import autosize from "autosize";
-import Image from "next/image";
-import React, {
-	ChangeEvent,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
-import { DebouncedState, useDebouncedCallback } from "use-debounce";
 import { CSS } from "@dnd-kit/utilities";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	CircleIcon,
 	Cross1Icon,
 	DragHandleDots2Icon,
-	RadiobuttonIcon,
 } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import autosize from "autosize";
+import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
-function MultipleChoiceItem({
+const MultipleChoiceItem = memo(function MultipleChoiceItem({
+	hideDelete,
+	index,
 	props,
 	isRadio,
 	onDelete,
 }: {
+	hideDelete: boolean;
+	index: number;
 	props: MultipleChoiceItemProps;
 	isRadio: boolean;
 	onDelete: (idToDelete: string) => void;
@@ -52,8 +47,7 @@ function MultipleChoiceItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		const refs =
-			debounceRefs.get(props.parentId);
+		const refs = debounceRefs.get(props.parentId);
 		if (!refs) return;
 		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);
@@ -81,23 +75,25 @@ function MultipleChoiceItem({
 					ref={textRef}
 					defaultValue={props.value}
 					onChange={handleTextChange}
-					placeholder="Enter option value"
+					placeholder={`Option ${index}`}
 					className="h-[32px] resize-none disabled:cursor-default"
 					maxLength={500}
 				/>
-				<Button
-					className="ml-2 size-9 px-3"
-					variant="ghost"
-					size="icon"
-					onClick={() => {
-						onDelete(props.id);
-					}}
-				>
-					<Cross1Icon />
-				</Button>
+				{hideDelete || (
+					<Button
+						className="ml-2 size-9 px-3"
+						variant="ghost"
+						size="icon"
+						onClick={() => {
+							onDelete(props.id);
+						}}
+					>
+						<Cross1Icon />
+					</Button>
+				)}
 			</div>
 		</div>
 	);
-}
+});
 
 export default MultipleChoiceItem;
