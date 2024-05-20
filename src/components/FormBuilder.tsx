@@ -28,6 +28,7 @@ import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import AddBar from "./AddBar";
 import Date from "./form-components/Date";
+import Media from "./form-components/Media";
 import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 
@@ -72,6 +73,14 @@ const FormBuilder = () => {
 								case "dropdown":
 									return (
 										<Dropdown
+											id={formItem.id}
+											key={formItem.id}
+											props={formItem.props}
+										/>
+									);
+								case "media":
+									return (
+										<Media
 											id={formItem.id}
 											key={formItem.id}
 											props={formItem.props}

@@ -20,6 +20,7 @@ import {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import MCQGridIcon from "../../public/icons/mcq_grid.svg";
+import MediaIcon from "../../public/icons/media.svg";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -140,6 +141,19 @@ function AddBar({
 							<CalendarIcon className="size-[1.4rem]" />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "media");
+						}}
+					>
+						Media
+						<DropdownMenuShortcut className="size-[1.3rem] fill-white">
+							<MediaIcon />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<div className="h-[1px] flex-grow bg-addbar" />
@@ -197,6 +211,8 @@ function AddBar({
 						value: "Option 1",
 					}),
 				};
+			case "media":
+				return constants.defaultMediaProps;
 			case "multiple-choice":
 				return {
 					...constants.defaultMultipleChoiceProps,

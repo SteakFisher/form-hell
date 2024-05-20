@@ -33,14 +33,16 @@ const AutoHeight = ({
 	const [duration, setDuration] = useState<number>(
 		constants.autoHeightDuration,
 	);
-	const [height, setHeight] = useState<Height>(0);
+	const [height, setHeight] = useState<Height>(
+		firstRenderRef.current ? "auto" : 0,
+	);
 
 	useEffect(() => {
-		if (!firstRenderRef.current && deleteClicked) {
+		if (deleteClicked) {
 			setDuration(constants.autoHeightDuration);
 			setHeight(0);
 		}
-	}, [deleteClicked, firstRenderRef]);
+	}, [deleteClicked]);
 
 	const autoScroll = useCallback(
 		function autoScroll(newHeight: number) {

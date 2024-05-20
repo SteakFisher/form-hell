@@ -27,12 +27,13 @@ import AutoHeight from "../AutoHeight";
 
 interface SortableItemProps<T extends propsTypes> {
 	className?: string;
+	hideRequired?: boolean;
+	id: string;
 	SortableItemChild: ComponentType<{
 		id: string;
 		isFocused: boolean;
 		props: T;
 	}>;
-	id: string;
 	props: T;
 }
 
@@ -42,6 +43,7 @@ interface FocusedSortableItemProps<T extends propsTypes>
 }
 
 export function SortableItem<T extends propsTypes>({
+	hideRequired,
 	id,
 	SortableItemChild,
 	props,
@@ -106,6 +108,7 @@ export function SortableItem<T extends propsTypes>({
 					>
 						{isFocused ? (
 							<FocusedSortableItem
+								hideRequired={hideRequired}
 								id={id}
 								props={props}
 								setDeleteClicked={setDeleteClicked}
@@ -153,27 +156,35 @@ export function SortableItem<T extends propsTypes>({
 	function handleOnBlur(e: React.FocusEvent<HTMLDivElement>) {
 		if (deleteClicked) return;
 		const focusedElement = e.relatedTarget;
-		
-		if (e.currentTarget.contains(focusedElement)) return;
-		if (focusedElement?.getAttribute("data-addmenu")) {
-			if (!autoHeightChildRef.current) return;
+		const currentTarget = e.currentTarget;
 
-			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
-			heightDiffRef.current.shouldScroll = true;
-			return;
-		}
+		checkIframe().then((el) => {
+			if (currentTarget.contains(focusedElement)) return;
+			if (focusedElement?.getAttribute("data-addmenu")) {
+				if (!autoHeightChildRef.current) return;
 
-		if (focusedElement?.getAttribute("data-error")) {
-			if (!autoHeightChildRef.current) return;
-			focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
+				focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
+				heightDiffRef.current.shouldScroll = true;
+				return;
+			}
 
-			focusingItemIdRef.current = focusedElement?.id ?? "";
-			heightDiffRef.current.shouldScroll = true;
-		} else {
-			heightDiffRef.current.shouldScroll = false;
-		}
+			if (document.activeElement?.id === `yt-player-${id}`) {
+				sortableItemRef.current?.focus({ preventScroll: true });
+				return;
+			}
 
-		blurItem();
+			if (focusedElement?.getAttribute("data-error")) {
+				if (!autoHeightChildRef.current) return;
+				focusedHeightRef.current = autoHeightChildRef.current.clientHeight;
+
+				focusingItemIdRef.current = focusedElement?.id ?? "";
+				heightDiffRef.current.shouldScroll = true;
+			} else {
+				heightDiffRef.current.shouldScroll = false;
+			}
+
+			blurItem();
+		});
 	}
 
 	function blurItem() {
@@ -243,6 +254,7 @@ function UnfocusedSortableItem<T extends propsTypes>({
 
 function FocusedSortableItem<T extends propsTypes>({
 	className,
+	hideRequired,
 	id,
 	props,
 	setDeleteClicked,
@@ -292,14 +304,16 @@ function FocusedSortableItem<T extends propsTypes>({
 						onClick={handleDeleteClick}
 					/>
 				</div>
-				<div className="flex space-x-2 pt-2">
-					<Label htmlFor="required">Required</Label>
-					<Checkbox
-						id="required"
-						onCheckedChange={handleRequiredChange}
-						defaultChecked={props.required}
-					/>
-				</div>
+				{hideRequired || (
+					<div className="flex space-x-2 pt-2">
+						<Label htmlFor="required">Required</Label>
+						<Checkbox
+							id="required"
+							onCheckedChange={handleRequiredChange}
+							defaultChecked={props.required}
+						/>
+					</div>
+				)}
 			</CardHeader>
 			<SortableItemChild id={id} props={props} isFocused={true} />
 		</div>
@@ -308,4 +322,13 @@ function FocusedSortableItem<T extends propsTypes>({
 	function handleDeleteClick() {
 		setDeleteClicked(true);
 	}
+}
+
+function sleep(ms = 0) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function checkIframe() {
+	await sleep(0);
+	return document.activeElement;
 }

@@ -3,6 +3,7 @@ export type FormItemTypes =
 	| "dropdown"
 	| "text-input"
 	| "title"
+	| "media"
 	| "multiple-choice"
 	| "multiple-choice-grid"
 	| "range";

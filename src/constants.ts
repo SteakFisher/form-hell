@@ -1,5 +1,6 @@
 import DateProps from "./interfaces/form-component-interfaces/DateProps";
 import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
+import MediaProps from "./interfaces/form-component-interfaces/MediaProps";
 import MultipleChoiceGridProps from "./interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
 import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
@@ -17,6 +18,15 @@ const DropdownPropsObj: DropdownProps = {
 	required: false,
 	title: "",
 	type: "dropdown",
+};
+
+const MediaPropsObj: MediaProps = {
+	altText: "",
+	mediaType: "image",
+	required: false,
+	title: "",
+	type: "media",
+	url: "",
 };
 
 const MultipleChoicePropsObj: MultipleChoiceProps = {
@@ -72,6 +82,7 @@ export const constants = Object.freeze({
 	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
 	defaultFormItems: [{ id: "0", props: TitlePropsObj }],
+	defaultMediaProps: MediaPropsObj,
 	defaultMultipleChoiceProps: MultipleChoicePropsObj,
 	defaultMultipleChoiceGridProps: MultipleChoiceGridPropsObj,
 	defaultRangeProps: RangePropsObj,
