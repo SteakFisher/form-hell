@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -27,25 +28,28 @@ import {
 import { CircleIcon } from "@radix-ui/react-icons";
 import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
 
-function MultipleChoiceGrid({
+const MultipleChoiceGrid = memo(function MultipleChoiceGrid({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceGridProps;
 }) {
 	return (
 		<SortableItem
 			id={id}
+			mediaProps={mediaProps}
 			props={props}
 			SortableItemChild={MultipleChoiceGridWrapper}
 		/>
 	);
-}
+});
 
 const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 	id,
@@ -64,7 +68,6 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 				<FocusedMultipleChoiceGrid
 					id={id}
 					props={props}
-					isRadio={isRadio}
 					setIsRadio={setIsRadio}
 				/>
 			) : (
@@ -74,14 +77,12 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 	);
 });
 
-function FocusedMultipleChoiceGrid({
+const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 	id,
-	isRadio,
 	props,
 	setIsRadio,
 }: {
 	id: string;
-	isRadio: boolean;
 	props: MultipleChoiceGridProps;
 	setIsRadio: (value: boolean) => void;
 }) {
@@ -95,6 +96,10 @@ function FocusedMultipleChoiceGrid({
 
 	const [rowsState, setRowsState] = useState([...props.rows]);
 	const [columnsState, setColumnsState] = useState([...props.columns]);
+	const [hideRowDelete, setHideRowDelete] = useState(rowsState.length === 1);
+	const [hideColumnDelete, setHideColumnDelete] = useState(
+		columnsState.length === 1,
+	);
 	const [showAddRow, setShowAddRow] = useState(rowsState.length < 10);
 	const [showAddColumn, setShowAddColumn] = useState(columnsState.length < 10);
 
@@ -112,14 +117,10 @@ function FocusedMultipleChoiceGrid({
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
 
-	useEffect(() => {
-		contentRef.current?.focus();
-	}, [isRadio]);
-
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox
@@ -149,10 +150,12 @@ function FocusedMultipleChoiceGrid({
 								{rowsState.map((item, index) => {
 									return (
 										<MultipleChoiceGridItem
+											hideDelete={hideRowDelete}
 											key={item.id}
 											onDelete={(idToDelete) =>
 												handleDeleteClick(idToDelete, "row")
 											}
+											placeholder={`Row ${index + 1}`}
 											props={item}
 										/>
 									);
@@ -193,10 +196,12 @@ function FocusedMultipleChoiceGrid({
 								{columnsState.map((item, index) => {
 									return (
 										<MultipleChoiceGridItem
+											hideDelete={hideColumnDelete}
 											key={item.id}
 											onDelete={(idToDelete) =>
 												handleDeleteClick(idToDelete, "column")
 											}
+											placeholder={`Column ${index + 1}`}
 											props={item}
 										/>
 									);
@@ -259,10 +264,14 @@ function FocusedMultipleChoiceGrid({
 		if (type === "row") {
 			props.rows.push(newItem);
 			if (props.rows.length === 10) setShowAddRow(false);
+			else setHideRowDelete(false);
+
 			setRowsState([...props.rows]);
 		} else {
 			props.columns.push(newItem);
 			if (props.columns.length === 10) setShowAddColumn(false);
+			else setHideColumnDelete(false);
+
 			setColumnsState([...props.columns]);
 		}
 	}
@@ -280,7 +289,8 @@ function FocusedMultipleChoiceGrid({
 					break;
 				}
 			}
-			if (props.rows.length < 10) setShowAddRow(true);
+			if (props.rows.length === 1) setHideRowDelete(true);
+			else if (props.rows.length < 10) setShowAddRow(true);
 		} else {
 			for (const [index, column] of props.columns.entries()) {
 				if (column.id === idToDelete) {
@@ -293,14 +303,15 @@ function FocusedMultipleChoiceGrid({
 					break;
 				}
 			}
-			if (props.columns.length < 10) setShowAddColumn(true);
+			if (props.columns.length === 1) setHideColumnDelete(true);
+			else if (props.columns.length < 10) setShowAddColumn(true);
 		}
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function UnfocusedMultipleChoiceGrid({
+const UnfocusedMultipleChoiceGrid = memo(function UnfocusedMultipleChoiceGrid({
 	props,
 	isRadio,
 }: {
@@ -308,52 +319,41 @@ function UnfocusedMultipleChoiceGrid({
 	isRadio: boolean;
 }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
+		<CardContent className="space-y-4 [overflow-wrap:anywhere]">
+			<div className="flex min-h-8 items-center space-x-2">
+				<div className="flex-1" />
+				{props.columns.map((column, index) => (
+					<span key={index} className="flex-1 truncate text-center">
+						{column.value || `Column ${index + 1}`}
 					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4 [overflow-wrap:anywhere]">
-				<div className="flex min-h-8 items-center space-x-2">
-					<div className="flex-1" />
-					{props.columns.map((column, index) => (
-						<span key={index} className="flex-1 truncate text-center">
-							{column.value}
+				))}
+			</div>
+			{props.rows.map((row, index) => {
+				return (
+					<div className="flex min-h-8 items-center space-x-2" key={index}>
+						<span className="flex-1 truncate">
+							{row.value || `Row ${index + 1}`}
 						</span>
-					))}
-				</div>
-				{props.rows.map((row, index) => {
-					return (
-						<div
-							className="flex min-h-8 items-center space-x-2"
-							key={index}
-						>
-							<span className="flex-1 truncate">{row.value}</span>
-							{props.columns.map((column, index) => (
-								<div
-									key={index}
-									className="flex flex-1 items-center justify-center"
-								>
-									{isRadio ? (
-										<CircleIcon className="size-5 shrink-0" />
-									) : (
-										<Checkbox
-											disabled
-											className="disabled:cursor-default disabled:opacity-100"
-										/>
-									)}
-								</div>
-							))}
-						</div>
-					);
-				})}
-			</CardContent>
-		</div>
+						{props.columns.map((column, index) => (
+							<div
+								key={index}
+								className="flex flex-1 items-center justify-center"
+							>
+								{isRadio ? (
+									<CircleIcon className="size-5 shrink-0" />
+								) : (
+									<Checkbox
+										disabled
+										className="disabled:cursor-default disabled:opacity-100"
+									/>
+								)}
+							</div>
+						))}
+					</div>
+				);
+			})}
+		</CardContent>
 	);
-}
+});
 
 export default MultipleChoiceGrid;

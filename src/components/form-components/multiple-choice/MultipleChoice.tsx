@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -27,29 +28,32 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
 
-function MultipleChoice({
+const MultipleChoice = memo(function MultipleChoice({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceProps;
 }) {
 	return (
 		<SortableItem
 			id={id}
+			mediaProps={mediaProps}
 			props={props}
 			SortableItemChild={MultipleChoiceWrapper}
 		/>
 	);
-}
+});
 
-function MultipleChoiceWrapper({
+const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
 	id,
 	props,
 	isFocused,
@@ -74,9 +78,9 @@ function MultipleChoiceWrapper({
 			)}
 		</>
 	);
-}	
+});
 
-function FocusedMultipleChoice({
+const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 	id,
 	isRadio,
 	props,
@@ -96,6 +100,9 @@ function FocusedMultipleChoice({
 	);
 
 	const [hasOther, setHasOther] = useState(props.hasOther);
+	const [hideDelete, setHideDelete] = useState(
+		props.items.length + +hasOther === 1,
+	);
 	const [itemsState, setItemsState] = useState([...props.items]);
 
 	const handleAllowMultipleClick = useDebouncedCallback(
@@ -112,14 +119,10 @@ function FocusedMultipleChoice({
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
 
-	useEffect(() => {
-		contentRef.current?.focus();
-	}, [isRadio]);
-
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox
@@ -143,6 +146,8 @@ function FocusedMultipleChoice({
 						{itemsState.map((item, index) => {
 							return (
 								<MultipleChoiceItem
+									hideDelete={hideDelete}
+									index={index + 1}
 									isRadio={isRadio}
 									key={item.id}
 									onDelete={handleDeleteClick}
@@ -204,6 +209,7 @@ function FocusedMultipleChoice({
 			value: "",
 		};
 		props.items.push(newItem);
+		setHideDelete(false);
 		setItemsState([...props.items]);
 	}
 
@@ -220,6 +226,7 @@ function FocusedMultipleChoice({
 			...props.items.slice(0, itemIndex),
 			...props.items.slice(itemIndex + 1),
 		];
+		if (props.items.length === 1) setHideDelete(true);
 		setItemsState(props.items);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
@@ -232,9 +239,9 @@ function FocusedMultipleChoice({
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function MultipleChoiceOtherItem({
+const MultipleChoiceOtherItem = memo(function MultipleChoiceOtherItem({
 	isRadio,
 	onDelete,
 }: {
@@ -270,9 +277,9 @@ function MultipleChoiceOtherItem({
 			</div>
 		</div>
 	);
-}
+});
 
-function UnfocusedMultipleChoice({
+const UnfocusedMultipleChoice = memo(function UnfocusedMultipleChoice({
 	props,
 	isRadio,
 }: {
@@ -280,33 +287,10 @@ function UnfocusedMultipleChoice({
 	isRadio: boolean;
 }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4 [overflow-wrap:anywhere]">
-				{props.items.map((item, index) => {
-					return (
-						<div className="flex min-h-8 items-center" key={index}>
-							{isRadio ? (
-								<CircleIcon className="mr-2 size-5 shrink-0" />
-							) : (
-								<Checkbox
-									disabled
-									className="mr-2 disabled:cursor-default disabled:opacity-100"
-								/>
-							)}
-							{item.value}
-						</div>
-					);
-				})}
-				{props.hasOther && (
-					<div className="flex min-h-8 items-center">
+		<CardContent className="space-y-4 [overflow-wrap:anywhere]">
+			{props.items.map((item, index) => {
+				return (
+					<div className="flex min-h-8 items-center" key={index}>
 						{isRadio ? (
 							<CircleIcon className="mr-2 size-5 shrink-0" />
 						) : (
@@ -315,16 +299,29 @@ function UnfocusedMultipleChoice({
 								className="mr-2 disabled:cursor-default disabled:opacity-100"
 							/>
 						)}
-						<Input
-							className="disabled:cursor-default disabled:opacity-100"
-							placeholder="Other"
-							disabled
-						/>
+						{item.value || `Option ${index + 1}`}
 					</div>
-				)}
-			</CardContent>
-		</div>
+				);
+			})}
+			{props.hasOther && (
+				<div className="flex min-h-8 items-center">
+					{isRadio ? (
+						<CircleIcon className="mr-2 size-5 shrink-0" />
+					) : (
+						<Checkbox
+							disabled
+							className="mr-2 disabled:cursor-default disabled:opacity-100"
+						/>
+					)}
+					<Input
+						className="disabled:cursor-default disabled:opacity-100"
+						placeholder="Other"
+						disabled
+					/>
+				</div>
+			)}
+		</CardContent>
 	);
-}
+});
 
 export default MultipleChoice;

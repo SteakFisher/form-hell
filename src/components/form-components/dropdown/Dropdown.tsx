@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -22,25 +23,28 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { memo, useContext, useRef, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
 
-function Dropdown({
+const Dropdown = memo(function Dropdown({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: DropdownProps;
 }) {
 	return (
 		<SortableItem
 			id={id}
+			mediaProps={mediaProps}
 			props={props}
 			SortableItemChild={DropdownWrapper}
 		/>
 	);
-}
+});
 
 const DropdownWrapper = memo(function DropdownWrapper({
 	id,
@@ -62,7 +66,13 @@ const DropdownWrapper = memo(function DropdownWrapper({
 	);
 });
 
-function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
+const FocusedDropdown = memo(function FocusedDropdown({
+	props,
+	id,
+}: {
+	props: DropdownProps;
+	id: string;
+}) {
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -71,12 +81,13 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 		}),
 	);
 
+	const [hideDelete, setHideDelete] = useState(props.items.length === 1);
 	const [itemsState, setItemsState] = useState([...props.items]);
 
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent ref={contentRef}>
+		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
 			<div>
 				<DndContext
 					id={`${id}dropdown-context`}
@@ -92,6 +103,8 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 						{itemsState.map((item, index) => {
 							return (
 								<DropdownItem
+									hideDelete={hideDelete}
+									index={index + 1}
 									props={item}
 									key={item.id}
 									onDelete={handleDeleteClick}
@@ -135,6 +148,7 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 		};
 		props.items.push(newItem);
 		setItemsState([...props.items]);
+		setHideDelete(false);
 	}
 
 	function handleDeleteClick(idToDelete: string) {
@@ -145,33 +159,30 @@ function FocusedDropdown({ props, id }: { props: DropdownProps; id: string }) {
 			...props.items.slice(itemIndex + 1),
 		];
 		setItemsState(props.items);
+		if (props.items.length === 1) setHideDelete(true);
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
 		contentRef.current?.focus();
 	}
-}
+});
 
-function UnfocusedDropdown({ props }: { props: DropdownProps }) {
+const UnfocusedDropdown = memo(function UnfocusedDropdown({
+	props,
+}: {
+	props: DropdownProps;
+}) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
+		<CardContent className="space-y-5 [overflow-wrap:anywhere]">
+			{props.items.map((item, index) => (
+				<p className="flex" key={index + 1}>
+					<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
+					<span className="flex-1">
+						{item.value || `Option ${index + 1}`}
 					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
-				{props.items.map((item, index) => (
-					<p className="flex" key={index + 1}>
-						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
-						<span className="flex-1">{item.value}</span>
-					</p>
-				))}
-			</CardContent>
-		</div>
+				</p>
+			))}
+		</CardContent>
 	);
-}
+});
 
 export default Dropdown;

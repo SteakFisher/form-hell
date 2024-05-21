@@ -7,13 +7,17 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
-import { ChangeEvent, useContext, useEffect, useRef } from "react";
+import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-function DropdownItem({
+const DropdownItem = memo(function DropdownItem({
+	hideDelete,
+	index,
 	props,
 	onDelete,
 }: {
+	hideDelete: boolean;
+	index: number;
 	props: DropdownItemProps;
 	onDelete: (idToDelete: string) => void;
 }) {
@@ -56,23 +60,25 @@ function DropdownItem({
 					ref={textRef}
 					defaultValue={props.value}
 					onChange={handleTextChange}
-					placeholder="Enter option value"
+					placeholder={`Option ${index}`}
 					className="h-[32px] resize-none disabled:cursor-default"
 					maxLength={300}
 				/>
-				<Button
-					className="ml-2 size-9 px-3"
-					variant="ghost"
-					size="icon"
-					onClick={() => {
-						onDelete(props.id);
-					}}
-				>
-					<Cross1Icon />
-				</Button>
+				{hideDelete || (
+					<Button
+						className="ml-2 size-9 px-3"
+						variant="ghost"
+						size="icon"
+						onClick={() => {
+							onDelete(props.id);
+						}}
+					>
+						<Cross1Icon />
+					</Button>
+				)}
 			</div>
 		</div>
 	);
-}
+});
 
 export default DropdownItem;

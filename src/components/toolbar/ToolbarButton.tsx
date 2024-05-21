@@ -1,23 +1,22 @@
-"use client";
-
 import { cn } from "@/lib/utils";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 interface ToolbarButtonProps {
 	children: ReactNode;
-	onBtnClick?: () => void;
 	className?: string;
+	onBtnClick?: () => void;
 }
 
 const ToolbarButton = ({
 	children,
-	onBtnClick,
 	className,
+	onBtnClick,
 }: ToolbarButtonProps) => {
 	return (
 		<div
 			className={cn("flex size-12 border border-accent", className)}
 			style={{ cursor: "pointer" }}
+			tabIndex={-1}
 			onClick={onBtnClick}
 		>
 			{children}

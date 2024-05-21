@@ -6,7 +6,8 @@
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 240 10% 3.9%;
-		--addbar: 217 217 222;
+		--addbar: 217, 217, 222;
+		--code: 92, 92, 99;
 		--card: 0 0% 100%;
 		--card-foreground: 240 10% 3.9%;
 		--popover: 0 0% 100%;
@@ -31,6 +32,7 @@
 		--background: 240 10% 3.9%;
 		--foreground: 0 0% 98%;
 		--addbar: 217, 217, 222;
+		--code: 92 92 99;
 		--card: 240 10% 3.9%;
 		--card-foreground: 0 0% 98%;
 		--popover: 240 10% 3.9%;
@@ -61,7 +63,7 @@
 }
 
 .error {
-	@apply text-red-500 text-sm h-7 py-2 truncate flex items-center justify-center;
+	@apply flex h-7 items-center justify-center truncate py-2 text-sm text-red-500;
 }
 
 .borderless-input {

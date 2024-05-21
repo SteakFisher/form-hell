@@ -7,13 +7,17 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-function MultipleChoiceGridItem({
+const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
+	hideDelete,
+	placeholder,
 	props,
 	onDelete,
 }: {
+	hideDelete: boolean;
+	placeholder: string;
 	props: MultipleChoiceGridItemProps;
 	onDelete: (idToDelete: string) => void;
 }) {
@@ -58,23 +62,25 @@ function MultipleChoiceGridItem({
 					ref={textRef}
 					defaultValue={props.value}
 					onChange={handleTextChange}
-					placeholder="Enter option value"
+					placeholder={placeholder}
 					className="h-[32px] resize-none disabled:cursor-default"
 					maxLength={150}
 				/>
-				<Button
-					className="ml-2 size-9 px-3"
-					variant="ghost"
-					size="icon"
-					onClick={() => {
-						onDelete(props.id);
-					}}
-				>
-					<Cross1Icon />
-				</Button>
+				{hideDelete || (
+					<Button
+						className="ml-2 size-9 px-3"
+						variant="ghost"
+						size="icon"
+						onClick={() => {
+							onDelete(props.id);
+						}}
+					>
+						<Cross1Icon />
+					</Button>
+				)}
 			</div>
 		</div>
 	);
-}
+});
 
 export default MultipleChoiceGridItem;

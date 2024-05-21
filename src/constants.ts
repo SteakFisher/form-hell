@@ -1,10 +1,12 @@
 import DateProps from "./interfaces/form-component-interfaces/DateProps";
 import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
+import MediaProps from "./interfaces/form-component-interfaces/MediaProps";
 import MultipleChoiceGridProps from "./interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
 import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
+import FormItem from "./interfaces/FormItem";
 
 const DatePropsObj: DateProps = {
 	required: false,
@@ -17,6 +19,15 @@ const DropdownPropsObj: DropdownProps = {
 	required: false,
 	title: "",
 	type: "dropdown",
+};
+
+const MediaPropsObj: MediaProps = {
+	altText: "",
+	mediaType: "image",
+	required: false,
+	title: "",
+	type: "media",
+	url: "",
 };
 
 const MultipleChoicePropsObj: MultipleChoiceProps = {
@@ -47,14 +58,12 @@ const RangePropsObj: RangeProps = {
 };
 
 const TextInputPropsObj: TextInputProps = {
-	inputType: "short-text",
 	lengthType: "characters",
-	minLength: 0,
 	maxLength: 0,
-	placeholder: "",
+	minLength: 0,
+	multiline: false,
 	regex: "",
-	regexFlags: "m",
-	regexMethod: "contains",
+	regexFlags: "",
 	required: false,
 	title: "",
 	type: "text-input",
@@ -67,16 +76,25 @@ const TitlePropsObj: TitleProps = {
 	type: "title",
 };
 
+const defaultFormItems: FormItem[] = [
+	{
+		id: "0",
+		mediaProps: { mediaAltText: "", mediaType: "image", mediaUrl: "" },
+		props: TitlePropsObj,
+	},
+];
+
 export const constants = Object.freeze({
 	autoHeightDuration: 225,
 	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
-	defaultFormItems: [{ id: "0", props: TitlePropsObj }],
+	defaultFormItems: defaultFormItems,
+	defaultMediaProps: MediaPropsObj,
 	defaultMultipleChoiceProps: MultipleChoicePropsObj,
 	defaultMultipleChoiceGridProps: MultipleChoiceGridPropsObj,
 	defaultRangeProps: RangePropsObj,
 	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
 	debounceWait: 500,
-	intRegex: /^(-)?((0+)|[1-9]\d*)?$/,
+	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
 });

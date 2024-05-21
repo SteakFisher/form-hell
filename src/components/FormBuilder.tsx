@@ -24,22 +24,23 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { FormBuilderContext } from "../contexts/FormBuilderContext";
 import AddBar from "./AddBar";
 import Date from "./form-components/Date";
+import Media from "./form-components/Media";
 import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 
 const FormBuilder = () => {
-	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const { formBuilderRef, formItems, setFormItems } =
+		useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
 			coordinateGetter: sortableKeyboardCoordinates,
 		}),
 	);
-	const formBuilderRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<Card className="w-[800px] [overflow-anchor:none]">
@@ -66,6 +67,7 @@ const FormBuilder = () => {
 										<Date
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -74,6 +76,16 @@ const FormBuilder = () => {
 										<Dropdown
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
+											props={formItem.props}
+										/>
+									);
+								case "media":
+									return (
+										<Media
+											id={formItem.id}
+											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -82,6 +94,7 @@ const FormBuilder = () => {
 										<MultipleChoice
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -90,6 +103,7 @@ const FormBuilder = () => {
 										<MultipleChoiceGrid
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -98,6 +112,7 @@ const FormBuilder = () => {
 										<Range
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -106,6 +121,7 @@ const FormBuilder = () => {
 										<TextInput
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);

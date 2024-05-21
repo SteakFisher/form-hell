@@ -21,6 +21,7 @@ const config = {
 			colors: {
 				addbar: "rgb(var(--addbar))",
 				border: "hsl(var(--border))",
+				code: "rgb(var(--code))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",
 				background: "hsl(var(--background))",

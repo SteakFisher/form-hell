@@ -1,4 +1,4 @@
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,10 +11,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { cn } from "@/lib/utils";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
 	ChangeEvent,
+	createContext,
 	memo,
+	MutableRefObject,
 	useContext,
 	useEffect,
 	useRef,
@@ -27,32 +33,83 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "../ui/accordion";
+import { buttonVariants } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "../ui/tooltip";
 import { SortableItem } from "./SortableItem";
+
+interface TextInputContextInterface {
+	lengthError: string;
+	lengthsRef: MutableRefObject<{
+		minLength: string;
+		maxLength: string;
+	}>;
+	regexError: string;
+	regexRef: MutableRefObject<{
+		pattern: string;
+		flags: string;
+	}>;
+	setLengthError: (value: string) => void;
+	setRegexError: (value: string) => void;
+}
+
+const TextInputContext = createContext<TextInputContextInterface>({
+	lengthError: "",
+	lengthsRef: { current: { minLength: "", maxLength: "" } },
+	regexError: "",
+	regexRef: { current: { pattern: "", flags: "" } },
+	setLengthError: () => {},
+	setRegexError: () => {},
+});
 
 export const TextInput = memo(function TextInput({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: TextInputProps;
 }) {
+	const [lengthError, setLengthError] = useState("");
+	const [regexError, setRegexError] = useState("");
+
+	const lengthsRef = useRef({
+		minLength: String(props.minLength || ""),
+		maxLength: String(props.maxLength || ""),
+	});
+	const regexRef = useRef({
+		pattern: props.regex,
+		flags: props.regexFlags,
+	});
+
 	return (
-		<SortableItem
-			id={id}
-			props={props}
-			SortableItemChild={({ id, isFocused, props }) =>
-				TextInputWrapper({
-					id,
-					isFocused,
-					props,
-				})
-			}
-		/>
+		<TextInputContext.Provider
+			value={{
+				lengthError,
+				lengthsRef,
+				regexError,
+				regexRef,
+				setLengthError,
+				setRegexError,
+			}}
+		>
+			<SortableItem
+				id={id}
+				mediaProps={mediaProps}
+				props={props}
+				SortableItemChild={TextInputWrapper}
+			/>
+		</TextInputContext.Provider>
 	);
 });
 
-function TextInputWrapper({
+const TextInputWrapper = memo(function TextInputWrapper({
 	id,
 	props,
 	isFocused,
@@ -61,6 +118,16 @@ function TextInputWrapper({
 	isFocused: boolean;
 	props: TextInputProps;
 }) {
+	const { lengthError, regexError } = useContext(TextInputContext);
+	const { sortableItemRef } = useContext(SortableItemContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			lengthError || regexError ? "true" : "false",
+		);
+	}, [isFocused, lengthError, regexError, sortableItemRef]);
+
 	return (
 		<>
 			{isFocused ? (
@@ -70,39 +137,44 @@ function TextInputWrapper({
 			)}
 		</>
 	);
-}
+});
 
 function FocusedTextInput({
 	id,
 	props,
 }: {
-	props: TextInputProps;
 	id: string;
+	props: TextInputProps;
 }) {
 	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
-	const [accordionItem, setAccordionItem] = useState("");
+	const {
+		lengthError,
+		lengthsRef,
+		regexError,
+		regexRef,
+		setLengthError,
+		setRegexError,
+	} = useContext(TextInputContext);
 
-	const regexRef = useRef<HTMLInputElement>(null);
-	const lengthsRef = useRef({
-		minLength: props.minLength ? props.minLength.toString() : "",
-		maxLength: props.maxLength ? props.maxLength.toString() : "",
-	});
+	const [accordionItem, setAccordionItem] = useState("item-1");
+	const [tooltipOpen, setTooltipOpen] = useState(false);
 
-	const [lengthError, setLengthError] = useState("");
-	const [regexError, setRegexError] = useState("");
+	const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const regexInputRef = useRef<HTMLInputElement>(null);
+	const regexFlagsInputRef = useRef<HTMLInputElement>(null);
 
-	const handleIgnoreCaseChange = useDebouncedCallback((isChecked: boolean) => {
-		props.regexFlags = isChecked ? "mi" : "m";
-	}, constants.debounceWait);
 	const handleMaxLengthChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			lengthsRef.current.maxLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.maxLength = Number(lengthsRef.current.maxLength);
+			if (!_error) {
+				props.minLength = +lengthsRef.current.minLength;
+				props.maxLength = +lengthsRef.current.maxLength;
+			}
 		},
 		constants.debounceWait,
 	);
@@ -111,20 +183,41 @@ function FocusedTextInput({
 			lengthsRef.current.minLength = e.target.value;
 			const _error = validateLength();
 			setLengthError(_error);
-			if (!_error) props.minLength = Number(lengthsRef.current.minLength);
+
+			if (!_error) {
+				props.minLength = +lengthsRef.current.minLength;
+				props.maxLength = +lengthsRef.current.maxLength;
+			}
 		},
 		constants.debounceWait,
 	);
+
+	const handleMultilineChange = useDebouncedCallback((isChecked: boolean) => {
+		props.multiline = isChecked;
+	}, constants.debounceWait);
+
 	const handleRegexChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
-			const newRegex = e.target.value;
-			setRegex(newRegex);
+			regexRef.current.pattern = e.target.value;
+			const _error = validateRegex();
+			if (!_error) {
+				props.regex = regexRef.current.pattern;
+				props.regexFlags = regexRef.current.flags;
+			}
+			setRegexError(_error);
 		},
 		constants.debounceWait,
 	);
-	const handlePlaceholderChange = useDebouncedCallback(
+
+	const handleRegexFlagsChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
-			props.placeholder = e.target.value;
+			regexRef.current.flags = e.target.value;
+			const _error = validateRegex();
+			if (!_error) {
+				props.regex = regexRef.current.pattern;
+				props.regexFlags = regexRef.current.flags;
+			}
+			setRegexError(_error);
 		},
 		constants.debounceWait,
 	);
@@ -133,44 +226,22 @@ function FocusedTextInput({
 		const refs = debounceRefs.get(id);
 		if (!refs) return;
 		refs
-			.set("ignore-case", handleIgnoreCaseChange)
 			.set("max-length", handleMaxLengthChange)
 			.set("min-length", handleMinLengthChange)
-			.set("placeholder", handlePlaceholderChange)
-			.set("regex", handleRegexChange);
+			.set("multiline", handleMultilineChange)
+			.set("regex", handleRegexChange)
+			.set("regex-flags", handleRegexFlagsChange);
 	}, []);
 
 	return (
-		<CardContent>
-			<div className="flex space-x-4">
-				<div className="flex items-center">
-					<Label htmlFor="inputType">Type</Label>
-					<Select
-						defaultValue={props.inputType}
-						onValueChange={handleInputTypeChange}
-					>
-						<SelectTrigger className="ml-2 w-[180px]" id="inputType">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="short-text">Short Text</SelectItem>
-							<SelectItem value="email">Email</SelectItem>
-							<SelectItem value="number">Number</SelectItem>
-							<SelectItem value="long-text">Long Text</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-				<div className="flex items-center">
-					<Label htmlFor="placeholder">Placeholder</Label>
-					<Input
-						type="text"
-						defaultValue={props.placeholder}
-						id="placeholder"
-						className="ml-2 w-72"
-						maxLength={50}
-						onChange={handlePlaceholderChange}
-					/>
-				</div>
+		<CardContent className="mt-5">
+			<div className="flex space-x-2">
+				<Label htmlFor="multiline">Multiline</Label>
+				<Checkbox
+					id="multiline"
+					onCheckedChange={handleMultilineChange}
+					defaultChecked={props.multiline}
+				/>
 			</div>
 
 			<Accordion
@@ -180,98 +251,127 @@ function FocusedTextInput({
 				onValueChange={handleAccordionToggle}
 			>
 				<AccordionItem value="item-1" className="border-b-0">
-					<AccordionTrigger className="custom-focus mt-2 rounded-sm px-1 hover:no-underline">
-						Advanced
+					<AccordionTrigger className="custom-focus mt-3 rounded-sm px-1 hover:no-underline">
+						Validation
 					</AccordionTrigger>
 					<Separator />
 
 					<AccordionContent className="mt-5 px-[1px]">
+						<div className="mt-7">
+							<div className="text-base font-semibold">
+								<u>Length</u>
+							</div>
+							<div className="flex w-full space-x-6">
+								<div className="flex">
+									<div className="flex h-9 items-center">
+										<Label htmlFor="min-length">Min. Length</Label>
+									</div>
+									<Input
+										defaultValue={lengthsRef.current.minLength || ""}
+										className="ml-2 w-24"
+										id="min-length"
+										onChange={handleMinLengthChange}
+										placeholder="0"
+									/>
+								</div>
+								<div className="flex">
+									<div className="flex h-9 items-center">
+										<Label htmlFor="max-length">Max. Length</Label>
+									</div>
+									<Input
+										defaultValue={lengthsRef.current.maxLength || ""}
+										className="ml-2 w-24"
+										id="max-length"
+										onChange={handleMaxLengthChange}
+									/>
+								</div>
+								<Select
+									defaultValue={props.lengthType}
+									onValueChange={handleLengthTypeChange}
+								>
+									<SelectTrigger className="w-36">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="characters">
+											Characters
+										</SelectItem>
+										<SelectItem value="words">Words</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+							<div className="error">{lengthError}</div>
+						</div>
+
 						<div className="text-base font-semibold">
-							<u>Length</u>
-						</div>
-
-						<div className="mt-3 flex w-full space-x-6">
-							<div className="flex">
-								<div className="flex h-9 items-center">
-									<Label htmlFor="min-length">Min. Length</Label>
-								</div>
-								<Input
-									defaultValue={props.minLength || ""}
-									className="ml-2 w-24"
-									id="min-length"
-									onChange={handleMinLengthChange}
-									placeholder="0"
-								/>
-							</div>
-							<div className="flex">
-								<div className="flex h-9 items-center">
-									<Label htmlFor="max-length">Max. Length</Label>
-								</div>
-								<Input
-									defaultValue={props.maxLength || ""}
-									className="ml-2 w-24"
-									id="max-length"
-									onChange={handleMaxLengthChange}
-								/>
-							</div>
-							<Select
-								defaultValue={props.lengthType}
-								onValueChange={handleLengthTypeChange}
-							>
-								<SelectTrigger className="w-36">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="characters">
-										Characters
-									</SelectItem>
-									<SelectItem value="words">Words</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-						<div className="error">{lengthError}</div>
-
-						<div className="mt-5 text-base font-semibold">
 							<u>Regex</u>
 						</div>
 						<div className="mt-4 flex items-center space-x-6">
-							<Select
-								defaultValue={props.regexMethod}
-								onValueChange={handleRegexMethodChange}
-							>
-								<SelectTrigger className="w-36">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="contains">Contains</SelectItem>
-									<SelectItem value="doesnt-contain">
-										{"Doesn't contain"}
-									</SelectItem>
-									<SelectItem value="matches">Matches</SelectItem>
-									<SelectItem value="doesnt-match">
-										{"Doesn't match"}
-									</SelectItem>
-								</SelectContent>
-							</Select>
-
+							<div className="flex items-center">
+								<Select value="" onValueChange={handlePresetChange}>
+									<SelectTrigger className="w-[100px]">
+										<SelectValue placeholder="Presets" />
+									</SelectTrigger>
+									<SelectContent
+										onCloseAutoFocus={(e) => e.preventDefault()}
+									>
+										<SelectItem value="email">Email</SelectItem>
+										<SelectItem value="number">Number</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
 							<div className="flex items-center space-x-2">
-								<Label htmlFor="regex">Regex pattern</Label>
+								<Label htmlFor="regex">Pattern</Label>
 								<Input
 									className="w-56"
+									defaultValue={regexRef.current.pattern}
 									id="regex"
-									ref={regexRef}
-									defaultValue={props.regex.toString()}
-									onChange={handleRegexChange}
 									maxLength={1000}
+									onChange={handleRegexChange}
+									ref={regexInputRef}
 								/>
 							</div>
 							<div className="flex items-center space-x-2">
-								<Label htmlFor="ignore-case">Ignore case</Label>
-								<Checkbox
-									id="ignore-case"
-									defaultChecked={props.regexFlags === "mi"}
-									onCheckedChange={handleIgnoreCaseChange}
+								<Label htmlFor="flags">Flags</Label>
+								<Input
+									className="w-24"
+									defaultValue={regexRef.current.flags}
+									id="flags"
+									maxLength={8}
+									onChange={handleRegexFlagsChange}
+									ref={regexFlagsInputRef}
 								/>
+								<TooltipProvider delayDuration={500}>
+									<Tooltip open={tooltipOpen}>
+										<TooltipTrigger
+											onMouseEnter={handleMouseEnter}
+											onMouseLeave={handleMouseLeave}
+										>
+											<InfoCircledIcon className="size-4 transition-opacity duration-200 hover:opacity-65" />
+										</TooltipTrigger>
+										<TooltipContent
+											className="border border-black bg-accent text-sm text-white"
+											sideOffset={8}
+										>
+											<p className="whitespace-pre">
+												{"Available flags: "}
+												<code className="rounded-md bg-code px-1">
+													d, g, i, m, s, u, v, y
+												</code>
+											</p>
+											<a
+												className={cn(
+													buttonVariants({ variant: "link" }),
+													"px-0",
+												)}
+												href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags"
+												target="_blank"
+											>
+												MDN Reference
+											</a>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
 							</div>
 						</div>
 						<div className="error">{regexError}</div>
@@ -283,32 +383,20 @@ function FocusedTextInput({
 
 	function handleAccordionToggle(value: string) {
 		if (value === "") {
-			handleIgnoreCaseChange.flush();
 			handleMaxLengthChange.flush();
 			handleMinLengthChange.flush();
 			handleRegexChange.flush();
+			handleRegexFlagsChange.flush();
 		}
 		setAccordionItem(value);
-		setLengthError("");
-		setRegexError("");
 	}
 
-	function handleInputTypeChange(inputType: string) {
+	function handlePresetChange(inputType: string) {
 		switch (inputType) {
-			case "short-text":
-				props.inputType = "short-text";
-				setRegex("");
-				break;
-			case "long-text":
-				props.inputType = "long-text";
-				setRegex("");
-				break;
 			case "email":
-				props.inputType = "email";
 				setRegex(emailRegex.toString());
 				break;
 			case "number":
-				props.inputType = "number";
 				setRegex(constants.intRegex.toString());
 				break;
 		}
@@ -318,27 +406,24 @@ function FocusedTextInput({
 		props.lengthType = newLengthType as "words" | "characters";
 	}
 
-	function handleRegexMethodChange(newRegexMethod: string) {
-		props.regexMethod = newRegexMethod as
-			| "contains"
-			| "doesnt-contain"
-			| "matches"
-			| "doesnt-match";
+	function handleMouseEnter() {
+		openTimeoutRef.current = setTimeout(() => {
+			setTooltipOpen(true);
+		}, 150);
+	}
+
+	function handleMouseLeave() {
+		if (!openTimeoutRef.current) return;
+		clearTimeout(openTimeoutRef.current);
+		setTooltipOpen(false);
 	}
 
 	function setRegex(newRegex: string) {
-		newRegex = newRegex.trim();
+		if (regexInputRef.current == null) return;
+		if (regexFlagsInputRef.current == null) return;
 
-		try {
-			new RegExp(newRegex);
-			setRegexError("");
-			props.regex = newRegex;
-		} catch (e) {
-			setRegexError("Enter a valid regex pattern");
-		}
-
-		if (regexRef.current == null) return;
-		regexRef.current.value = newRegex;
+		regexInputRef.current.value = newRegex;
+		regexFlagsInputRef.current.value = "";
 	}
 
 	function validateLength(): string {
@@ -367,27 +452,35 @@ function FocusedTextInput({
 		}
 		return "";
 	}
+
+	function validateRegex(): string {
+		const pattern = regexRef.current.pattern;
+		const flags = regexRef.current.flags;
+
+		try {
+			new RegExp(pattern);
+		} catch {
+			return "Enter a valid regex pattern";
+		}
+
+		try {
+			new RegExp(pattern, flags);
+		} catch {
+			return "Invalid flags";
+		}
+		return "";
+	}
 }
 
 function UnfocusedTextInput({ props }: { props: TextInputProps }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<Input
-					id="name"
-					placeholder={props.placeholder || "Text"}
-					disabled
-					className="disabled:cursor-default disabled:opacity-100"
-				/>
-			</CardContent>
-		</div>
+		<CardContent>
+			<Input
+				id="name"
+				placeholder="Enter your answer"
+				disabled
+				className="disabled:cursor-default disabled:opacity-100"
+			/>
+		</CardContent>
 	);
 }

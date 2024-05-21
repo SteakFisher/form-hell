@@ -1,8 +1,8 @@
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
+import { FormItemTypes } from "@/interfaces/FormItemTypes";
 import { propsTypes } from "@/interfaces/propsTypes";
-import { typesEnum } from "@/misc/typesEnum";
 import {
 	CalendarIcon,
 	CheckCircledIcon,
@@ -12,11 +12,15 @@ import {
 	TextIcon,
 } from "@radix-ui/react-icons";
 import {
-	RefObject,
-	useContext
+	MutableRefObject,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import MCQGridIcon from "../../public/icons/mcq_grid.svg";
+import MediaIcon from "../../public/icons/media.svg";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,18 +30,27 @@ import {
 } from "./ui/dropdown-menu";
 
 function AddBar({
-	addMenuRef,
+	focusingItemIdRef,
 	id,
 }: {
+	focusingItemIdRef?: MutableRefObject<string>;
 	id: string;
-	addMenuRef?: RefObject<HTMLDivElement>;
 }) {
-	const { formItems, focusedItemRef, setFormItems} = useContext(FormBuilderContext);
+	const { formItems, setFormItems } = useContext(FormBuilderContext);
+	const [isOpen, setIsOpen] = useState(false);
+
+	const didSelectRef = useRef(false);
+
+	useEffect(() => {
+		if (isOpen) {
+			didSelectRef.current = false;
+		}
+	}, [isOpen]);
 
 	return (
 		<div className="-z-10 flex h-8 w-full items-center px-2">
 			<div className="h-[1px] flex-grow bg-addbar" />
-			<DropdownMenu onOpenChange={handleOpenChange}>
+			<DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
 				<DropdownMenuTrigger className="custom-focus">
 					<PlusCircledIcon className="mx-1.5 size-6 text-addbar" />
 				</DropdownMenuTrigger>
@@ -46,14 +59,15 @@ function AddBar({
 					className="w-56"
 					data-addmenu
 					onCloseAutoFocus={(e) => e.preventDefault()}
-					ref={addMenuRef}
 					side="bottom"
 					sideOffset={9}
 				>
 					<DropdownMenuItem
 						className="h-10 text-sm"
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
 						onSelect={(e) => {
-							handleAddElement(typesEnum["text-input"]);
+							handleAddElement(e, "text-input");
 						}}
 					>
 						Text
@@ -63,8 +77,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["multiple-choice"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "multiple-choice");
 						}}
 					>
 						Multiple choice
@@ -74,8 +90,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["dropdown"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "dropdown");
 						}}
 					>
 						Dropdown
@@ -85,8 +103,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["range"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "range");
 						}}
 					>
 						Range
@@ -96,8 +116,10 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["multiple-choice-grid"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "multiple-choice-grid");
 						}}
 					>
 						Multiple choice grid
@@ -107,13 +129,28 @@ function AddBar({
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="h-10 text-sm"
-						onSelect={() => {
-							handleAddElement(typesEnum["date"]);
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "date");
 						}}
 					>
 						Date
 						<DropdownMenuShortcut>
 							<CalendarIcon className="size-[1.4rem]" />
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						className="h-10 text-sm"
+						onPointerLeave={preventPointerEvent}
+						onPointerMove={preventPointerEvent}
+						onSelect={(e) => {
+							handleAddElement(e, "media");
+						}}
+					>
+						Media
+						<DropdownMenuShortcut className="size-[1.3rem] fill-white">
+							<MediaIcon />
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
@@ -122,10 +159,22 @@ function AddBar({
 		</div>
 	);
 
-	async function handleAddElement(type: typesEnum) {
+	function preventPointerEvent(e: React.PointerEvent<HTMLDivElement>) {
+		if (didSelectRef.current) {
+			e.preventDefault();
+		}
+	}
+
+	function handleAddElement(e: Event, type: FormItemTypes) {
+		e.preventDefault();
+		didSelectRef.current = true;
+
 		const newId = uuidv4();
-		const newItem = {
+		if (focusingItemIdRef) focusingItemIdRef.current = newId;
+
+		const newItem: FormItem = {
 			id: newId,
+			mediaProps: { mediaAltText: "", mediaType: "image", mediaUrl: "" },
 			props: { ...returnTypeProps(type, newId) },
 		};
 
@@ -137,56 +186,57 @@ function AddBar({
 			}
 		});
 
+		setIsOpen(false);
 		setFormItems(newFormItems);
 	}
 
-	async function handleOpenChange(isOpen: boolean) {
-		if (!isOpen) {
-			focusedItemRef.current.blurItem();
-		}
+	function handleOpenChange(newIsOpen: boolean) {
+		setIsOpen(newIsOpen);
 	}
 
-	function returnTypeProps(type: typesEnum, parentId: string): propsTypes {
+	function returnTypeProps(type: FormItemTypes, parentId: string): propsTypes {
 		switch (type) {
-			case typesEnum["date"]:
+			case "date":
 				return constants.defaultDateProps;
-			case typesEnum["dropdown"]:
+			case "dropdown":
 				return {
 					...constants.defaultDropdownProps,
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Option 1",
+						value: "",
 					}),
 				};
-			case typesEnum["multiple-choice"]:
+			case "media":
+				return constants.defaultMediaProps;
+			case "multiple-choice":
 				return {
 					...constants.defaultMultipleChoiceProps,
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Option 1",
+						value: "",
 					}),
 				};
-			case typesEnum["multiple-choice-grid"]:
+			case "multiple-choice-grid":
 				return {
 					...constants.defaultMultipleChoiceGridProps,
 					columns: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Column 1",
+						value: "",
 					}),
 					rows: new Array({
 						id: uuidv4(),
 						parentId: parentId,
-						value: "Row 1",
+						value: "",
 					}),
 				};
-			case typesEnum["range"]:
+			case "range":
 				return constants.defaultRangeProps;
-			case typesEnum["text-input"]:
+			case "text-input":
 				return constants.defaultTextInputProps;
-			case typesEnum["title"]:
+			case "title":
 				return constants.defaultTitleProps;
 		}
 	}
