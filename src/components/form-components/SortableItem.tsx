@@ -26,7 +26,7 @@ import React, {
 	useState,
 	useTransition,
 } from "react";
-import { DebouncedState, useDebouncedCallback } from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
 import DeleteIcon from "../../../public/icons/delete.svg";
 import MediaIcon from "../../../public/icons/media.svg";
 import VideoIcon from "../../../public/icons/video.svg";
@@ -292,6 +292,8 @@ function FocusedSortableItem<T extends propsTypes>({
 
 	const [isPending, startTransition] = useTransition();
 
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 
 	const handleAltTextChange = useDebouncedCallback(
@@ -339,14 +341,18 @@ function FocusedSortableItem<T extends propsTypes>({
 							maxLength={500}
 						/>
 						{isMedia || (
-							<Popover modal>
+							<Popover
+								modal
+								open={isPopoverOpen}
+								onOpenChange={setIsPopoverOpen}
+							>
 								<PopoverTrigger className="mr-1 size-10 rounded-md transition-colors hover:bg-accent hover:text-accent-foreground">
 									<MediaIcon className="size-10 cursor-pointer fill-white p-2.5" />
 								</PopoverTrigger>
 								<PopoverContent className="flex w-full">
 									<SortableItemMedia
-										handleAltTextChange={handleAltTextChange}
 										mediaProps={mediaProps}
+										setIsOpen={setIsPopoverOpen}
 										startTransition={startTransition}
 									/>
 								</PopoverContent>
@@ -434,14 +440,12 @@ function FocusedSortableItem<T extends propsTypes>({
 }
 
 const SortableItemMedia = memo(function SortableItemMedia({
-	handleAltTextChange,
 	mediaProps,
+	setIsOpen,
 	startTransition,
 }: {
-	handleAltTextChange: DebouncedState<
-		(e: ChangeEvent<HTMLInputElement>) => void
-	>;
 	mediaProps: FormItemMediaProps;
+	setIsOpen: (value: boolean) => void;
 	startTransition: React.TransitionStartFunction;
 }) {
 	const { mediaVideoIdRef, setMediaUrlState } =
@@ -471,8 +475,6 @@ const SortableItemMedia = memo(function SortableItemMedia({
 		},
 		constants.debounceWait,
 	);
-
-	// debouncerefs
 
 	return (
 		<Tabs className="w-full" value={tab} onValueChange={handleTabChange}>
@@ -540,6 +542,7 @@ const SortableItemMedia = memo(function SortableItemMedia({
 
 			mediaProps.mediaType = "image";
 			setMediaUrlState(url);
+			setIsOpen(false);
 		});
 	}
 
@@ -553,6 +556,7 @@ const SortableItemMedia = memo(function SortableItemMedia({
 		mediaProps.mediaType = "video";
 		mediaProps.mediaAltText = "";
 		setMediaUrlState(url);
+		setIsOpen(false);
 	}
 
 	function handleTabChange(newTab: string) {

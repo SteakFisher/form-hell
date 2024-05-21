@@ -366,16 +366,11 @@ export const YTIframe = memo(function YTIframe({
 	id: string;
 	videoIdRef: MutableRefObject<string>;
 }) {
-	console.log("alsdjflkfdj");
 	return (
 		<iframe
 			className="mb-3"
 			height="390"
 			id={`yt-player-${id}`}
-			// key={`yt-player-${id}`}
-			onBlur={() => {
-				console.log("jjj");
-			}}
 			width="640"
 			src={`http://www.youtube.com/embed/${videoIdRef.current}`}
 		/>
