@@ -17,7 +17,8 @@ export default function MultipleChoiceComponent({
 	const isRadio = !props.allowMultiple;
 	const { formResponses } = useContext(FormRendererContext);
 	const [selected, setSelected] = useState<Set<string>>(new Set());
-	formResponses[id] = { type: "multiple-choice", selected: selected } as MultipleChoiceResponse;
+	formResponses[id] = { type: "multiple-choice", selected: selected };
+	let multipleChoiceResponse = formResponses[id] as MultipleChoiceResponse;
 
 	return (
 		<Card className={"mb-4 w-10/12 self-center"}>
@@ -27,7 +28,7 @@ export default function MultipleChoiceComponent({
 			<CardContent>
 				{isRadio ? (
 					<RadioGroup onValueChange={(value) => {
-						formResponses[id].selected = new Set([value]);
+						multipleChoiceResponse.selected = new Set([value]);
 					}} defaultValue={props.items[0].value}>
 						{props.items.map((item, index) => {
 							return (
@@ -53,11 +54,11 @@ export default function MultipleChoiceComponent({
 								<div key={item.id} className="items-cen mb-4 flex">
 									<Checkbox id={item.id + "-checkbox"} checked={selected.has(item.value)} onCheckedChange={(e) => {
 										if (e && !selected.has("other")) {
-											formResponses[id].selected.add(item.value);
-											setSelected(new Set(formResponses[id].selected));
+											multipleChoiceResponse.selected.add(item.value);
+											setSelected(new Set(multipleChoiceResponse.selected));
 										} else if (!selected.has("other")) {
-											formResponses[id].selected.delete(item.value);
-											setSelected(new Set(formResponses[id].selected));
+											multipleChoiceResponse.selected.delete(item.value);
+											setSelected(new Set(multipleChoiceResponse.selected));
 										}
 									}} />
 									<label
@@ -75,10 +76,10 @@ export default function MultipleChoiceComponent({
 									<Checkbox id="other" checked={selected.has("other")} onCheckedChange={(e) => {
 										if (e) {
 											setSelected(new Set(["other"]));
-											formResponses[id].selected = new Set(["other"]);
+											multipleChoiceResponse.selected = new Set(["other"]);
 										} else {
 											setSelected(new Set([]));
-											formResponses[id].selected = new Set([]);
+											multipleChoiceResponse.selected = new Set([]);
 										}
 									}}/>
 									<label

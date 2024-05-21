@@ -42,8 +42,10 @@ export default function DateComponent({ props, id }: { id: string; props: DatePr
 							mode="single"
 							selected={date}
 							onSelect={(date) => {
-								setDate(date)
-								formResponses[id] = { date: date, type: "date" }
+								if (date) {
+									setDate(date)
+									formResponses[id] = { date: date, type: "date" }
+								}
 							}}
 							initialFocus
 						/>
