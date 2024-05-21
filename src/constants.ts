@@ -6,6 +6,7 @@ import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/mult
 import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "./interfaces/form-component-interfaces/TitleProps";
+import FormItem from "./interfaces/FormItem";
 
 const DatePropsObj: DateProps = {
 	required: false,
@@ -75,11 +76,19 @@ const TitlePropsObj: TitleProps = {
 	type: "title",
 };
 
+const defaultFormItems: FormItem[] = [
+	{
+		id: "0",
+		mediaProps: { mediaAltText: "", mediaType: "image", mediaUrl: "" },
+		props: TitlePropsObj,
+	},
+];
+
 export const constants = Object.freeze({
 	autoHeightDuration: 225,
 	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
-	defaultFormItems: [{ id: "0", props: TitlePropsObj }],
+	defaultFormItems: defaultFormItems,
 	defaultMediaProps: MediaPropsObj,
 	defaultMultipleChoiceProps: MultipleChoicePropsObj,
 	defaultMultipleChoiceGridProps: MultipleChoiceGridPropsObj,

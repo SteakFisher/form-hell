@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -28,13 +29,20 @@ import DropdownItem from "./DropdownItem";
 
 const Dropdown = memo(function Dropdown({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: DropdownProps;
 }) {
 	return (
-		<SortableItem id={id} props={props} SortableItemChild={DropdownWrapper} />
+		<SortableItem
+			id={id}
+			mediaProps={mediaProps}
+			props={props}
+			SortableItemChild={DropdownWrapper}
+		/>
 	);
 });
 
@@ -164,26 +172,16 @@ const UnfocusedDropdown = memo(function UnfocusedDropdown({
 	props: DropdownProps;
 }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
+		<CardContent className="space-y-5 [overflow-wrap:anywhere]">
+			{props.items.map((item, index) => (
+				<p className="flex" key={index + 1}>
+					<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
+					<span className="flex-1">
+						{item.value || `Option ${index + 1}`}
 					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-5 [overflow-wrap:anywhere]">
-				{props.items.map((item, index) => (
-					<p className="flex" key={index + 1}>
-						<span className="mr-1 whitespace-nowrap">{index + 1}.</span>
-						<span className="flex-1">
-							{item.value || `Option ${index + 1}`}
-						</span>
-					</p>
-				))}
-			</CardContent>
-		</div>
+				</p>
+			))}
+		</CardContent>
 	);
 });
 

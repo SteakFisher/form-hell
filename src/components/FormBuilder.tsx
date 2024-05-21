@@ -67,6 +67,7 @@ const FormBuilder = () => {
 										<Date
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -75,6 +76,7 @@ const FormBuilder = () => {
 										<Dropdown
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -83,6 +85,7 @@ const FormBuilder = () => {
 										<Media
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -91,6 +94,7 @@ const FormBuilder = () => {
 										<MultipleChoice
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -99,6 +103,7 @@ const FormBuilder = () => {
 										<MultipleChoiceGrid
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -107,6 +112,7 @@ const FormBuilder = () => {
 										<Range
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);
@@ -115,6 +121,7 @@ const FormBuilder = () => {
 										<TextInput
 											id={formItem.id}
 											key={formItem.id}
+											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
 									);

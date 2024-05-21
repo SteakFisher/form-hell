@@ -172,8 +172,9 @@ function AddBar({
 		const newId = uuidv4();
 		if (focusingItemIdRef) focusingItemIdRef.current = newId;
 
-		const newItem = {
+		const newItem: FormItem = {
 			id: newId,
+			mediaProps: { mediaAltText: "", mediaType: "image", mediaUrl: "" },
 			props: { ...returnTypeProps(type, newId) },
 		};
 

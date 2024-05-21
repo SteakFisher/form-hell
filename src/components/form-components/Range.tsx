@@ -2,6 +2,7 @@ import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	ChangeEvent,
 	createContext,
@@ -13,7 +14,7 @@ import {
 	useState,
 } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
@@ -37,9 +38,11 @@ const RangeContext = createContext<RangeContextInterface>({
 
 const Range = memo(function Range({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: RangeProps;
 }) {
 	const rangeRef = useRef({
@@ -51,7 +54,12 @@ const Range = memo(function Range({
 
 	return (
 		<RangeContext.Provider value={{ rangeError, rangeRef, setRangeError }}>
-			<SortableItem id={id} props={props} SortableItemChild={RangeWrapper} />
+			<SortableItem
+				id={id}
+				mediaProps={mediaProps}
+				props={props}
+				SortableItemChild={RangeWrapper}
+			/>
 		</RangeContext.Provider>
 	);
 });
@@ -221,21 +229,11 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 
 function UnfocusedRange({ props }: { props: RangeProps }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="flex">
-				{props.min || 0}
-				<Slider className="pointer-events-none mx-2" disabled />
-				{props.max || 1}
-			</CardContent>
-		</div>
+		<CardContent className="flex">
+			{props.min || 0}
+			<Slider className="pointer-events-none mx-2" disabled />
+			{props.max || 1}
+		</CardContent>
 	);
 }
 

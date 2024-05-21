@@ -3,7 +3,8 @@ import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
-import { ImageIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { ImageIcon } from "@radix-ui/react-icons";
 import getVideoId from "get-video-id";
 import {
 	ChangeEvent,
@@ -19,7 +20,7 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import VideoIcon from "../../../public/icons/video.svg";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -39,9 +40,11 @@ const MediaContext = createContext<MediaContextInterface>({
 
 const Media = memo(function Media({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: MediaProps;
 }) {
 	const [urlState, setUrlState] = useState(props.url);
@@ -63,8 +66,9 @@ const Media = memo(function Media({
 			}}
 		>
 			<SortableItem
-				hideRequired={true}
+				isMedia={true}
 				id={id}
+				mediaProps={mediaProps}
 				props={props}
 				SortableItemChild={MediaWrapper}
 			/>
@@ -143,11 +147,6 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 			.set("video-url-change", handleVideoUrlChange);
 	}, []);
 
-	useEffect(() => {
-		if (!contentRef.current) return;
-		contentRef.current.focus({ preventScroll: true });
-	}, [isPending]);
-
 	return (
 		<CardContent className="custom-focus" tabIndex={-1} ref={contentRef}>
 			<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
@@ -220,18 +219,14 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 									onChange={handleImageUrlChange}
 									placeholder="Paste image URL here..."
 								/>
-								{isPending ? (
-									<LoadingButton />
-								) : (
-									<Button
-										className="ml-6 w-40"
-										onClick={() =>
-											startTransition(() => handleInsertImage())
-										}
-									>
-										Insert image
-									</Button>
-								)}
+								<Button
+									className="ml-6 w-40 transition-opacity"
+									onClick={() =>
+										startTransition(() => handleInsertImage())
+									}
+								>
+									Insert image
+								</Button>
 							</div>
 
 							<div className="error">{imageError}</div>
@@ -247,18 +242,14 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 									onChange={handleVideoUrlChange}
 									placeholder="Paste YouTube URL here..."
 								/>
-								{isPending ? (
-									<LoadingButton />
-								) : (
-									<Button
-										className="ml-6 w-40"
-										onClick={() =>
-											startTransition(() => handleInsertVideo())
-										}
-									>
-										Insert video
-									</Button>
-								)}
+								<Button
+									className="ml-6 w-40"
+									onClick={() =>
+										startTransition(() => handleInsertVideo())
+									}
+								>
+									Insert video
+								</Button>
 							</div>
 							<div className="error">{videoError}</div>
 						</TabsContent>
@@ -273,14 +264,16 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 	}
 
 	function handleInsertImage() {
-		handleAltTextChange.flush();
+		handleImageUrlChange.flush();
 		const url = mediaRef.current.imageUrl;
 		const error = validateImageUrl(url);
-		setImageError(error);
-		if (error) return;
+		error.then((error) => {
+			setImageError(error);
+			if (error) return;
 
-		props.mediaType = "image";
-		setUrlState(url);
+			props.mediaType = "image";
+			setUrlState(url);
+		});
 	}
 
 	function handleInsertVideo() {
@@ -307,7 +300,7 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 		}
 	}
 
-	function validateImageUrl(url: string): string {
+	async function validateImageUrl(url: string): Promise<string> {
 		try {
 			new URL(url);
 		} catch (e) {
@@ -315,18 +308,16 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 		}
 
 		try {
-			const response = fetch(url, { method: "HEAD" });
+			const response = await fetch(url, { method: "HEAD" });
 
-			response.then((response) => {
-				if (!response.ok) {
-					return `HTTP error! Status: ${response.status}`;
-				}
+			if (!response.ok) {
+				return `HTTP error! Status: ${response.status}`;
+			}
 
-				const contentType = response.headers.get("Content-Type");
-				if (!contentType || !contentType.startsWith("image/")) {
-					return "URL does not point to a valid image";
-				}
-			});
+			const contentType = response.headers.get("Content-Type");
+			if (!contentType || !contentType.startsWith("image/")) {
+				return "URL does not point to a valid image";
+			}
 		} catch (error) {
 			return "Failed to fetch the URL";
 		}
@@ -352,44 +343,36 @@ function UnfocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 	const { urlState, videoIdRef } = useContext(MediaContext);
 
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<div className="mb-6 flex min-h-10 w-full flex-col items-center">
-					{urlState &&
-						(props.mediaType === "image" ? (
-							<div className="relative mb-3">
-								<img src={urlState} alt={props.altText} />
-							</div>
-						) : (
-							<YTIframe id={id} videoIdRef={videoIdRef} />
-						))}
-					<div className="error">{!urlState && "No media inserted"}</div>
-				</div>
-			</CardContent>
-		</div>
+		<CardContent>
+			<div className="mb-6 flex min-h-10 w-full flex-col items-center">
+				{urlState &&
+					(props.mediaType === "image" ? (
+						<div className="relative mb-3">
+							<img src={urlState} alt={props.altText} />
+						</div>
+					) : (
+						<YTIframe id={id} videoIdRef={videoIdRef} />
+					))}
+				<div className="error">{!urlState && "No media inserted"}</div>
+			</div>
+		</CardContent>
 	);
 }
 
-function YTIframe({
+export const YTIframe = memo(function YTIframe({
 	id,
 	videoIdRef,
 }: {
 	id: string;
 	videoIdRef: MutableRefObject<string>;
 }) {
+	console.log("alsdjflkfdj");
 	return (
 		<iframe
 			className="mb-3"
 			height="390"
 			id={`yt-player-${id}`}
+			// key={`yt-player-${id}`}
 			onBlur={() => {
 				console.log("jjj");
 			}}
@@ -397,15 +380,6 @@ function YTIframe({
 			src={`http://www.youtube.com/embed/${videoIdRef.current}`}
 		/>
 	);
-}
-
-function LoadingButton() {
-	return (
-		<Button className="ml-6 w-40" disabled>
-			<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-			Please wait
-		</Button>
-	);
-}
+});
 
 export default Media;

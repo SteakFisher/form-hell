@@ -1,4 +1,4 @@
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,6 +13,7 @@ import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import { cn } from "@/lib/utils";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
@@ -68,9 +69,11 @@ const TextInputContext = createContext<TextInputContextInterface>({
 
 export const TextInput = memo(function TextInput({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: TextInputProps;
 }) {
 	const [lengthError, setLengthError] = useState("");
@@ -98,6 +101,7 @@ export const TextInput = memo(function TextInput({
 		>
 			<SortableItem
 				id={id}
+				mediaProps={mediaProps}
 				props={props}
 				SortableItemChild={TextInputWrapper}
 			/>
@@ -351,7 +355,7 @@ function FocusedTextInput({
 										>
 											<p className="whitespace-pre">
 												{"Available flags: "}
-												<code className="bg-code rounded-md px-1">
+												<code className="rounded-md bg-code px-1">
 													d, g, i, m, s, u, v, y
 												</code>
 											</p>
@@ -470,23 +474,13 @@ function FocusedTextInput({
 
 function UnfocusedTextInput({ props }: { props: TextInputProps }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<Input
-					id="name"
-					placeholder="Enter your answer"
-					disabled
-					className="disabled:cursor-default disabled:opacity-100"
-				/>
-			</CardContent>
-		</div>
+		<CardContent>
+			<Input
+				id="name"
+				placeholder="Enter your answer"
+				disabled
+				className="disabled:cursor-default disabled:opacity-100"
+			/>
+		</CardContent>
 	);
 }

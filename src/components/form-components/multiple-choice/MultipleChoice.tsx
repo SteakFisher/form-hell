@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -35,14 +36,17 @@ import MultipleChoiceItem from "./MultipleChoiceItem";
 
 const MultipleChoice = memo(function MultipleChoice({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceProps;
 }) {
 	return (
 		<SortableItem
 			id={id}
+			mediaProps={mediaProps}
 			props={props}
 			SortableItemChild={MultipleChoiceWrapper}
 		/>
@@ -283,33 +287,10 @@ const UnfocusedMultipleChoice = memo(function UnfocusedMultipleChoice({
 	isRadio: boolean;
 }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
-					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4 [overflow-wrap:anywhere]">
-				{props.items.map((item, index) => {
-					return (
-						<div className="flex min-h-8 items-center" key={index}>
-							{isRadio ? (
-								<CircleIcon className="mr-2 size-5 shrink-0" />
-							) : (
-								<Checkbox
-									disabled
-									className="mr-2 disabled:cursor-default disabled:opacity-100"
-								/>
-							)}
-							{item.value || `Option ${index + 1}`}
-						</div>
-					);
-				})}
-				{props.hasOther && (
-					<div className="flex min-h-8 items-center">
+		<CardContent className="space-y-4 [overflow-wrap:anywhere]">
+			{props.items.map((item, index) => {
+				return (
+					<div className="flex min-h-8 items-center" key={index}>
 						{isRadio ? (
 							<CircleIcon className="mr-2 size-5 shrink-0" />
 						) : (
@@ -318,15 +299,28 @@ const UnfocusedMultipleChoice = memo(function UnfocusedMultipleChoice({
 								className="mr-2 disabled:cursor-default disabled:opacity-100"
 							/>
 						)}
-						<Input
-							className="disabled:cursor-default disabled:opacity-100"
-							placeholder="Other"
-							disabled
-						/>
+						{item.value || `Option ${index + 1}`}
 					</div>
-				)}
-			</CardContent>
-		</div>
+				);
+			})}
+			{props.hasOther && (
+				<div className="flex min-h-8 items-center">
+					{isRadio ? (
+						<CircleIcon className="mr-2 size-5 shrink-0" />
+					) : (
+						<Checkbox
+							disabled
+							className="mr-2 disabled:cursor-default disabled:opacity-100"
+						/>
+					)}
+					<Input
+						className="disabled:cursor-default disabled:opacity-100"
+						placeholder="Other"
+						disabled
+					/>
+				</div>
+			)}
+		</CardContent>
 	);
 });
 

@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
 	DndContext,
 	DragEndEvent,
@@ -33,14 +34,17 @@ import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
 
 const MultipleChoiceGrid = memo(function MultipleChoiceGrid({
 	id,
+	mediaProps,
 	props,
 }: {
 	id: string;
+	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceGridProps;
 }) {
 	return (
 		<SortableItem
 			id={id}
+			mediaProps={mediaProps}
 			props={props}
 			SortableItemChild={MultipleChoiceGridWrapper}
 		/>
@@ -315,53 +319,40 @@ const UnfocusedMultipleChoiceGrid = memo(function UnfocusedMultipleChoiceGrid({
 	isRadio: boolean;
 }) {
 	return (
-		<div className="h-min w-full whitespace-pre-wrap leading-snug">
-			<CardHeader>
-				<CardTitle className="flex leading-snug [overflow-wrap:anywhere]">
-					<span>{props.title || "Title"}</span>
-					<span>
-						{props.required && <sup className="ml-2 text-red-500">*</sup>}
+		<CardContent className="space-y-4 [overflow-wrap:anywhere]">
+			<div className="flex min-h-8 items-center space-x-2">
+				<div className="flex-1" />
+				{props.columns.map((column, index) => (
+					<span key={index} className="flex-1 truncate text-center">
+						{column.value || `Column ${index + 1}`}
 					</span>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4 [overflow-wrap:anywhere]">
-				<div className="flex min-h-8 items-center space-x-2">
-					<div className="flex-1" />
-					{props.columns.map((column, index) => (
-						<span key={index} className="flex-1 truncate text-center">
-							{column.value || `Column ${index + 1}`}
+				))}
+			</div>
+			{props.rows.map((row, index) => {
+				return (
+					<div className="flex min-h-8 items-center space-x-2" key={index}>
+						<span className="flex-1 truncate">
+							{row.value || `Row ${index + 1}`}
 						</span>
-					))}
-				</div>
-				{props.rows.map((row, index) => {
-					return (
-						<div
-							className="flex min-h-8 items-center space-x-2"
-							key={index}
-						>
-							<span className="flex-1 truncate">
-								{row.value || `Row ${index + 1}`}
-							</span>
-							{props.columns.map((column, index) => (
-								<div
-									key={index}
-									className="flex flex-1 items-center justify-center"
-								>
-									{isRadio ? (
-										<CircleIcon className="size-5 shrink-0" />
-									) : (
-										<Checkbox
-											disabled
-											className="disabled:cursor-default disabled:opacity-100"
-										/>
-									)}
-								</div>
-							))}
-						</div>
-					);
-				})}
-			</CardContent>
-		</div>
+						{props.columns.map((column, index) => (
+							<div
+								key={index}
+								className="flex flex-1 items-center justify-center"
+							>
+								{isRadio ? (
+									<CircleIcon className="size-5 shrink-0" />
+								) : (
+									<Checkbox
+										disabled
+										className="disabled:cursor-default disabled:opacity-100"
+									/>
+								)}
+							</div>
+						))}
+					</div>
+				);
+			})}
+		</CardContent>
 	);
 });
 
