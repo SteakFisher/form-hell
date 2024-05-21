@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
+import MultipleChoiceResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 
 export default function MultipleChoiceComponent({
 	props,
@@ -16,7 +17,7 @@ export default function MultipleChoiceComponent({
 	const isRadio = !props.allowMultiple;
 	const { formResponses } = useContext(FormRendererContext);
 	const [selected, setSelected] = useState<Set<string>>(new Set());
-	formResponses[id] = { type: "multiple-choice", selected: selected };
+	formResponses[id] = { type: "multiple-choice", selected: selected } as MultipleChoiceResponse;
 
 	return (
 		<Card className={"mb-4 w-10/12 self-center"}>
