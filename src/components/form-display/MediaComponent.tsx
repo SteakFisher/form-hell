@@ -1,6 +1,8 @@
 import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import Image from "next/image";
+import {YTIframe} from "@/components/form-components/Media";
+import getVideoId from "get-video-id";
 
 
 export default function MediaComponent({
@@ -10,6 +12,7 @@ export default function MediaComponent({
   props: MediaProps;
   id: string;
 }) {
+  const vidid = getVideoId(props.url)
   return (
     <Card className={"mb-4 w-10/12 self-center"}>
       <CardHeader>
@@ -20,7 +23,9 @@ export default function MediaComponent({
           props.mediaType === "image" ? (
             <img src={props.url} alt={props.altText}  />
           ) : (
-            <video src={props.url} controls />
+            <YTIframe id={""} videoIdRef={{
+              current: vidid.id ?? ""
+            }} />
           )
         }
       </CardContent>
