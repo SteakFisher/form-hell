@@ -16,11 +16,12 @@ import {Button} from "@/components/ui/button";
 import {validateJSON} from "@/functions/validations";
 import {serverValidate} from "@/actions/validations";
 import MultipleChoiceGridComponent from "@/components/form-display/MultipleChoiceGridComponent";
+import MediaComponent from "@/components/form-display/MediaComponent";
 
 export default function Form() {
   const {
     current: formItems
-  } = useRef<FormItem[]>([{"id":"0","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"description":"sfqwer","required":false,"title":"New test Form Title","type":"title"}},{"id":"8f8ee2fd-3650-4cf8-9ab5-117db1665f02","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"altText":"LMFAO","mediaType":"image","required":false,"title":"The embed component","type":"media","url":"https://avatars.githubusercontent.com/u/54469796?s=48&v=4"}},{"id":"c674bbb8-599c-4e32-a683-daf4df269e8d","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"allowMultiple":false,"hasOther":true,"items":[{"id":"7a581b65-033a-4e03-bdb8-f554f9e37d62","parentId":"c674bbb8-599c-4e32-a683-daf4df269e8d","value":"123"},{"id":"4a8deda6-a349-4b8a-9748-4a5d97147104","parentId":"c674bbb8-599c-4e32-a683-daf4df269e8d","value":"345"},{"id":"fcbc07fa-f84d-4408-a166-552163a12d2b","parentId":"c674bbb8-599c-4e32-a683-daf4df269e8d","value":"654"}],"required":true,"title":"Wanted other to be input","type":"multiple-choice"}},{"id":"b56d9a4c-c8f9-460f-85f4-e60ca6e849b4","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"allowMultiple":true,"hasOther":true,"items":[{"id":"214dbe59-f0a4-45b6-ab5a-2c20757e879b","parentId":"b56d9a4c-c8f9-460f-85f4-e60ca6e849b4","value":"12"},{"id":"4af6459c-c937-4a88-90c8-6856a7ca7152","parentId":"b56d9a4c-c8f9-460f-85f4-e60ca6e849b4","value":"43"}],"required":true,"title":"1 more","type":"multiple-choice"}}])
+  } = useRef<FormItem[]>([{"id":"0","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"description":"","required":false,"title":"","type":"title"}},{"id":"c2e4b47b-0283-426f-8e29-5e2eed23d905","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"min":0,"max":4,"step":1,"required":false,"title":"","type":"range"}},{"id":"584f4bbc-3821-4ec1-b0ef-dcb93ee892e4","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"allowMultiple":true,"hasOther":true,"items":[{"id":"74669d3c-4e8c-430c-b4c6-1ec2d048dfab","parentId":"584f4bbc-3821-4ec1-b0ef-dcb93ee892e4","value":"1"},{"id":"e81816a0-6697-4959-bed2-55dec5101174","parentId":"584f4bbc-3821-4ec1-b0ef-dcb93ee892e4","value":"2"}],"required":true,"title":"Yea","type":"multiple-choice"}},{"id":"3f659519-25c4-486a-9f65-c3074ae50b79","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"allowMultiple":false,"hasOther":true,"items":[{"id":"c554f498-05eb-4da1-9d7f-0a7a6169bc53","parentId":"3f659519-25c4-486a-9f65-c3074ae50b79","value":"1"},{"id":"3d721f69-5831-4310-bd78-05b29c0a8eea","parentId":"3f659519-25c4-486a-9f65-c3074ae50b79","value":"2"}],"required":true,"title":"Nope","type":"multiple-choice"}},{"id":"d24dd8ad-913e-4dfc-ac16-09f4392f3ff5","mediaProps":{"mediaAltText":"","mediaType":"image","mediaUrl":""},"props":{"altText":"dqweqwe","mediaType":"image","required":false,"title":"asdfasdf","type":"media","url":"https://avatars.githubusercontent.com/u/54469796?s=48&v=4"}}])
   const {
     current: formResponses
   } = useRef<FormResponse<Response>>({});
@@ -67,6 +68,8 @@ export default function Form() {
                     return <MultipleChoiceGridComponent key={item.id} id={item.id} props={item.props}/>;
                   case "date":
                     return <DateComponent key={item.id} id={item.id} props={item.props}/>;
+                  case "media":
+                    return <MediaComponent key={item.id} id={item.id} props={item.props}/>;
                   default:
                     return null;
                 }

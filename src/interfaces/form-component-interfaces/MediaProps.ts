@@ -1,4 +1,4 @@
-export default interface DateProps {
+export default interface MediaProps {
 	altText: string;
 	mediaType: "image" | "video";
 	required: false;

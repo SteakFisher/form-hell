@@ -55,15 +55,15 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
       }
     }
 
+
     if (formResponses[item.id] && responses.type === "multiple-choice" && item.props.type === "multiple-choice") {
-      if (responses.selected.size > 1 && !item.props.allowMultiple) {
+      if (Object.keys(responses.selected).length > 1 && !item.props.allowMultiple) {
         errors[item.id] = "Please select only one option"
       }
-      if (responses.selected.size > 1 && item.props.allowMultiple && responses.selected.has("other")) {
+      if (Object.keys(responses.selected).length > 1 && item.props.allowMultiple && responses.selected["other"] != undefined) {
         errors[item.id] = "Selecting other limits you to only one option"
       }
-      if (responses.selected.size === 0 && item.props.required) {
-        
+      if (Object.keys(responses.selected).length === 0 && item.props.required) {
         errors[item.id] = "This field is required"
       }
     }
