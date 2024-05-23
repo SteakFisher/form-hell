@@ -16,7 +16,7 @@ export default function TextInputComponent({props, id, e }: {props: TextInputPro
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Input placeholder={props.placeholder} onChange={(e) => {
+        <Input onChange={(e) => {
           let input = z.string()
 
           if (props.lengthType === "characters") {

@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { SortableItemContext } from "@/contexts/SortableItemContext";
+import {constants} from "@/constants";
+import {FormBuilderContext} from "@/contexts/FormBuilderContext";
+import {SortableItemContext} from "@/contexts/SortableItemContext";
 import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
-import { ImageIcon } from "@radix-ui/react-icons";
+import {FormItemMediaProps} from "@/interfaces/FormItemMediaProps";
+import {ImageIcon, Link2Icon} from "@radix-ui/react-icons";
 import getVideoId from "get-video-id";
 import {
 	ChangeEvent,
@@ -17,14 +17,14 @@ import {
 	useState,
 	useTransition,
 } from "react";
-import { useDebouncedCallback } from "use-debounce";
+import {useDebouncedCallback} from "use-debounce";
 import VideoIcon from "../../../public/icons/video.svg";
-import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { SortableItem } from "./SortableItem";
+import {Button} from "../ui/button";
+import {Card, CardContent} from "../ui/card";
+import {Input} from "../ui/input";
+import {Label} from "../ui/label";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
+import {SortableItem} from "./SortableItem";
 
 interface MediaContextInterface {
 	setUrlState: (value: string) => void;
@@ -211,7 +211,7 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 						<TabsContent value="image">
 							<div className="flex items-center pt-4">
 								<Label className="text-nowrap pr-2" htmlFor="image-url">
-									URL:
+									<Link2Icon />
 								</Label>
 								<Input
 									defaultValue={mediaRef.current.imageUrl}
@@ -234,7 +234,7 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 						<TabsContent value="video">
 							<div className="flex items-center pt-4">
 								<Label className="text-nowrap pr-2" htmlFor="video-url">
-									URL:
+									<Link2Icon />
 								</Label>
 								<Input
 									id="video-url"
