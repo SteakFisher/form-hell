@@ -262,16 +262,18 @@ function UnfocusedSortableItem<T extends propsTypes>({
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<div className="mb-6 flex min-h-10 w-full flex-col items-center">
-				{mediaUrlState &&
-					(mediaProps.mediaType === "image" ? (
+			{mediaUrlState && (
+				<div className="mb-6 flex min-h-10 w-full flex-col items-center">
+					{mediaProps.mediaType === "image" ? (
 						<div className="relative mb-3">
 							<img src={mediaUrlState} alt={mediaProps.mediaAltText} />
 						</div>
 					) : (
 						<YTIframe id={id} videoIdRef={mediaVideoIdRef} />
-					))}
-			</div>
+					)}
+				</div>
+			)}
+
 			<SortableItemChild id={id} props={props} isFocused={false} />
 		</div>
 	);
@@ -368,9 +370,9 @@ function FocusedSortableItem<T extends propsTypes>({
 						</Button>
 					</CardTitle>
 				</div>
-				<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
-					{mediaUrlState &&
-						(mediaProps.mediaType === "image" ? (
+				{mediaUrlState && (
+					<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
+						{mediaProps.mediaType === "image" ? (
 							<>
 								<div className="relative">
 									<img
@@ -413,8 +415,9 @@ function FocusedSortableItem<T extends propsTypes>({
 									Remove Video
 								</Button>
 							</>
-						))}
-				</div>
+						)}
+					</div>
+				)}
 				{isMedia || (
 					<div className="flex space-x-2 pt-2">
 						<Label htmlFor="required">Required</Label>

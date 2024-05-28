@@ -98,3 +98,8 @@ export const constants = Object.freeze({
 	debounceWait: 500,
 	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
 });
+
+export const textInputConstants = Object.freeze({
+	lengthsMin: 0,
+	lengthsMax: 99999,
+});
