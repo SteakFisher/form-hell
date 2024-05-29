@@ -4,8 +4,12 @@ import {Input} from "@/components/ui/input";
 import {useContext, useState} from "react";
 import {z, ZodError} from "zod";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
+import FormItem from "@/interfaces/FormItem";
+import ChildMediaComponent from "@/components/form-display/ChildMediaComponent";
+import {AspectRatio} from "@/components/ui/aspect-ratio";
 
-export default function TextInputComponent({props, id, e }: {props: TextInputProps, id: string, e?: string | null}) {
+export default function TextInputComponent({item, id, e }: {item: FormItem, id: string, e?: string | null}) {
+  const props = item.props as TextInputProps
   const { formResponses } = useContext(FormRendererContext)
   const [error, setError] = useState(e);
   return (
@@ -15,6 +19,10 @@ export default function TextInputComponent({props, id, e }: {props: TextInputPro
           {props.title}
         </CardTitle>
       </CardHeader>
+
+      <CardFooter className={"flex justify-center flex-grow"}>
+        <ChildMediaComponent props={item.mediaProps} />
+      </CardFooter>
       <CardContent>
         <Input onChange={(e) => {
           let input = z.string()

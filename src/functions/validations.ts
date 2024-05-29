@@ -78,31 +78,26 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
     }
 
     if (formResponses[item.id] && responses.type === "multiple-choice-grid" && item.props.type === "multiple-choice-grid") {
-      let resp = responses
       let requireFlag = false;
       let validFlag = false;
       let tooManyEntriesFlag = false;
+      let selected = responses.selected
 
       if (item.props.type === "multiple-choice-grid") {
         let gridProps = item.props
+        gridProps.rows.map((row) => {
+          if (!selected[row.id]) requireFlag = true
+          else if (selected[row.id]) {
+            selected[row.id].forEach((entry) => {
+              if (!gridProps.columns.map((column) => column.id).includes(entry)) validFlag = true
+            })
 
-        Object.keys(responses.selected).map((rowId) => {
-          if (resp.selected[rowId].size === 0 && item.props.required) {
-            errors[item.id] = "This field is required"
-            requireFlag = true
-          } else if (resp.selected[rowId].size > 1 && !gridProps.allowMultiple) {
-            tooManyEntriesFlag = true
+            if (selected[row.id].size > 1) tooManyEntriesFlag = true
           }
-
-          resp.selected[rowId].forEach((columnId) => {
-            if (!gridProps.columns.map((column) => column.id).includes(columnId)) {
-              validFlag = true;
-            }
-          })
         })
       }
 
-      if (requireFlag) errors[item.id] = "This field is required"
+      if (requireFlag && item.props.required) errors[item.id] = "This field is required"
       if (validFlag) errors[item.id] = "Please select a valid option"
       if (tooManyEntriesFlag) errors[item.id] = "Please select only one option"
     }
