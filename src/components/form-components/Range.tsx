@@ -1,4 +1,4 @@
-import { constants } from "@/constants";
+import { constants, rangeConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
@@ -218,9 +218,9 @@ function FocusedRange({ props, id }: { props: RangeProps; id: string }) {
 		if (maxNum <= minNum) {
 			return "Max. must be greater than Min.";
 		}
-		const range = (maxNum - minNum) / stepNum;
-		if (range < 1 || range > 50) {
-			return "Step count must be between 1 and 50";
+		const stepCount = (maxNum - minNum) / stepNum;
+		if (stepCount < 1 || stepCount > rangeConstants.maxStepCount) {
+			return `Step count must be between 1 and ${rangeConstants.maxStepCount}`;
 		}
 
 		return "";

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { constants } from "@/constants";
+import { constants, mediaConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import FormItem from "@/interfaces/FormItem";
@@ -120,6 +120,7 @@ export function SortableItem<T extends propsTypes>({
 				style={style}
 				tabIndex={0}
 			>
+				{/* autoscroll broken becuase of new focus thing */}
 				<Card
 					className={cn(
 						"custom-focus relative flex w-full select-none overflow-hidden scroll-smooth border-[1.5px] bg-none pl-3 pr-7 transition-all duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-7 before:bg-accent",
@@ -340,7 +341,7 @@ function FocusedSortableItem<T extends propsTypes>({
 							defaultValue={props.title}
 							onChange={handleTitleChange}
 							className="mr-2 h-[30px] resize-none text-base leading-snug tracking-tight"
-							maxLength={500}
+							maxLength={constants.formItemTitleMaxLength}
 						/>
 						{isMedia || (
 							<Popover
@@ -390,6 +391,7 @@ function FocusedSortableItem<T extends propsTypes>({
 									<Input
 										defaultValue={mediaProps.mediaAltText}
 										id="alt-text"
+										maxLength={mediaConstants.altTextMaxLength}
 										onChange={handleAltTextChange}
 										placeholder="Enter alt text (optional)"
 									/>

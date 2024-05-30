@@ -1,8 +1,8 @@
+import { CardHeader } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
-import { CardHeader } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import autosize from "autosize";
 import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -54,7 +54,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 				ref={formTitleRef}
 				placeholder="Form Title"
 				defaultValue={props.title}
-				maxLength={250}
+				maxLength={constants.formTitleMaxLength}
 				className="borderless-input mb-3 h-[50px] resize-none text-2xl"
 				onChange={handleTitleChange}
 			/>
@@ -62,7 +62,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 				ref={descriptionRef}
 				placeholder="Description"
 				defaultValue={props.description}
-				maxLength={750}
+				maxLength={constants.formDescMaxLength}
 				className="h-[42px] resize-none text-base"
 				onChange={handleDescriptionChange}
 			/>

@@ -10,9 +10,9 @@ import TitleProps from "./form-component-interfaces/TitleProps";
 export type propsTypes =
 	| DateProps
 	| DropdownProps
-	| TextInputProps
-	| TitleProps
 	| MediaProps
 	| MultipleChoiceProps
 	| MultipleChoiceGridProps
-	| RangeProps;
+	| RangeProps
+	| TextInputProps
+	| TitleProps;

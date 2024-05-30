@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { constants, textInputConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
+import { validateRegex } from "@/functions/validateRegex";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import { cn } from "@/lib/utils";
@@ -154,7 +155,7 @@ function FocusedTextInput({
 		setRegexError,
 	} = useContext(TextInputContext);
 
-	const [accordionItem, setAccordionItem] = useState("item-1");
+	const [accordionItem, setAccordionItem] = useState("");
 	const [tooltipOpen, setTooltipOpen] = useState(false);
 
 	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -195,7 +196,10 @@ function FocusedTextInput({
 	const handleRegexChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			regexRef.current.pattern = e.target.value;
-			const _error = validateRegex();
+			const _error = validateRegex(
+				regexRef.current.pattern,
+				regexRef.current.flags,
+			);
 			if (!_error) {
 				props.regex = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
@@ -208,7 +212,10 @@ function FocusedTextInput({
 	const handleRegexFlagsChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			regexRef.current.flags = e.target.value;
-			const _error = validateRegex();
+			const _error = validateRegex(
+				regexRef.current.pattern,
+				regexRef.current.flags,
+			);
 			if (!_error) {
 				props.regex = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
@@ -322,7 +329,7 @@ function FocusedTextInput({
 									className="w-56"
 									defaultValue={regexRef.current.pattern}
 									id="regex"
-									maxLength={1000}
+									maxLength={textInputConstants.regexPatternMaxLength}
 									onChange={handleRegexChange}
 									ref={regexInputRef}
 								/>
@@ -333,7 +340,7 @@ function FocusedTextInput({
 									className="w-24"
 									defaultValue={regexRef.current.flags}
 									id="flags"
-									maxLength={8}
+									maxLength={textInputConstants.regexFlagsMaxLength}
 									onChange={handleRegexFlagsChange}
 									ref={regexFlagsInputRef}
 								/>
@@ -461,24 +468,6 @@ function FocusedTextInput({
 		}
 		if (maxNum < minNum && maxLength) {
 			return "Max. length must be greater than or equal to min. length";
-		}
-		return "";
-	}
-
-	function validateRegex(): string {
-		const pattern = regexRef.current.pattern;
-		const flags = regexRef.current.flags;
-
-		try {
-			new RegExp(pattern);
-		} catch {
-			return "Enter a valid regex pattern";
-		}
-
-		try {
-			new RegExp(pattern, flags);
-		} catch {
-			return "Invalid flags";
 		}
 		return "";
 	}

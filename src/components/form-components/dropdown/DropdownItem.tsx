@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { constants } from "@/constants";
+import { constants, dropdownConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownItemProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
 import { useSortable } from "@dnd-kit/sortable";
@@ -62,7 +62,7 @@ const DropdownItem = memo(function DropdownItem({
 					onChange={handleTextChange}
 					placeholder={`Option ${index}`}
 					className="h-[32px] resize-none disabled:cursor-default"
-					maxLength={300}
+					maxLength={dropdownConstants.itemMaxLength}
 				/>
 				{hideDelete || (
 					<Button

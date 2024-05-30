@@ -86,6 +86,7 @@ const defaultFormItems: FormItem[] = [
 
 export const constants = Object.freeze({
 	autoHeightDuration: 225,
+
 	defaultDateProps: DatePropsObj,
 	defaultDropdownProps: DropdownPropsObj,
 	defaultFormItems: defaultFormItems,
@@ -95,11 +96,40 @@ export const constants = Object.freeze({
 	defaultRangeProps: RangePropsObj,
 	defaultTextInputProps: TextInputPropsObj,
 	defaultTitleProps: TitlePropsObj,
+
 	debounceWait: 500,
+	formItemTitleMaxLength: 500,
+	formTitleMaxLength: 250,
+	formDescMaxLength: 750,
 	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
+});
+
+export const dropdownConstants = Object.freeze({
+	itemMaxLength: 300,
+	maxItems: 10,
+});
+
+export const mediaConstants = Object.freeze({
+	altTextMaxLength: 300,
+});
+
+export const multipleChoiceConstants = Object.freeze({
+	itemMaxLength: 300,
+	maxItems: 10,
+});
+
+export const multipleChoiceGridConstants = Object.freeze({
+	itemMaxLength: 300,
+	maxItems: 10,
+});
+
+export const rangeConstants = Object.freeze({
+	maxStepCount: 50,
 });
 
 export const textInputConstants = Object.freeze({
 	lengthsMin: 0,
 	lengthsMax: 99999,
+	regexPatternMaxLength: 1000,
+	regexFlagsMaxLength: 8,
 });
