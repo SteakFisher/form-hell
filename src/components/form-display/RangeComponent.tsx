@@ -13,6 +13,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 import { useContext, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import FormItem from "@/interfaces/FormItem";
 
 const Slider = React.forwardRef<
 	React.ElementRef<typeof SliderPrimitive.Root>,
@@ -100,12 +101,13 @@ const Slider = React.forwardRef<
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export default function RangeComponent({
-	props,
+	item,
 	id,
 }: {
 	id: string;
-	props: RangeProps;
+	item: FormItem;
 }) {
+	const props = item.props as RangeProps;
 	const { formResponses } = useContext(FormRendererContext);
 	const [val, setVal] = useState<number>(props.min);
 	let rangeResp = formResponses[id] as RangeResponse;

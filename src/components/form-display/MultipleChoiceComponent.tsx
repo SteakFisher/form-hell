@@ -1,5 +1,5 @@
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import React, {useContext, useRef, useState} from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -7,14 +7,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
 import {MultipleChoiceResponse, MultipleChoiceOther} from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 import {Input} from "@/components/ui/input";
+import ChildMediaComponent from "@/components/form-display/ChildMediaComponent";
+import FormItem from "@/interfaces/FormItem";
 
 export default function MultipleChoiceComponent({
-	props,
+	item,
 	id
 } : {
-	props: MultipleChoiceProps,
+	item: FormItem,
 	id: string
 }) {
+	const props = item.props as MultipleChoiceProps;
 	const isRadio = !props.allowMultiple;
 	const [selected, setSelected] = useState<MultipleChoiceOther>({});
 	const { formResponses } = useContext(FormRendererContext);
@@ -28,6 +31,9 @@ export default function MultipleChoiceComponent({
 			<CardHeader>
 				<CardTitle>{props.title}</CardTitle>
 			</CardHeader>
+			<CardFooter className={"flex justify-center flex-grow"}>
+				<ChildMediaComponent props={item.mediaProps} />
+			</CardFooter>
 			<CardContent>
 				{
 					isRadio ? (
