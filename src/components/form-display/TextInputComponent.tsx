@@ -1,3 +1,5 @@
+"use client"
+
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";

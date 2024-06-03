@@ -1,3 +1,5 @@
+"use client"
+
 import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import Image from "next/image";

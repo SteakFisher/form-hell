@@ -1,3 +1,5 @@
+"use client"
+
 import DateProps from "@/interfaces/form-component-interfaces/DateProps";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

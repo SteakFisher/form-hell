@@ -1,3 +1,5 @@
+"use client"
+
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import React, {useContext, useRef, useState} from "react";
