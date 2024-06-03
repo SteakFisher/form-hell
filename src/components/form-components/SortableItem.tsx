@@ -120,7 +120,6 @@ export function SortableItem<T extends propsTypes>({
 				style={style}
 				tabIndex={0}
 			>
-				{/* autoscroll broken becuase of new focus thing */}
 				<Card
 					className={cn(
 						"custom-focus relative flex w-full select-none overflow-hidden scroll-smooth border-[1.5px] bg-none pl-3 pr-7 transition-all duration-200 before:absolute before:right-0 before:top-0 before:h-full before:w-7 before:bg-accent",
@@ -201,6 +200,7 @@ export function SortableItem<T extends propsTypes>({
 	}
 
 	function handleOnFocus() {
+		if (focusedItemRef.current.id === id) return;
 		focusedItemRef.current.blurItem();
 		focusedItemRef.current = {
 			...focusedItemRef.current,

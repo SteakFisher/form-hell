@@ -108,7 +108,7 @@ const Toolbar = () => {
 			setTimeout(
 				() => {
 					focusErrorElement(errorElement, setIsSavingDialogOpen);
-					toast.error("Fix all errors before submitting", {
+					toast.error("Please fix all errors before submitting", {
 						duration: 2000,
 						id: "fb-submit-toast",
 					});
