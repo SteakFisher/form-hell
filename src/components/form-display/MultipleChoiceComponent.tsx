@@ -42,7 +42,6 @@ export default function MultipleChoiceComponent({
 						<RadioGroup onValueChange={(value) => {
 							if (value !== "other") {
 								multipleChoiceResponse = { [value]: "value" }
-								console.log(formResponses[id])
 								setSelected(multipleChoiceResponse)
 							} else {
 								multipleChoiceResponse = { "other": inputRef.current ? inputRef.current.value : ""}
@@ -52,7 +51,7 @@ export default function MultipleChoiceComponent({
 							{props.items.map((item, index) => {
 								return (
 									<div className="flex items-center mt-2 space-x-2" key={item.id}>
-										<RadioGroupItem value={item.value} id={item.id} />
+										<RadioGroupItem value={item.id} id={item.id} />
 										<Label htmlFor={item.id}>{item.value}</Label>
 									</div>
 								);
@@ -75,13 +74,12 @@ export default function MultipleChoiceComponent({
 								props.items.map((item, index) => {
 									return (
 										<div key={item.id} className="items-cen mb-4 flex">
-											<Checkbox checked={!!selected[item.value]} onCheckedChange={(e) => {
-												console.log(multipleChoiceResponse)
+											<Checkbox checked={!!selected[item.id]} onCheckedChange={(e) => {
 												if (e && multipleChoiceResponse["other"] == undefined) {
-													multipleChoiceResponse[item.value] = item.value;
+													multipleChoiceResponse[item.id] = "value";
 													setSelected({...multipleChoiceResponse});
 												} else {
-													delete multipleChoiceResponse[item.value];
+													delete multipleChoiceResponse[item.id];
 													setSelected({...multipleChoiceResponse});
 												}
 											}} id={item.id + "-checkbox"} />
