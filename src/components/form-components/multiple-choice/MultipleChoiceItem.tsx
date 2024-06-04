@@ -14,6 +14,7 @@ import {
 import autosize from "autosize";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { MultipleChoiceContext } from "./MultipleChoice";
 
 const MultipleChoiceItem = memo(function MultipleChoiceItem({
 	hideDelete,
@@ -28,17 +29,23 @@ const MultipleChoiceItem = memo(function MultipleChoiceItem({
 	isRadio: boolean;
 	onDelete: (idToDelete: string) => void;
 }) {
-	const textRef = useRef(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const { checkForEmptyItems } = useContext(MultipleChoiceContext);
+
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
 	const style = {
 		transform: CSS.Translate.toString(transform),
 		transition,
 	};
+
+	const textRef = useRef(null);
+
 	const handleTextChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLTextAreaElement>) => {
+			const performCheck = !!props.value !== !!e.target.value;
 			props.value = e.target.value;
+			if (performCheck) checkForEmptyItems();
 		},
 		constants.debounceWait,
 	);

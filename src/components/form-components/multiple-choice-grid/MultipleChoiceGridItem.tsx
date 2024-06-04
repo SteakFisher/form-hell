@@ -9,20 +9,24 @@ import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { MCGridContext } from "./MultipleChoiceGrid";
 
 const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
 	hideDelete,
+	onDelete,
 	placeholder,
 	props,
-	onDelete,
+	type,
 }: {
 	hideDelete: boolean;
+	onDelete: (idToDelete: string) => void;
 	placeholder: string;
 	props: MultipleChoiceGridItemProps;
-	onDelete: (idToDelete: string) => void;
+	type: "row" | "column";
 }) {
-	const textRef = useRef(null);
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const { checkForEmptyColumns, checkForEmptyRows } =
+		useContext(MCGridContext);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
@@ -31,9 +35,16 @@ const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
 		transition,
 	};
 
+	const textRef = useRef(null);
+
 	const handleTextChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLTextAreaElement>) => {
+			const performCheck = !!props.value !== !!e.target.value;
 			props.value = e.target.value;
+			if (!performCheck) return;
+
+			if (type === "column") checkForEmptyColumns();
+			if (type === "row") checkForEmptyRows();
 		},
 		constants.debounceWait,
 	);

@@ -1,8 +1,10 @@
 import { FormItemMediaProps } from "./FormItemMediaProps";
 import { propsTypes } from "./propsTypes";
 
-export default interface FormItem {
+type FormItem = {
 	id: string;
 	props: propsTypes;
 	mediaProps: FormItemMediaProps;
-}
+};
+
+export default FormItem;

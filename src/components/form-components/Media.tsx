@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
-import {constants} from "@/constants";
-import {FormBuilderContext} from "@/contexts/FormBuilderContext";
-import {SortableItemContext} from "@/contexts/SortableItemContext";
+import { constants, mediaConstants } from "@/constants";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
+import { validateImageUrl, validateVideoUrl } from "@/functions/mediaHelpers";
 import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
-import {FormItemMediaProps} from "@/interfaces/FormItemMediaProps";
-import {ImageIcon, Link2Icon} from "@radix-ui/react-icons";
+import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { ImageIcon, Link2Icon } from "@radix-ui/react-icons";
 import getVideoId from "get-video-id";
 import {
 	ChangeEvent,
@@ -17,14 +18,14 @@ import {
 	useState,
 	useTransition,
 } from "react";
-import {useDebouncedCallback} from "use-debounce";
+import { useDebouncedCallback } from "use-debounce";
 import VideoIcon from "../../../public/icons/video.svg";
-import {Button} from "../ui/button";
-import {Card, CardContent} from "../ui/card";
-import {Input} from "../ui/input";
-import {Label} from "../ui/label";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "../ui/tabs";
-import {SortableItem} from "./SortableItem";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { SortableItem } from "./SortableItem";
 
 interface MediaContextInterface {
 	setUrlState: (value: string) => void;
@@ -163,6 +164,7 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 								<Input
 									defaultValue={props.altText}
 									id="alt-text"
+									maxLength={mediaConstants.altTextMaxLength}
 									onChange={handleAltTextChange}
 									placeholder="Enter alt text (optional)"
 								/>
@@ -279,7 +281,7 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 	function handleInsertVideo() {
 		handleVideoUrlChange.flush();
 		const url = mediaRef.current.videoUrl;
-		const error = validateVideoUrl(url);
+		const error = validateVideoUrl(url, videoIdRef);
 		setVideoError(error);
 		if (error) return;
 
@@ -298,44 +300,6 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 			handleImageUrlChange.flush();
 			setTab("video");
 		}
-	}
-
-	async function validateImageUrl(url: string): Promise<string> {
-		try {
-			new URL(url);
-		} catch (e) {
-			return "Invalid URL";
-		}
-
-		try {
-			const response = await fetch(url, { method: "HEAD" });
-
-			if (!response.ok) {
-				return `HTTP error! Status: ${response.status}`;
-			}
-
-			const contentType = response.headers.get("Content-Type");
-			if (!contentType || !contentType.startsWith("image/")) {
-				return "URL does not point to a valid image";
-			}
-		} catch (error) {
-			return "Failed to fetch the URL";
-		}
-		return "";
-	}
-
-	function validateVideoUrl(url: string): string {
-		try {
-			new URL(url);
-		} catch (e) {
-			return "Invalid URL";
-		}
-		const { id, service } = getVideoId(url);
-		if (service !== "youtube") return "Invalid URL";
-		if (!id) return "Invalid URL";
-
-		videoIdRef.current = id;
-		return "";
 	}
 }
 

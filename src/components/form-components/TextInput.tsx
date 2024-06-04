@@ -9,9 +9,10 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { constants } from "@/constants";
+import { constants, textInputConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
+import { validateRegex } from "@/functions/validateRegex";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import { cn } from "@/lib/utils";
@@ -35,12 +36,7 @@ import {
 } from "../ui/accordion";
 import { buttonVariants } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "../ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { SortableItem } from "./SortableItem";
 
 interface TextInputContextInterface {
@@ -159,9 +155,10 @@ function FocusedTextInput({
 		setRegexError,
 	} = useContext(TextInputContext);
 
-	const [accordionItem, setAccordionItem] = useState("item-1");
+	const [accordionItem, setAccordionItem] = useState("");
 	const [tooltipOpen, setTooltipOpen] = useState(false);
 
+	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const regexInputRef = useRef<HTMLInputElement>(null);
 	const regexFlagsInputRef = useRef<HTMLInputElement>(null);
@@ -199,7 +196,10 @@ function FocusedTextInput({
 	const handleRegexChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			regexRef.current.pattern = e.target.value;
-			const _error = validateRegex();
+			const _error = validateRegex(
+				regexRef.current.pattern,
+				regexRef.current.flags,
+			);
 			if (!_error) {
 				props.regex = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
@@ -212,7 +212,10 @@ function FocusedTextInput({
 	const handleRegexFlagsChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			regexRef.current.flags = e.target.value;
-			const _error = validateRegex();
+			const _error = validateRegex(
+				regexRef.current.pattern,
+				regexRef.current.flags,
+			);
 			if (!_error) {
 				props.regex = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
@@ -326,7 +329,7 @@ function FocusedTextInput({
 									className="w-56"
 									defaultValue={regexRef.current.pattern}
 									id="regex"
-									maxLength={1000}
+									maxLength={textInputConstants.regexPatternMaxLength}
 									onChange={handleRegexChange}
 									ref={regexInputRef}
 								/>
@@ -337,41 +340,52 @@ function FocusedTextInput({
 									className="w-24"
 									defaultValue={regexRef.current.flags}
 									id="flags"
-									maxLength={8}
+									maxLength={textInputConstants.regexFlagsMaxLength}
 									onChange={handleRegexFlagsChange}
 									ref={regexFlagsInputRef}
 								/>
-								<TooltipProvider delayDuration={500}>
-									<Tooltip open={tooltipOpen}>
-										<TooltipTrigger
-											onMouseEnter={handleMouseEnter}
-											onMouseLeave={handleMouseLeave}
+								<Popover
+									open={tooltipOpen}
+									onOpenChange={setTooltipOpen}
+								>
+									<div
+										onMouseEnter={handleMouseEnter}
+										onMouseLeave={handleMouseLeave}
+									>
+										<PopoverTrigger
+											onClick={(e) => e.preventDefault()}
 										>
 											<InfoCircledIcon className="size-4 transition-opacity duration-200 hover:opacity-65" />
-										</TooltipTrigger>
-										<TooltipContent
-											className="border border-black bg-accent text-sm text-white"
-											sideOffset={8}
+										</PopoverTrigger>
+									</div>
+									<PopoverContent
+										onMouseEnter={() => {
+											if (!closeTimeoutRef.current) return;
+											clearTimeout(closeTimeoutRef.current);
+										}}
+										onMouseLeave={handleMouseLeave}
+										className="w-auto border border-black bg-accent text-sm text-white"
+										side="top"
+										sideOffset={6}
+									>
+										<p className="whitespace-pre">
+											{"Available flags: "}
+											<code className="rounded-md bg-code px-1">
+												d, g, i, m, s, u, v, y
+											</code>
+										</p>
+										<a
+											className={cn(
+												buttonVariants({ variant: "link" }),
+												"px-0",
+											)}
+											href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags"
+											target="_blank"
 										>
-											<p className="whitespace-pre">
-												{"Available flags: "}
-												<code className="rounded-md bg-code px-1">
-													d, g, i, m, s, u, v, y
-												</code>
-											</p>
-											<a
-												className={cn(
-													buttonVariants({ variant: "link" }),
-													"px-0",
-												)}
-												href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#advanced_searching_with_flags"
-												target="_blank"
-											>
-												MDN Reference
-											</a>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
+											MDN Reference
+										</a>
+									</PopoverContent>
+								</Popover>
 							</div>
 						</div>
 						<div className="error">{regexError}</div>
@@ -407,15 +421,20 @@ function FocusedTextInput({
 	}
 
 	function handleMouseEnter() {
+		if (closeTimeoutRef.current) {
+			clearTimeout(closeTimeoutRef.current);
+		}
 		openTimeoutRef.current = setTimeout(() => {
 			setTooltipOpen(true);
 		}, 150);
 	}
 
-	function handleMouseLeave() {
+	function handleMouseLeave(e: React.MouseEvent<HTMLDivElement>) {
 		if (!openTimeoutRef.current) return;
 		clearTimeout(openTimeoutRef.current);
-		setTooltipOpen(false);
+		closeTimeoutRef.current = setTimeout(() => {
+			setTooltipOpen(false);
+		}, 150);
 	}
 
 	function setRegex(newRegex: string) {
@@ -441,32 +460,14 @@ function FocusedTextInput({
 		) {
 			return "Min. length and max. length must be positive integers";
 		}
-		if (maxNum > 99999) {
+		if (maxNum > textInputConstants.lengthsMax) {
 			return "Please enter a smaller max. length";
 		}
-		if (minNum > 99999) {
+		if (minNum > textInputConstants.lengthsMax) {
 			return "Please enter a smaller min. length";
 		}
 		if (maxNum < minNum && maxLength) {
 			return "Max. length must be greater than or equal to min. length";
-		}
-		return "";
-	}
-
-	function validateRegex(): string {
-		const pattern = regexRef.current.pattern;
-		const flags = regexRef.current.flags;
-
-		try {
-			new RegExp(pattern);
-		} catch {
-			return "Enter a valid regex pattern";
-		}
-
-		try {
-			new RegExp(pattern, flags);
-		} catch {
-			return "Invalid flags";
 		}
 		return "";
 	}

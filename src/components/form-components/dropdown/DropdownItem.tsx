@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { constants } from "@/constants";
+import { constants, dropdownConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { DropdownItemProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
 import { useSortable } from "@dnd-kit/sortable";
@@ -9,6 +9,7 @@ import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { DropdownContext } from "./Dropdown";
 
 const DropdownItem = memo(function DropdownItem({
 	hideDelete,
@@ -21,17 +22,23 @@ const DropdownItem = memo(function DropdownItem({
 	props: DropdownItemProps;
 	onDelete: (idToDelete: string) => void;
 }) {
-	const textRef = useRef<HTMLTextAreaElement>(null);
+	const { checkForEmptyItems } = useContext(DropdownContext);
 	const { debounceRefs } = useContext(FormBuilderContext);
+
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
 	const style = {
 		transform: CSS.Translate.toString(transform),
 		transition,
 	};
+
+	const textRef = useRef<HTMLTextAreaElement>(null);
+
 	const handleTextChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLTextAreaElement>) => {
+			const performCheck = !!props.value !== !!e.target.value;
 			props.value = e.target.value;
+			if (performCheck) checkForEmptyItems();
 		},
 		constants.debounceWait,
 	);
@@ -62,7 +69,7 @@ const DropdownItem = memo(function DropdownItem({
 					onChange={handleTextChange}
 					placeholder={`Option ${index}`}
 					className="h-[32px] resize-none disabled:cursor-default"
-					maxLength={300}
+					maxLength={dropdownConstants.itemMaxLength}
 				/>
 				{hideDelete || (
 					<Button

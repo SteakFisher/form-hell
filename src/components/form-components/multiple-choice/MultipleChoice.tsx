@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
@@ -28,11 +29,31 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import {
+	createContext,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceItem from "./MultipleChoiceItem";
+
+interface MultipleChoiceContextInterface {
+	checkForEmptyItems: () => void;
+	multipleChoiceError: string;
+	setMultipleChoiceError: (value: string) => void;
+}
+
+export const MultipleChoiceContext =
+	createContext<MultipleChoiceContextInterface>({
+		checkForEmptyItems: () => {},
+		multipleChoiceError: "",
+		setMultipleChoiceError: () => {},
+	});
 
 const MultipleChoice = memo(function MultipleChoice({
 	id,
@@ -43,14 +64,38 @@ const MultipleChoice = memo(function MultipleChoice({
 	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceProps;
 }) {
+	const [multipleChoiceError, setMultipleChoiceError] = useState("");
+
+	useEffect(() => {
+		if (props.items.length) checkForEmptyItems();
+	}, []);
+
 	return (
-		<SortableItem
-			id={id}
-			mediaProps={mediaProps}
-			props={props}
-			SortableItemChild={MultipleChoiceWrapper}
-		/>
+		<MultipleChoiceContext.Provider
+			value={{
+				checkForEmptyItems,
+				multipleChoiceError,
+				setMultipleChoiceError,
+			}}
+		>
+			<SortableItem
+				id={id}
+				mediaProps={mediaProps}
+				props={props}
+				SortableItemChild={MultipleChoiceWrapper}
+			/>
+		</MultipleChoiceContext.Provider>
 	);
+
+	function checkForEmptyItems() {
+		for (const item of props.items) {
+			if (item.value.trim() === "") {
+				setMultipleChoiceError("Item cannot be empty");
+				return;
+			}
+		}
+		setMultipleChoiceError("");
+	}
 });
 
 const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
@@ -64,19 +109,25 @@ const MultipleChoiceWrapper = memo(function MultipleChoiceWrapper({
 }) {
 	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
 
-	return (
-		<>
-			{isFocused ? (
-				<FocusedMultipleChoice
-					id={id}
-					props={props}
-					isRadio={isRadio}
-					setIsRadio={setIsRadio}
-				/>
-			) : (
-				<UnfocusedMultipleChoice props={props} isRadio={isRadio} />
-			)}
-		</>
+	const { sortableItemRef } = useContext(SortableItemContext);
+	const { multipleChoiceError } = useContext(MultipleChoiceContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			`${!!multipleChoiceError}`,
+		);
+	}, [multipleChoiceError]);
+
+	return isFocused ? (
+		<FocusedMultipleChoice
+			id={id}
+			props={props}
+			isRadio={isRadio}
+			setIsRadio={setIsRadio}
+		/>
+	) : (
+		<UnfocusedMultipleChoice props={props} isRadio={isRadio} />
 	);
 });
 
@@ -92,6 +143,9 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 	setIsRadio: (value: boolean) => void;
 }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const { checkForEmptyItems, multipleChoiceError, setMultipleChoiceError } =
+		useContext(MultipleChoiceContext);
+
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -100,10 +154,15 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 	);
 
 	const [hasOther, setHasOther] = useState(props.hasOther);
+	const [hideAdd, setHideAdd] = useState(
+		props.items.length + +hasOther === 10,
+	);
 	const [hideDelete, setHideDelete] = useState(
 		props.items.length + +hasOther === 1,
 	);
 	const [itemsState, setItemsState] = useState([...props.items]);
+
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handleAllowMultipleClick = useDebouncedCallback(
 		(isChecked: boolean) => {
@@ -119,10 +178,8 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 		refs.set("allow-multiple", handleAllowMultipleClick);
 	}, []);
 
-	const contentRef = useRef<HTMLDivElement>(null);
-
 	return (
-		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
+		<CardContent className="mt-5 pb-4" ref={contentRef} tabIndex={-1}>
 			<div className="mb-9 flex space-x-2">
 				<Label htmlFor="allow-multiple">Allow multiple selection</Label>
 				<Checkbox
@@ -165,26 +222,31 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 				)}
 			</div>
 			<div className="flex items-center">
-				<Button
-					onClick={handleAddItemClick}
-					variant={"ghost"}
-					className="px-2"
-				>
-					Add item
-				</Button>
-				{!hasOther && (
+				{hideAdd || (
 					<>
-						<span className="px-1 text-sm font-medium">or</span>
 						<Button
+							onClick={handleAddItemClick}
 							variant={"ghost"}
 							className="px-2"
-							onClick={handleAddOtherClick}
 						>
-							{'Add "Other"'}
+							Add item
 						</Button>
+						{hasOther || (
+							<>
+								<span className="px-1 text-sm font-medium">or</span>
+								<Button
+									variant={"ghost"}
+									className="px-2"
+									onClick={handleAddOtherClick}
+								>
+									{'Add "Other"'}
+								</Button>
+							</>
+						)}
 					</>
 				)}
 			</div>
+			<div className="error">{multipleChoiceError}</div>
 		</CardContent>
 	);
 
@@ -210,12 +272,15 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 		};
 		props.items.push(newItem);
 		setHideDelete(false);
+		if (props.items.length + +hasOther === 10) setHideAdd(true);
 		setItemsState([...props.items]);
+		setMultipleChoiceError("Item cannot be empty");
 	}
 
 	function handleAddOtherClick() {
 		props.hasOther = true;
 		setHasOther(true);
+		if (props.items.length + +hasOther === 10) setHideAdd(true);
 		contentRef.current?.focus();
 	}
 
@@ -226,8 +291,10 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 			...props.items.slice(0, itemIndex),
 			...props.items.slice(itemIndex + 1),
 		];
+		setHideAdd(false);
 		if (props.items.length === 1) setHideDelete(true);
 		setItemsState(props.items);
+		if (item.value === "") checkForEmptyItems();
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
 		contentRef.current?.focus();
@@ -235,6 +302,7 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 
 	function handleDeleteOtherClick() {
 		props.hasOther = false;
+		setHideAdd(false);
 		setHasOther(false);
 
 		contentRef.current?.focus();

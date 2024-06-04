@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
 import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
@@ -22,10 +23,29 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { memo, useContext, useRef, useState } from "react";
+import {
+	createContext,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import DropdownItem from "./DropdownItem";
+
+interface DropdownContextInterface {
+	checkForEmptyItems: () => void;
+	dropdownError: string;
+	setDropdownError: (value: string) => void;
+}
+
+export const DropdownContext = createContext<DropdownContextInterface>({
+	checkForEmptyItems: () => {},
+	dropdownError: "",
+	setDropdownError: () => {},
+});
 
 const Dropdown = memo(function Dropdown({
 	id,
@@ -36,14 +56,34 @@ const Dropdown = memo(function Dropdown({
 	mediaProps: FormItemMediaProps;
 	props: DropdownProps;
 }) {
+	const [dropdownError, setDropdownError] = useState("");
+
+	useEffect(() => {
+		if (props.items.length) checkForEmptyItems();
+	}, []);
+
 	return (
-		<SortableItem
-			id={id}
-			mediaProps={mediaProps}
-			props={props}
-			SortableItemChild={DropdownWrapper}
-		/>
+		<DropdownContext.Provider
+			value={{ checkForEmptyItems, dropdownError, setDropdownError }}
+		>
+			<SortableItem
+				id={id}
+				mediaProps={mediaProps}
+				props={props}
+				SortableItemChild={DropdownWrapper}
+			/>
+		</DropdownContext.Provider>
 	);
+
+	function checkForEmptyItems() {
+		for (const item of props.items) {
+			if (item.value.trim() === "") {
+				setDropdownError("Item cannot be empty");
+				return;
+			}
+		}
+		setDropdownError("");
+	}
 });
 
 const DropdownWrapper = memo(function DropdownWrapper({
@@ -55,14 +95,17 @@ const DropdownWrapper = memo(function DropdownWrapper({
 	isFocused: boolean;
 	props: DropdownProps;
 }) {
-	return (
-		<>
-			{isFocused ? (
-				<FocusedDropdown props={props} id={id} />
-			) : (
-				<UnfocusedDropdown props={props} />
-			)}
-		</>
+	const { sortableItemRef } = useContext(SortableItemContext);
+	const { dropdownError } = useContext(DropdownContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute("data-error", `${!!dropdownError}`);
+	}, [dropdownError]);
+
+	return isFocused ? (
+		<FocusedDropdown props={props} id={id} />
+	) : (
+		<UnfocusedDropdown props={props} />
 	);
 });
 
@@ -73,6 +116,8 @@ const FocusedDropdown = memo(function FocusedDropdown({
 	props: DropdownProps;
 	id: string;
 }) {
+	const { checkForEmptyItems, dropdownError, setDropdownError } =
+		useContext(DropdownContext);
 	const { debounceRefs } = useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -81,13 +126,14 @@ const FocusedDropdown = memo(function FocusedDropdown({
 		}),
 	);
 
+	const [hideAdd, setHideAdd] = useState(props.items.length === 10);
 	const [hideDelete, setHideDelete] = useState(props.items.length === 1);
 	const [itemsState, setItemsState] = useState([...props.items]);
 
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<CardContent className="mt-5" ref={contentRef} tabIndex={-1}>
+		<CardContent className="mt-5 pb-4" ref={contentRef} tabIndex={-1}>
 			<div>
 				<DndContext
 					id={`${id}dropdown-context`}
@@ -115,14 +161,17 @@ const FocusedDropdown = memo(function FocusedDropdown({
 				</DndContext>
 			</div>
 			<div className="flex items-center">
-				<Button
-					onClick={handleAddItemClick}
-					variant={"ghost"}
-					className="px-2"
-				>
-					Add item
-				</Button>
+				{hideAdd || (
+					<Button
+						onClick={handleAddItemClick}
+						variant={"ghost"}
+						className="px-2"
+					>
+						Add item
+					</Button>
+				)}
 			</div>
+			<div className="error">{dropdownError}</div>
 		</CardContent>
 	);
 
@@ -148,7 +197,9 @@ const FocusedDropdown = memo(function FocusedDropdown({
 		};
 		props.items.push(newItem);
 		setItemsState([...props.items]);
+		if (props.items.length === 10) setHideAdd(true);
 		setHideDelete(false);
+		setDropdownError("Item cannot be empty");
 	}
 
 	function handleDeleteClick(idToDelete: string) {
@@ -159,7 +210,9 @@ const FocusedDropdown = memo(function FocusedDropdown({
 			...props.items.slice(itemIndex + 1),
 		];
 		setItemsState(props.items);
+		setHideAdd(false);
 		if (props.items.length === 1) setHideDelete(true);
+		if (item.value === "") checkForEmptyItems();
 		debounceRefs.delete(`${id}:${item.id}:text`);
 
 		contentRef.current?.focus();

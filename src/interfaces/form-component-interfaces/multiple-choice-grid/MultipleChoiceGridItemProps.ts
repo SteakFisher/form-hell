@@ -1,5 +1,5 @@
-export interface MultipleChoiceGridItemProps {
+export type MultipleChoiceGridItemProps = {
 	id: string;
 	parentId: string;
 	value: string;
-}
+};

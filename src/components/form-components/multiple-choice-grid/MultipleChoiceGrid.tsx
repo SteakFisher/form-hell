@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SortableItemContext } from "@/contexts/SortableItemContext";
 import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
 import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
 import {
@@ -26,11 +27,36 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon } from "@radix-ui/react-icons";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import {
+	createContext,
+	memo,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import { SortableItem } from "../SortableItem";
 import MultipleChoiceGridItem from "./MultipleChoiceGridItem";
+
+interface MCGridContextInterface {
+	checkForEmptyColumns: () => void;
+	checkForEmptyRows: () => void;
+	MCGridColumnError: string;
+	MCGridRowError: string;
+	setMCGridColumnError: (value: string) => void;
+	setMCGridRowError: (value: string) => void;
+}
+
+export const MCGridContext = createContext<MCGridContextInterface>({
+	checkForEmptyColumns: () => {},
+	checkForEmptyRows: () => {},
+	MCGridColumnError: "",
+	MCGridRowError: "",
+	setMCGridColumnError: () => {},
+	setMCGridRowError: () => {},
+});
 
 const MultipleChoiceGrid = memo(function MultipleChoiceGrid({
 	id,
@@ -41,14 +67,53 @@ const MultipleChoiceGrid = memo(function MultipleChoiceGrid({
 	mediaProps: FormItemMediaProps;
 	props: MultipleChoiceGridProps;
 }) {
+	const [MCGridColumnError, setMCGridColumnError] = useState("");
+	const [MCGridRowError, setMCGridRowError] = useState("");
+
+	useEffect(() => {
+		if (props.columns.length) checkForEmptyColumns();
+		if (props.rows.length) checkForEmptyRows();
+	}, []);
+
 	return (
-		<SortableItem
-			id={id}
-			mediaProps={mediaProps}
-			props={props}
-			SortableItemChild={MultipleChoiceGridWrapper}
-		/>
+		<MCGridContext.Provider
+			value={{
+				checkForEmptyColumns,
+				checkForEmptyRows,
+				MCGridColumnError,
+				MCGridRowError,
+				setMCGridColumnError,
+				setMCGridRowError,
+			}}
+		>
+			<SortableItem
+				id={id}
+				mediaProps={mediaProps}
+				props={props}
+				SortableItemChild={MultipleChoiceGridWrapper}
+			/>
+		</MCGridContext.Provider>
 	);
+
+	function checkForEmptyColumns() {
+		for (const column of props.columns) {
+			if (column.value.trim() === "") {
+				setMCGridColumnError("Column cannot be empty");
+				return;
+			}
+		}
+		setMCGridColumnError("");
+	}
+
+	function checkForEmptyRows() {
+		for (const row of props.rows) {
+			if (row.value.trim() === "") {
+				setMCGridRowError("Row cannot be empty");
+				return;
+			}
+		}
+		setMCGridRowError("");
+	}
 });
 
 const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
@@ -61,6 +126,16 @@ const MultipleChoiceGridWrapper = memo(function MultipleChoiceGridWrapper({
 	props: MultipleChoiceGridProps;
 }) {
 	const [isRadio, setIsRadio] = useState(!props.allowMultiple);
+
+	const { sortableItemRef } = useContext(SortableItemContext);
+	const { MCGridColumnError, MCGridRowError } = useContext(MCGridContext);
+
+	useEffect(() => {
+		sortableItemRef.current?.setAttribute(
+			"data-error",
+			`${!!(MCGridColumnError || MCGridRowError)}`,
+		);
+	}, [MCGridColumnError, MCGridRowError]);
 
 	return (
 		<>
@@ -87,6 +162,15 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 	setIsRadio: (value: boolean) => void;
 }) {
 	const { debounceRefs } = useContext(FormBuilderContext);
+	const {
+		checkForEmptyColumns,
+		checkForEmptyRows,
+		MCGridColumnError,
+		MCGridRowError,
+		setMCGridColumnError,
+		setMCGridRowError,
+	} = useContext(MCGridContext);
+
 	const sensors = useSensors(
 		useSensor(PointerSensor),
 		useSensor(KeyboardSensor, {
@@ -157,6 +241,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 											}
 											placeholder={`Row ${index + 1}`}
 											props={item}
+											type="row"
 										/>
 									);
 								})}
@@ -174,6 +259,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 							</Button>
 						</div>
 					)}
+					<div className="error">{MCGridRowError}</div>
 				</div>
 				<div className="my-1 w-[1px] bg-white opacity-75" />
 				<div className="w-1/2">
@@ -203,6 +289,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 											}
 											placeholder={`Column ${index + 1}`}
 											props={item}
+											type="column"
 										/>
 									);
 								})}
@@ -220,6 +307,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 							</Button>
 						</div>
 					)}
+					<div className="error">{MCGridColumnError}</div>
 				</div>
 			</div>
 		</CardContent>
@@ -267,12 +355,14 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 			else setHideRowDelete(false);
 
 			setRowsState([...props.rows]);
+			setMCGridRowError("Row cannot be empty");
 		} else {
 			props.columns.push(newItem);
 			if (props.columns.length === 10) setShowAddColumn(false);
 			else setHideColumnDelete(false);
 
 			setColumnsState([...props.columns]);
+			setMCGridColumnError("Column cannot be empty");
 		}
 	}
 
@@ -285,10 +375,12 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 						...props.rows.slice(index + 1),
 					];
 					setRowsState(props.rows);
+					if (row.value === "") checkForEmptyRows();
 					debounceRefs.delete(`${id}:${row.id}:text`);
 					break;
 				}
 			}
+
 			if (props.rows.length === 1) setHideRowDelete(true);
 			else if (props.rows.length < 10) setShowAddRow(true);
 		} else {
@@ -299,6 +391,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 						...props.columns.slice(index + 1),
 					];
 					setColumnsState(props.columns);
+					if (column.value === "") checkForEmptyColumns();
 					debounceRefs.delete(`${id}:${column.id}:text`);
 					break;
 				}

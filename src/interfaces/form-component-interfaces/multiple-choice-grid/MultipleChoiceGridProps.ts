@@ -1,10 +1,12 @@
 import { MultipleChoiceGridItemProps } from "./MultipleChoiceGridItemProps";
 
-export default interface MultipleChoiceGridProps {
+type MultipleChoiceGridProps = {
 	allowMultiple: boolean;
 	columns: MultipleChoiceGridItemProps[];
 	required: boolean;
 	rows: MultipleChoiceGridItemProps[];
 	title: string;
 	type: "multiple-choice-grid";
-}
+};
+
+export default MultipleChoiceGridProps;

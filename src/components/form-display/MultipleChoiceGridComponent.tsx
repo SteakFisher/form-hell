@@ -1,3 +1,5 @@
+"use client"
+
 import React, {useContext, useEffect, useState} from "react";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
 import MultipleChoiceGridProps
@@ -6,18 +8,20 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Checkbox} from "@/components/ui/checkbox";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
+import FormItem from "@/interfaces/FormItem";
 
 type Selected = {
   [rowId: string]: Set<string>
 }
 
 export default function MultipleChoiceGridComponent({
-  props,
+  item,
   id
 }: {
-  props: MultipleChoiceGridProps;
+  item: FormItem;
   id: string;
 }) {
+  const props = item.props as MultipleChoiceGridProps;
   const isRadio = !props.allowMultiple;
   const { formResponses } = useContext(FormRendererContext);
 

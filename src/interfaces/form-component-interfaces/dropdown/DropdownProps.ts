@@ -1,8 +1,8 @@
 import { DropdownItemProps } from "./DropdownItemProps";
 
-export interface DropdownProps {
+export type DropdownProps = {
 	items: DropdownItemProps[];
 	required: boolean;
 	title: string;
 	type: "dropdown";
-}
+};

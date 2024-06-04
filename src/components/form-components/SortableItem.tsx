@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { constants } from "@/constants";
+import { constants, mediaConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import FormItem from "@/interfaces/FormItem";
@@ -200,6 +200,7 @@ export function SortableItem<T extends propsTypes>({
 	}
 
 	function handleOnFocus() {
+		if (focusedItemRef.current.id === id) return;
 		focusedItemRef.current.blurItem();
 		focusedItemRef.current = {
 			...focusedItemRef.current,
@@ -262,16 +263,18 @@ function UnfocusedSortableItem<T extends propsTypes>({
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<div className="mb-6 flex min-h-10 w-full flex-col items-center">
-				{mediaUrlState &&
-					(mediaProps.mediaType === "image" ? (
+			{mediaUrlState && (
+				<div className="mb-6 flex min-h-10 w-full flex-col items-center">
+					{mediaProps.mediaType === "image" ? (
 						<div className="relative mb-3">
 							<img src={mediaUrlState} alt={mediaProps.mediaAltText} />
 						</div>
 					) : (
 						<YTIframe id={id} videoIdRef={mediaVideoIdRef} />
-					))}
-			</div>
+					)}
+				</div>
+			)}
+
 			<SortableItemChild id={id} props={props} isFocused={false} />
 		</div>
 	);
@@ -338,7 +341,7 @@ function FocusedSortableItem<T extends propsTypes>({
 							defaultValue={props.title}
 							onChange={handleTitleChange}
 							className="mr-2 h-[30px] resize-none text-base leading-snug tracking-tight"
-							maxLength={500}
+							maxLength={constants.formItemTitleMaxLength}
 						/>
 						{isMedia || (
 							<Popover
@@ -368,9 +371,9 @@ function FocusedSortableItem<T extends propsTypes>({
 						</Button>
 					</CardTitle>
 				</div>
-				<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
-					{mediaUrlState &&
-						(mediaProps.mediaType === "image" ? (
+				{mediaUrlState && (
+					<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
+						{mediaProps.mediaType === "image" ? (
 							<>
 								<div className="relative">
 									<img
@@ -388,6 +391,7 @@ function FocusedSortableItem<T extends propsTypes>({
 									<Input
 										defaultValue={mediaProps.mediaAltText}
 										id="alt-text"
+										maxLength={mediaConstants.altTextMaxLength}
 										onChange={handleAltTextChange}
 										placeholder="Enter alt text (optional)"
 									/>
@@ -413,8 +417,9 @@ function FocusedSortableItem<T extends propsTypes>({
 									Remove Video
 								</Button>
 							</>
-						))}
-				</div>
+						)}
+					</div>
+				)}
 				{isMedia || (
 					<div className="flex space-x-2 pt-2">
 						<Label htmlFor="required">Required</Label>

@@ -1,4 +1,4 @@
-export default interface TextInputProps {
+type TextInputProps = {
 	lengthType: "words" | "characters";
 	minLength: number;
 	maxLength: number;
@@ -8,4 +8,6 @@ export default interface TextInputProps {
 	required: boolean;
 	title: string;
 	type: "text-input";
-}
+};
+
+export default TextInputProps;

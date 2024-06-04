@@ -1,3 +1,5 @@
+"use client"
+
 import DateProps from "@/interfaces/form-component-interfaces/DateProps";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,8 +15,10 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import {useContext, useState} from "react";
 import { cn } from "@/lib/utils";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
+import FormItem from "@/interfaces/FormItem";
 
-export default function DateComponent({ props, id }: { id: string; props: DateProps }) {
+export default function DateComponent({ item, id }: { id: string; item: FormItem }) {
+	const props = item.props as DateProps;
 	const [date, setDate] = useState<Date>();
 	const { formResponses } = useContext(FormRendererContext)
 

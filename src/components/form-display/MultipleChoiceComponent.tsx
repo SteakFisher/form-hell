@@ -1,5 +1,7 @@
+"use client"
+
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import React, {useContext, useRef, useState} from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -7,14 +9,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
 import {MultipleChoiceResponse, MultipleChoiceOther} from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 import {Input} from "@/components/ui/input";
+import ChildMediaComponent from "@/components/form-display/ChildMediaComponent";
+import FormItem from "@/interfaces/FormItem";
 
 export default function MultipleChoiceComponent({
-	props,
+	item,
 	id
 } : {
-	props: MultipleChoiceProps,
+	item: FormItem,
 	id: string
 }) {
+	const props = item.props as MultipleChoiceProps;
 	const isRadio = !props.allowMultiple;
 	const [selected, setSelected] = useState<MultipleChoiceOther>({});
 	const { formResponses } = useContext(FormRendererContext);
@@ -28,13 +33,15 @@ export default function MultipleChoiceComponent({
 			<CardHeader>
 				<CardTitle>{props.title}</CardTitle>
 			</CardHeader>
+			<CardFooter className={"flex justify-center flex-grow"}>
+				<ChildMediaComponent props={item.mediaProps} />
+			</CardFooter>
 			<CardContent>
 				{
 					isRadio ? (
 						<RadioGroup onValueChange={(value) => {
 							if (value !== "other") {
 								multipleChoiceResponse = { [value]: "value" }
-								console.log(formResponses[id])
 								setSelected(multipleChoiceResponse)
 							} else {
 								multipleChoiceResponse = { "other": inputRef.current ? inputRef.current.value : ""}
@@ -44,7 +51,7 @@ export default function MultipleChoiceComponent({
 							{props.items.map((item, index) => {
 								return (
 									<div className="flex items-center mt-2 space-x-2" key={item.id}>
-										<RadioGroupItem value={item.value} id={item.id} />
+										<RadioGroupItem value={item.id} id={item.id} />
 										<Label htmlFor={item.id}>{item.value}</Label>
 									</div>
 								);
@@ -67,13 +74,12 @@ export default function MultipleChoiceComponent({
 								props.items.map((item, index) => {
 									return (
 										<div key={item.id} className="items-cen mb-4 flex">
-											<Checkbox checked={!!selected[item.value]} onCheckedChange={(e) => {
-												console.log(multipleChoiceResponse)
+											<Checkbox checked={!!selected[item.id]} onCheckedChange={(e) => {
 												if (e && multipleChoiceResponse["other"] == undefined) {
-													multipleChoiceResponse[item.value] = item.value;
+													multipleChoiceResponse[item.id] = "value";
 													setSelected({...multipleChoiceResponse});
 												} else {
-													delete multipleChoiceResponse[item.value];
+													delete multipleChoiceResponse[item.id];
 													setSelected({...multipleChoiceResponse});
 												}
 											}} id={item.id + "-checkbox"} />

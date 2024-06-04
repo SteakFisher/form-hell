@@ -1,4 +1,4 @@
-export interface RangeProps {
+export type RangeProps = {
 	min: number;
 	max: number;
 	required: boolean;
