@@ -266,8 +266,12 @@ function UnfocusedSortableItem<T extends propsTypes>({
 			{mediaUrlState && (
 				<div className="mb-6 flex min-h-10 w-full flex-col items-center">
 					{mediaProps.mediaType === "image" ? (
-						<div className="relative mb-3">
-							<img src={mediaUrlState} alt={mediaProps.mediaAltText} />
+						<div className="mb-3">
+							<img
+								className="media-image"
+								src={mediaUrlState}
+								alt={mediaProps.mediaAltText}
+							/>
 						</div>
 					) : (
 						<YTIframe id={id} videoIdRef={mediaVideoIdRef} />
@@ -377,6 +381,7 @@ function FocusedSortableItem<T extends propsTypes>({
 							<>
 								<div className="relative">
 									<img
+										className="media-image"
 										src={mediaUrlState}
 										alt={mediaProps.mediaAltText}
 									/>

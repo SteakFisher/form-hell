@@ -7,6 +7,7 @@ import {
 	multipleChoiceConstants,
 	rangeConstants,
 	textInputConstants,
+	titleConstants,
 } from "@/constants";
 import { validateImageUrl, validateVideoUrl } from "@/functions/mediaHelpers";
 import { validateRegex } from "@/functions/validateRegex";
@@ -660,8 +661,8 @@ function validateTitle(props: TitleProps): validateResult {
 					invalid_type_error: `The 'title' prop must be of type 'string'`,
 					required_error: "The 'title' prop is required",
 				})
-				.max(constants.formTitleMaxLength, {
-					message: `Form title must not exceed ${constants.formTitleMaxLength}`,
+				.max(titleConstants.formTitleMaxLength, {
+					message: `Form title must not exceed ${titleConstants.formTitleMaxLength}`,
 				}),
 			type: z.literal("title", {
 				invalid_type_error: "Invalid title object",

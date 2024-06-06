@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { constants } from "@/constants";
+import { constants, MCGridConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { MultipleChoiceGridItemProps } from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridItemProps";
 import { useSortable } from "@dnd-kit/sortable";
@@ -75,7 +75,7 @@ const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
 					onChange={handleTextChange}
 					placeholder={placeholder}
 					className="h-[32px] resize-none disabled:cursor-default"
-					maxLength={150}
+					maxLength={MCGridConstants.itemMaxLength}
 				/>
 				{hideDelete || (
 					<Button

@@ -84,50 +84,56 @@ const defaultFormItems: FormItem[] = [
 	},
 ];
 
+// --- constants objs ---
+
 export const constants = Object.freeze({
 	autoHeightDuration: 225,
-
-	defaultDateProps: DatePropsObj,
-	defaultDropdownProps: DropdownPropsObj,
-	defaultFormItems: defaultFormItems,
-	defaultMediaProps: MediaPropsObj,
-	defaultMultipleChoiceProps: MultipleChoicePropsObj,
-	defaultMultipleChoiceGridProps: MultipleChoiceGridPropsObj,
-	defaultRangeProps: RangePropsObj,
-	defaultTextInputProps: TextInputPropsObj,
-	defaultTitleProps: TitlePropsObj,
-
 	debounceWait: 500,
+	defaultFormItems: defaultFormItems,
 	formItemTitleMaxLength: 500,
-	formTitleMaxLength: 250,
-	formDescMaxLength: 750,
 	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
 });
 
+export const dateConstants = Object.freeze({
+	defaultProps: DatePropsObj,
+});
+
+export const titleConstants = Object.freeze({
+	defaultProps: TitlePropsObj,
+	formTitleMaxLength: 250,
+	formDescMaxLength: 750,
+});
+
 export const dropdownConstants = Object.freeze({
+	defaultProps: DropdownPropsObj,
 	itemMaxLength: 300,
 	maxItems: 10,
 });
 
 export const mediaConstants = Object.freeze({
+	defaultProps: MediaPropsObj,
 	altTextMaxLength: 300,
 });
 
 export const multipleChoiceConstants = Object.freeze({
+	defaultProps: MultipleChoicePropsObj,
 	itemMaxLength: 300,
 	maxItems: 10,
 });
 
-export const multipleChoiceGridConstants = Object.freeze({
+export const MCGridConstants = Object.freeze({
+	defaultProps: MultipleChoiceGridPropsObj,
 	itemMaxLength: 300,
 	maxItems: 10,
 });
 
 export const rangeConstants = Object.freeze({
+	defaultProps: RangePropsObj,
 	maxStepCount: 50,
 });
 
 export const textInputConstants = Object.freeze({
+	defaultProps: TextInputPropsObj,
 	lengthsMin: 0,
 	lengthsMax: 99999,
 	regexPatternMaxLength: 1000,
