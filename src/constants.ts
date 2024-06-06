@@ -62,7 +62,7 @@ const TextInputPropsObj: TextInputProps = {
 	maxLength: 0,
 	minLength: 0,
 	multiline: false,
-	regex: "",
+	regexPattern: "",
 	regexFlags: "",
 	required: false,
 	title: "",

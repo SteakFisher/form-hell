@@ -614,7 +614,7 @@ function validateTextInput(props: TextInputProps): validateResult {
 				})
 				.refine(
 					(flags) => {
-						const error = validateRegex(props.regex, flags);
+						const error = validateRegex(props.regexPattern, flags);
 						return !error;
 					},
 					{ message: "Invalid regex flags" },

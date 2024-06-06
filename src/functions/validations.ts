@@ -101,7 +101,7 @@ function validateTextInput(item: FormItem, response: TextInputResponse, errors: 
     if (item.props.minLength) inputResponseValidate = inputResponseValidate.min(item.props.minLength, {message: `Input can't be shorter than ${item.props.minLength} characters!`})
   }
 
-  if (item.props.regex) inputResponseValidate = inputResponseValidate.regex(new RegExp(item.props.regex, item.props.regexFlags), {message: `Input doesn't match the regex ${item.props.regex}`})
+  if (item.props.regexPattern) inputResponseValidate = inputResponseValidate.regex(new RegExp(item.props.regexPattern, item.props.regexFlags), {message: `Input doesn't match the regex ${item.props.regexPattern}`})
 
   let inputValidate = z.object({
     input: inputResponseValidate,

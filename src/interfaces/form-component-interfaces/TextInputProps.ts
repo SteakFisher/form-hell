@@ -3,7 +3,7 @@ type TextInputProps = {
 	minLength: number;
 	maxLength: number;
 	multiline: boolean;
-	regex: string;
+	regexPattern: string;
 	regexFlags: string;
 	required: boolean;
 	title: string;
