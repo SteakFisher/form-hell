@@ -43,7 +43,7 @@ const FormBuilder = () => {
 	);
 
 	return (
-		<Card className="w-[800px] [overflow-anchor:none]">
+		<Card className="w-[900px] [overflow-anchor:none]">
 			{formItems[0].props.type === "title" && (
 				<Title key={formItems[0].id} props={formItems[0].props} />
 			)}

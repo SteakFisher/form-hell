@@ -150,13 +150,15 @@ function FocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 
 	return (
 		<CardContent className="custom-focus" tabIndex={-1} ref={contentRef}>
-			<div className="mb-6 flex min-h-10 w-full flex-col items-center space-y-3">
+			<div className="mb-6 mt-3 flex min-h-10 w-full flex-col items-center space-y-3">
 				{urlState &&
 					(props.mediaType === "image" ? (
 						<>
-							<div className="relative">
-								<img src={urlState} alt={props.altText} />
-							</div>
+							<img
+								className="media-image"
+								src={urlState}
+								alt={props.altText}
+							/>
 							<div className="flex items-center">
 								<Label className="text-nowrap pr-2" htmlFor="alt-text">
 									Alt text:
@@ -311,8 +313,12 @@ function UnfocusedMedia({ id, props }: { id: string; props: MediaProps }) {
 			<div className="mb-6 flex min-h-10 w-full flex-col items-center">
 				{urlState &&
 					(props.mediaType === "image" ? (
-						<div className="relative mb-3">
-							<img src={urlState} alt={props.altText} />
+						<div className="mb-3">
+							<img
+								className="media-image"
+								src={urlState}
+								alt={props.altText}
+							/>
 						</div>
 					) : (
 						<YTIframe id={id} videoIdRef={videoIdRef} />

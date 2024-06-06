@@ -66,6 +66,10 @@
 	@apply flex h-7 items-center justify-center truncate py-2 text-sm text-red-500;
 }
 
+.media-image {
+	@apply max-h-[1500px] max-w-[760px];
+}
+
 .borderless-input {
 	@apply border-none px-0;
 }

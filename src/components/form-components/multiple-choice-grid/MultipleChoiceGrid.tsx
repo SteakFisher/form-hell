@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { constants } from "@/constants";
+import { MCGridConstants, constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
@@ -184,8 +184,12 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 	const [hideColumnDelete, setHideColumnDelete] = useState(
 		columnsState.length === 1,
 	);
-	const [showAddRow, setShowAddRow] = useState(rowsState.length < 10);
-	const [showAddColumn, setShowAddColumn] = useState(columnsState.length < 10);
+	const [showAddRow, setShowAddRow] = useState(
+		rowsState.length < MCGridConstants.maxItems,
+	);
+	const [showAddColumn, setShowAddColumn] = useState(
+		columnsState.length < MCGridConstants.maxItems,
+	);
 
 	const handleAllowMultipleClick = useDebouncedCallback(
 		(isChecked: boolean) => {
@@ -351,14 +355,16 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 
 		if (type === "row") {
 			props.rows.push(newItem);
-			if (props.rows.length === 10) setShowAddRow(false);
+			if (props.rows.length === MCGridConstants.maxItems)
+				setShowAddRow(false);
 			else setHideRowDelete(false);
 
 			setRowsState([...props.rows]);
 			setMCGridRowError("Row cannot be empty");
 		} else {
 			props.columns.push(newItem);
-			if (props.columns.length === 10) setShowAddColumn(false);
+			if (props.columns.length === MCGridConstants.maxItems)
+				setShowAddColumn(false);
 			else setHideColumnDelete(false);
 
 			setColumnsState([...props.columns]);
@@ -382,7 +388,8 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 			}
 
 			if (props.rows.length === 1) setHideRowDelete(true);
-			else if (props.rows.length < 10) setShowAddRow(true);
+			else if (props.rows.length < MCGridConstants.maxItems)
+				setShowAddRow(true);
 		} else {
 			for (const [index, column] of props.columns.entries()) {
 				if (column.id === idToDelete) {
@@ -397,7 +404,8 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 				}
 			}
 			if (props.columns.length === 1) setHideColumnDelete(true);
-			else if (props.columns.length < 10) setShowAddColumn(true);
+			else if (props.columns.length < MCGridConstants.maxItems)
+				setShowAddColumn(true);
 		}
 
 		contentRef.current?.focus();
