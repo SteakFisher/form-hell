@@ -43,7 +43,7 @@ export default function TextInputComponent({item, id, e }: {item: FormItem, id: 
             }
           }
 
-          if (props.regex) input = input.regex(new RegExp(props.regex, props.regexFlags), {message: `Input doesn't match the regex ${props.regex}`})
+          if (props.regexPattern) input = input.regex(new RegExp(props.regexPattern, props.regexFlags), {message: `Input doesn't match the regex ${props.regexPattern}`})
 
 
           try {

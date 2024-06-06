@@ -80,7 +80,7 @@ export const TextInput = memo(function TextInput({
 		maxLength: String(props.maxLength || ""),
 	});
 	const regexRef = useRef({
-		pattern: props.regex,
+		pattern: props.regexPattern,
 		flags: props.regexFlags,
 	});
 
@@ -201,7 +201,7 @@ function FocusedTextInput({
 				regexRef.current.flags,
 			);
 			if (!_error) {
-				props.regex = regexRef.current.pattern;
+				props.regexPattern = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
 			}
 			setRegexError(_error);
@@ -217,7 +217,7 @@ function FocusedTextInput({
 				regexRef.current.flags,
 			);
 			if (!_error) {
-				props.regex = regexRef.current.pattern;
+				props.regexPattern = regexRef.current.pattern;
 				props.regexFlags = regexRef.current.flags;
 			}
 			setRegexError(_error);
@@ -408,10 +408,10 @@ function FocusedTextInput({
 	function handlePresetChange(inputType: string) {
 		switch (inputType) {
 			case "email":
-				setRegex(emailRegex.toString());
+				setRegexPattern(emailRegex.toString());
 				break;
 			case "number":
-				setRegex(constants.intRegex.toString());
+				setRegexPattern(constants.intRegex.toString());
 				break;
 		}
 	}
@@ -437,7 +437,7 @@ function FocusedTextInput({
 		}, 150);
 	}
 
-	function setRegex(newRegex: string) {
+	function setRegexPattern(newRegex: string) {
 		if (regexInputRef.current == null) return;
 		if (regexFlagsInputRef.current == null) return;
 

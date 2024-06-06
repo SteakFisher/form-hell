@@ -1,4 +1,13 @@
-import { constants } from "@/constants";
+import {
+	dateConstants,
+	dropdownConstants,
+	MCGridConstants,
+	mediaConstants,
+	multipleChoiceConstants,
+	rangeConstants,
+	textInputConstants,
+	titleConstants,
+} from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
 import { FormItemTypes } from "@/interfaces/FormItemTypes";
@@ -197,10 +206,10 @@ function AddBar({
 	function returnTypeProps(type: FormItemTypes, parentId: string): propsTypes {
 		switch (type) {
 			case "date":
-				return constants.defaultDateProps;
+				return dateConstants.defaultProps;
 			case "dropdown":
 				return {
-					...constants.defaultDropdownProps,
+					...dropdownConstants.defaultProps,
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
@@ -208,10 +217,10 @@ function AddBar({
 					}),
 				};
 			case "media":
-				return constants.defaultMediaProps;
+				return mediaConstants.defaultProps;
 			case "multiple-choice":
 				return {
-					...constants.defaultMultipleChoiceProps,
+					...multipleChoiceConstants.defaultProps,
 					items: new Array({
 						id: uuidv4(),
 						parentId: parentId,
@@ -220,7 +229,7 @@ function AddBar({
 				};
 			case "multiple-choice-grid":
 				return {
-					...constants.defaultMultipleChoiceGridProps,
+					...MCGridConstants.defaultProps,
 					columns: new Array({
 						id: uuidv4(),
 						parentId: parentId,
@@ -233,11 +242,11 @@ function AddBar({
 					}),
 				};
 			case "range":
-				return constants.defaultRangeProps;
+				return rangeConstants.defaultProps;
 			case "text-input":
-				return constants.defaultTextInputProps;
+				return textInputConstants.defaultProps;
 			case "title":
-				return constants.defaultTitleProps;
+				return titleConstants.defaultProps;
 		}
 	}
 }
