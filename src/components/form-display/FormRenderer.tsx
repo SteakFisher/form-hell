@@ -15,16 +15,19 @@ import {validateJSON} from "@/functions/validations";
 import {serverValidate} from "@/actions/validations";
 import {toast} from "sonner";
 import {Button} from "@/components/ui/button";
+import FormItemsObject from "@/interfaces/FormItemsObject";
 
-export default function FormRenderer({ formItems, formResponses } : { formItems: FormItem[], formResponses: FormResponses<Response> }) {
-  return (
+export default function FormRenderer({ formItemsObject, formResponses } : { formItemsObject: FormItemsObject, formResponses: FormResponses<Response> }) {
+  let formItems = formItemsObject.formItems
+
+   return (
     <form action={async () => {
       let { errors } = validateJSON(formItems, {
          responseId: "placeholderValue",
          formResponse: formResponses
       })
       if (Object.keys(errors).length == 0) {
-        errors = await serverValidate(formItems, formResponses)
+        errors = await serverValidate(formItemsObject, formResponses)
       }
       if (Object.keys(errors).length > 0) {
         Object.keys(errors).map((key) => {
