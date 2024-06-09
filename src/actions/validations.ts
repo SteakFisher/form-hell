@@ -1,27 +1,25 @@
-"use server"
+"use server";
 
-import {FormResponse, Response} from "@/interfaces/FormResponse";
+import { FormResponses, Response } from "@/interfaces/FormResponses";
 import FormItem from "@/interfaces/FormItem";
-import {validateJSON} from "@/functions/validations";
-import Firebase from "@/helpers/firebase";
-import { getFirestore } from "firebase-admin/firestore";
+import { validateJSON } from "@/functions/validations";
+import firestoreServer from "@/helpers/firestoreServer";
+import FormResponseObject from "@/interfaces/FormResponseObject";
+import { v4 as uuidv4 } from "uuid";
 
 
-export async function serverValidate(formItems: FormItem[], formResponses: FormResponse<Response>) {
-  let errors = validateJSON(formItems, formResponses)
+export async function serverValidate(formItems: FormItem[], formResponses: FormResponses<Response>) {
+  let formResponseObject : FormResponseObject = {
+    responseId: uuidv4(),
+    formResponse: formResponses
+  }
+  let { finalResponse, errors } = validateJSON(formItems, formResponseObject)
   if (Object.keys(errors).length > 0) {
     return errors
   } else {
     // Save the data
-    const app = Firebase()
-
-    if (!app) {
-      errors["General"] = "Error initializing Firebase"
-      return errors
-    }
-
-    const db = getFirestore(app);
-    let document = await db.doc("Responses/FormID/ComponentID/ResponseID").get()
+    const db = firestoreServer()
+    let document = await db.doc(`Responses/FormID/ComponentID/ResponseID`).get()
     console.log(document.data())
 
     return {}

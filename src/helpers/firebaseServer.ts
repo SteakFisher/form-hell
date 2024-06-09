@@ -8,7 +8,7 @@ const serviceAccount = JSON.parse(
 	process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
 );
 
-export default function Firebase() {
+export default function FirebaseServer() {
 	// Your web app's Firebase configuration
 	// const firebaseConfig = {
 	// 	apiKey: process.env.API_KEY,

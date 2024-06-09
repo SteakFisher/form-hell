@@ -1,9 +1,9 @@
 import FormItem from "@/interfaces/FormItem";
 import {Card} from "@/components/ui/card";
-import {FormResponse, Response} from "@/interfaces/FormResponse";
+import {FormResponses, Response} from "@/interfaces/FormResponses";
 import FormRenderer from "@/components/form-display/FormRenderer";
 
-const formResponses: FormResponse<Response> = {}
+const formResponses: FormResponses<Response> = {}
 
 function sleep(ms = 0) {
   return new Promise(resolve => setTimeout(resolve, ms));

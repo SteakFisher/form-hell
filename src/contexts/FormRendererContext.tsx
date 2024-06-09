@@ -1,9 +1,9 @@
 import {createContext} from "react";
-import {FormResponse} from "@/interfaces/FormResponse";
-import {Response} from "@/interfaces/FormResponse";
+import {FormResponses} from "@/interfaces/FormResponses";
+import {Response} from "@/interfaces/FormResponses";
 
 interface FormRendererContextInterface {
-  formResponses: FormResponse<Response>
+  formResponses: FormResponses<Response>
 }
 
 export const FormRendererContext = createContext<FormRendererContextInterface>({
