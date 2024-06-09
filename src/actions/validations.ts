@@ -13,7 +13,7 @@ export async function serverValidate(formItems: FormItem[], formResponses: FormR
     responseId: uuidv4(),
     formResponse: formResponses
   }
-  let { finalResponse, errors } = validateJSON(formItems, formResponseObject)
+  let { errors } = validateJSON(formItems, formResponseObject)
   if (Object.keys(errors).length > 0) {
     return errors
   } else {
