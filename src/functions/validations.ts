@@ -7,7 +7,6 @@ import DateResponse from "@/interfaces/form-component-response-interfaces/DateRe
 import RangeResponse from "@/interfaces/form-component-response-interfaces/RangeResponse";
 import { MultipleChoiceResponse } from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
-import FormResponseObject from "@/interfaces/FormResponseObject";
 
 type Errors = {
   [id: string]: string

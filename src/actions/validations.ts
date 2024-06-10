@@ -1,14 +1,11 @@
 "use server";
 
 import { FormResponses, Response } from "@/interfaces/FormResponses";
-import FormItem from "@/interfaces/FormItem";
 import { validateJSON } from "@/functions/validations";
 import firestoreServer from "@/helpers/firestoreServer";
 import FormResponseObject from "@/interfaces/FormResponseObject";
 import { v4 as uuidv4 } from "uuid";
 import FormItemsObject from "@/interfaces/FormItemsObject";
-import formItem from "@/interfaces/FormItem";
-import DropdownResponse from "@/interfaces/form-component-response-interfaces/DropdownResponse";
 import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
 
 type SelectedJSONGridResponse = {
