@@ -15,9 +15,8 @@ type Errors = {
 
 
 
-export function validateJSON(formItems: FormItem[], formResponseObject: FormResponseObject) {
+export function validateJSON(formItems: FormItem[], formResponses: FormResponses<Response>) {
   let errors : Errors  = {}
-  let formResponses = formResponseObject.formResponse;
   let finalResponse = {} as FormResponses<Response>
 
   formItems.map((item) => {
@@ -88,7 +87,8 @@ export function validateJSON(formItems: FormItem[], formResponseObject: FormResp
     }
   })
 
-  if (Object.keys(errors).length === 0) finalResponse = {}
+  if (Object.keys(errors).length != 0) finalResponse = {}
+
 
   return { finalResponse, errors }
 }

@@ -22,15 +22,17 @@ export default function FormRenderer({ formItemsObject, formResponses } : { form
 
    return (
     <form action={async () => {
-      let { errors } = validateJSON(formItems, {
-         responseId: "placeholderValue",
-         formResponse: formResponses
-      })
+      let { errors } = validateJSON(formItems, formResponses)
       if (Object.keys(errors).length == 0) {
         errors = await serverValidate(formItemsObject, formResponses)
       }
       if (Object.keys(errors).length > 0) {
         Object.keys(errors).map((key) => {
+           if (key === "error") {
+               toast.error(errors[key])
+               return
+           }
+
           let name = formItems.filter((item) => item.id === key)[0].props.title
           toast.error(name, {
             description: errors[key]
