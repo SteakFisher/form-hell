@@ -291,7 +291,6 @@ const Toolbar = () => {
 				focusAndScrollToElement(errorElement, setIsSavingDialogOpen);
 				toast.error(errorObj.message, {
 					duration: 2500,
-					id: "fb-submit-toast",
 				});
 			}
 			return;
@@ -326,7 +325,6 @@ const Toolbar = () => {
 				focusAndScrollToElement(errorElement, setIsSavingDialogOpen);
 				toast.error(errorObj.message, {
 					duration: 2500,
-					id: "fb-submit-toast",
 				});
 			}
 			return;
@@ -372,7 +370,6 @@ const Toolbar = () => {
 	}
 
 	function handleSaveClick() {
-		toast.dismiss("fb-submit-toast");
 		setIsSavingDialogOpen(true);
 		const timeoutStart = Date.now();
 		isSavingRef.current = true;
@@ -385,7 +382,6 @@ const Toolbar = () => {
 					focusAndScrollToElement(errorElement, setIsSavingDialogOpen);
 					toast.error("Please fix all errors before submitting", {
 						duration: toastDuration,
-						id: "fb-submit-toast",
 					});
 				},
 				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
@@ -400,7 +396,6 @@ const Toolbar = () => {
 						() => {
 							toast.error(errorObj.message, {
 								duration: 2500,
-								id: "fb-submit-toast",
 							});
 							setIsSavingDialogOpen(false);
 						},
@@ -419,7 +414,6 @@ const Toolbar = () => {
 							);
 							toast.error(errorObj.message, {
 								duration: 2500,
-								id: "fb-submit-toast",
 							});
 						},
 						Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
@@ -436,7 +430,6 @@ const Toolbar = () => {
 					setIsSavingDialogOpen(false);
 					toast.success("Form saved successfully!", {
 						duration: toastDuration,
-						id: "fb-submit-toast",
 					});
 				},
 				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
