@@ -6,6 +6,7 @@ import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { v4 as uuid } from "uuid";
 
 const NewFormPage = () => {
 	const debounceRefs = useMemo(() => new Map(), []);
@@ -14,6 +15,7 @@ const NewFormPage = () => {
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const isSavingRef = useRef(false);
+	const keyPrefixRef = useRef(uuid());
 
 	const [formItems, setFormItems] = useState<FormItem[]>(
 		constants.defaultFormItems,
@@ -33,6 +35,7 @@ const NewFormPage = () => {
 				formItems,
 				heightDiffRef,
 				isSavingRef,
+				keyPrefixRef,
 				setFormItems,
 			}}
 		>

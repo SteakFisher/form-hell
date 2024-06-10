@@ -45,6 +45,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 	return (
 		<CardHeader
 			className="mx-6 mb-6 border-b px-0"
+			id="0"
 			tabIndex={-1}
 			onFocus={() =>
 				(focusedItemRef.current = { id: "0", blurItem: () => {} })

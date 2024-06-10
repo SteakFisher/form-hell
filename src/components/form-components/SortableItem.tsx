@@ -201,6 +201,7 @@ export function SortableItem<T extends propsTypes>({
 
 	function handleOnFocus() {
 		if (focusedItemRef.current.id === id) return;
+		console.log("still here");
 		focusedItemRef.current.blurItem();
 		focusedItemRef.current = {
 			...focusedItemRef.current,

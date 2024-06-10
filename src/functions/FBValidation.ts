@@ -1,5 +1,3 @@
-"use server";
-
 import {
 	constants,
 	dropdownConstants,
@@ -24,7 +22,7 @@ import { z } from "zod";
 
 export type FBValidateError = { id: string; message: string };
 
-export async function FBValidateForm(
+export async function FBValidate(
 	formItems: FormItem[],
 ): Promise<FBValidateError> {
 	let titleParsed = false;
@@ -34,7 +32,7 @@ export async function FBValidateForm(
 	for (const formItem of formItems) {
 		if (!titleParsed) {
 			titleParsed = true;
-			const formItemError = z
+			const formItemError = await z
 				.object({
 					id: z.literal("0", {
 						invalid_type_error: `The 'id' prop must be of type 'string'`,
@@ -52,10 +50,6 @@ export async function FBValidateForm(
 								.max(mediaConstants.altTextMaxLength, {
 									message: `Alt text must not exceed ${mediaConstants.altTextMaxLength} characters`,
 								}),
-							mediaUrl: z.string({
-								invalid_type_error: `The 'mediaUrl' prop must be of type 'string'`,
-								required_error: "The 'mediaUrl' prop is required",
-							}),
 							mediaType: z.union(
 								[z.literal("image"), z.literal("video")],
 								{
@@ -63,11 +57,28 @@ export async function FBValidateForm(
 									required_error: "The 'mediaType' prop is required",
 								},
 							),
+							mediaUrl: z
+								.string({
+									invalid_type_error: `The 'mediaUrl' prop must be of type 'string'`,
+									required_error: "The 'mediaUrl' prop is required",
+								})
+								.refine(
+									async (url) => {
+										if (url === "") return true;
+										await validateUrl(
+											url,
+											formItem.mediaProps.mediaType,
+										);
+									},
+									{
+										message: "Invalid url",
+									},
+								),
 						})
 						.strict(),
 				})
 				.strict()
-				.safeParse(formItem);
+				.safeParseAsync(formItem);
 
 			if (!formItemError.success) {
 				return {
@@ -137,7 +148,8 @@ export async function FBValidateForm(
 				break;
 			}
 			case "media": {
-				propsError = validateMedia(formItem.props).error;
+				const _propsError = await validateMedia(formItem.props);
+				propsError = _propsError.error;
 				break;
 			}
 			case "multiple-choice": {
@@ -269,8 +281,8 @@ function validateDropdown(
 	return { error: "" };
 }
 
-function validateMedia(props: MediaProps): validateResult {
-	const parseResult = z
+async function validateMedia(props: MediaProps): Promise<validateResult> {
+	const parseResult = await z
 		.object({
 			altText: z
 				.string({
@@ -301,15 +313,20 @@ function validateMedia(props: MediaProps): validateResult {
 				required_error: "Invalid media object",
 			}),
 			url: z
-				.string()
-				.min(1, { message: "Url must be empty" })
-				.refine((url) => validateUrl(url, props.mediaType)),
+				.string({
+					invalid_type_error: `The 'url' prop must be of type 'string'`,
+					required_error: "The 'url' prop is required",
+				})
+				.min(1, { message: "Url must not be empty" })
+				.refine(async (url) => await validateUrl(url, props.mediaType), {
+					message: "Invalid url",
+				}),
 		})
 		.strict()
-		.safeParse(props);
+		.safeParseAsync(props);
 
 	if (!parseResult.success) {
-		return { error: parseResult.error.errors[0].message };
+		return { error: parseResult.error.message };
 	}
 	return { error: "" };
 }
@@ -588,13 +605,14 @@ function validateTextInput(props: TextInputProps): validateResult {
 					"The prop 'multiline' must be of type 'boolean'",
 				required_error: "The prop 'multiline' is required",
 			}),
-			regex: z
+			regexPattern: z
 				.string({
-					invalid_type_error: "The prop 'regex' must be of type 'string'",
-					required_error: "The prop 'regex' is required",
+					invalid_type_error:
+						"The prop 'regexPattern' must be of type 'string'",
+					required_error: "The prop 'regexPattern' is required",
 				})
 				.max(textInputConstants.regexPatternMaxLength, {
-					message: `The prop 'regex' must not exceed ${textInputConstants.regexPatternMaxLength} characters`,
+					message: `The prop 'regexPattern' must not exceed ${textInputConstants.regexPatternMaxLength} characters`,
 				})
 				.refine(
 					(pattern) => {
@@ -678,14 +696,12 @@ function validateTitle(props: TitleProps): validateResult {
 	return { error: "" };
 }
 
-function validateUrl(url: string, mediaType: "image" | "video"): boolean {
+async function validateUrl(url: string, mediaType: "image" | "video") {
 	if (url === "") return true;
 	if (mediaType === "image") {
-		const error = validateImageUrl(url);
-		error.then((error) => {
-			if (error) return false;
-			return true;
-		});
+		const error = await validateImageUrl(url);
+		if (error) return false;
+		return true;
 	} else if (mediaType === "video") {
 		const error = validateVideoUrl(url, { current: "" });
 		if (error) return false;
