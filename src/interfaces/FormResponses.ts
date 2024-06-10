@@ -13,6 +13,6 @@ TextInputResponse
 | MultipleChoiceGridResponse
 | RangeResponse;
 
-export interface FormResponse <T extends Response> {
+export interface FormResponses <T extends Response> {
   [id: string] : T;
 }

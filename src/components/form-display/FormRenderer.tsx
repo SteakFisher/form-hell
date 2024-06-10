@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import TitleComponent from "@/components/form-display/TitleComponent";
 import TextInputComponent from "@/components/form-display/TextInputComponent";
@@ -8,23 +8,30 @@ import RangeComponent from "@/components/form-display/RangeComponent";
 import MultipleChoiceGridComponent from "@/components/form-display/MultipleChoiceGridComponent";
 import DateComponent from "@/components/form-display/DateComponent";
 import MediaComponent from "@/components/form-display/MediaComponent";
-import {FormRendererContext} from "@/contexts/FormRendererContext";
-import {FormResponse, Response} from "@/interfaces/FormResponse";
-import FormItem from "@/interfaces/FormItem";
-import {validateJSON} from "@/functions/validations";
-import {serverValidate} from "@/actions/validations";
-import {toast} from "sonner";
-import {Button} from "@/components/ui/button";
+import { FormRendererContext } from "@/contexts/FormRendererContext";
+import { FormResponses, Response } from "@/interfaces/FormResponses";
+import { validateJSON } from "@/functions/validations";
+import { serverValidate } from "@/actions/validations";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import FormItemsObject from "@/interfaces/FormItemsObject";
 
-export default function FormRenderer({ formItems, formResponses } : { formItems: FormItem[], formResponses: FormResponse<Response> }) {
-  return (
+export default function FormRenderer({ formItemsObject, formResponses } : { formItemsObject: FormItemsObject, formResponses: FormResponses<Response> }) {
+  let formItems = formItemsObject.formItems
+
+   return (
     <form action={async () => {
-      let errors = validateJSON(formItems, formResponses)
+      let { errors } = validateJSON(formItems, formResponses)
       if (Object.keys(errors).length == 0) {
-        errors = await serverValidate(formItems, formResponses)
+        errors = await serverValidate(formItemsObject, formResponses)
       }
       if (Object.keys(errors).length > 0) {
         Object.keys(errors).map((key) => {
+           if (key === "error") {
+               toast.error(errors[key])
+               return
+           }
+
           let name = formItems.filter((item) => item.id === key)[0].props.title
           toast.error(name, {
             description: errors[key]

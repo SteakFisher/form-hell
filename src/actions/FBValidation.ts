@@ -7,6 +7,7 @@ import {
 	multipleChoiceConstants,
 	rangeConstants,
 	textInputConstants,
+	titleConstants,
 } from "@/constants";
 import { validateImageUrl, validateVideoUrl } from "@/functions/mediaHelpers";
 import { validateRegex } from "@/functions/validateRegex";
@@ -20,6 +21,7 @@ import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProp
 import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
 import FormItem from "@/interfaces/FormItem";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 export type FBValidateError = { id: string; message: string };
 
@@ -175,6 +177,9 @@ export async function FBValidateForm(
 		}
 	}
 
+	localStorage.setItem("formItemsObject", JSON.stringify(formItems));
+	// after saving
+	redirect(`/form/${3}/edit`);
 	return { id: "", message: "" };
 }
 
@@ -613,7 +618,7 @@ function validateTextInput(props: TextInputProps): validateResult {
 				})
 				.refine(
 					(flags) => {
-						const error = validateRegex(props.regex, flags);
+						const error = validateRegex(props.regexPattern, flags);
 						return !error;
 					},
 					{ message: "Invalid regex flags" },
@@ -660,8 +665,8 @@ function validateTitle(props: TitleProps): validateResult {
 					invalid_type_error: `The 'title' prop must be of type 'string'`,
 					required_error: "The 'title' prop is required",
 				})
-				.max(constants.formTitleMaxLength, {
-					message: `Form title must not exceed ${constants.formTitleMaxLength}`,
+				.max(titleConstants.formTitleMaxLength, {
+					message: `Form title must not exceed ${titleConstants.formTitleMaxLength}`,
 				}),
 			type: z.literal("title", {
 				invalid_type_error: "Invalid title object",

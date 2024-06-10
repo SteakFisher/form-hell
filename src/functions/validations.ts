@@ -1,11 +1,11 @@
 import FormItem from "@/interfaces/FormItem";
-import {FormResponse, Response} from "@/interfaces/FormResponse";
-import zod, {z, ZodError} from "zod";
+import { FormResponses, Response } from "@/interfaces/FormResponses";
+import { z, ZodError } from "zod";
 import TextInputResponse from "@/interfaces/form-component-response-interfaces/TextInputResponse";
 import DropdownResponse from "@/interfaces/form-component-response-interfaces/DropdownResponse";
 import DateResponse from "@/interfaces/form-component-response-interfaces/DateResponse";
 import RangeResponse from "@/interfaces/form-component-response-interfaces/RangeResponse";
-import {MultipleChoiceResponse} from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
+import { MultipleChoiceResponse } from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
 
 type Errors = {
@@ -14,9 +14,9 @@ type Errors = {
 
 
 
-export function validateJSON(formItems: FormItem[], formResponses: FormResponse<Response>) {
+export function validateJSON(formItems: FormItem[], formResponses: FormResponses<Response>) {
   let errors : Errors  = {}
-  let finalResponse = {} as FormResponse<Response>
+  let finalResponse = {} as FormResponses<Response>
 
   formItems.map((item) => {
     let response = formResponses[item.id]
@@ -86,10 +86,13 @@ export function validateJSON(formItems: FormItem[], formResponses: FormResponse<
     }
   })
 
-  return errors
+  if (Object.keys(errors).length != 0) finalResponse = {}
+
+
+  return { finalResponse, errors }
 }
 
-function validateTextInput(item: FormItem, response: TextInputResponse, errors: Errors, finalResponse: FormResponse<Response>){
+function validateTextInput(item: FormItem, response: TextInputResponse, errors: Errors, finalResponse: FormResponses<Response>){
   if (item.props.type !== "text-input") return;
 
   if (!response.input && !item.props.required) return;
@@ -101,7 +104,7 @@ function validateTextInput(item: FormItem, response: TextInputResponse, errors: 
     if (item.props.minLength) inputResponseValidate = inputResponseValidate.min(item.props.minLength, {message: `Input can't be shorter than ${item.props.minLength} characters!`})
   }
 
-  if (item.props.regex) inputResponseValidate = inputResponseValidate.regex(new RegExp(item.props.regex, item.props.regexFlags), {message: `Input doesn't match the regex ${item.props.regex}`})
+  if (item.props.regexPattern) inputResponseValidate = inputResponseValidate.regex(new RegExp(item.props.regexPattern, item.props.regexFlags), {message: `Input doesn't match the regex ${item.props.regexPattern}`})
 
   let inputValidate = z.object({
     input: inputResponseValidate,
@@ -134,7 +137,7 @@ function validateTextInput(item: FormItem, response: TextInputResponse, errors: 
   }
 }
 
-function validateDropdownInput(item: FormItem, response: DropdownResponse, errors: Errors, finalResponse: FormResponse<Response>){
+function validateDropdownInput(item: FormItem, response: DropdownResponse, errors: Errors, finalResponse: FormResponses<Response>){
   if (item.props.type !== "dropdown") return;
 
   if (!response.selected && !item.props.required) return;
@@ -168,7 +171,7 @@ function validateDropdownInput(item: FormItem, response: DropdownResponse, error
   }
 }
 
-function validateDateInput(item: FormItem, response: DateResponse, errors: Errors, finalResponse: FormResponse<Response>) {
+function validateDateInput(item: FormItem, response: DateResponse, errors: Errors, finalResponse: FormResponses<Response>) {
   if (item.props.type !== "date") return;
 
   if (!response.date && !item.props.required) return;
@@ -198,7 +201,7 @@ function validateDateInput(item: FormItem, response: DateResponse, errors: Error
   }
 }
 
-function validateRangeInput(item: FormItem, response: RangeResponse, errors: Errors, finalResponse: FormResponse<Response>) {
+function validateRangeInput(item: FormItem, response: RangeResponse, errors: Errors, finalResponse: FormResponses<Response>) {
   if (item.props.type !== "range") return;
 
   if (!response.range && !item.props.required) return;
@@ -225,7 +228,7 @@ function validateRangeInput(item: FormItem, response: RangeResponse, errors: Err
   }
 }
 
-function validateMultipleChoiceInput(item: FormItem, response: MultipleChoiceResponse, errors: Errors, finalResponse: FormResponse<Response>){
+function validateMultipleChoiceInput(item: FormItem, response: MultipleChoiceResponse, errors: Errors, finalResponse: FormResponses<Response>){
   if (item.props.type !== "multiple-choice") return;
 
   if ((!response.selected || Object.keys(response.selected).length == 0) && !item.props.required) return;
@@ -269,7 +272,7 @@ function validateMultipleChoiceInput(item: FormItem, response: MultipleChoiceRes
   }
 }
 
-function validateMultipleChoiceGridInput(item: FormItem, response: MultipleChoiceGridResponse, errors: Errors, finalResponse: FormResponse<Response>){
+function validateMultipleChoiceGridInput(item: FormItem, response: MultipleChoiceGridResponse, errors: Errors, finalResponse: FormResponses<Response>){
   if (item.props.type !== "multiple-choice-grid") return;
 
   if ((!response.selected || Object.keys(response.selected).length == 0) && !item.props.required) return;
