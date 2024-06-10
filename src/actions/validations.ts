@@ -14,10 +14,6 @@ type SelectedJSONGridResponse = {
 
 
 export async function serverValidate(formItemsObject: FormItemsObject, formResponses: FormResponses<Response>) {
-  let formResponseObject : FormResponseObject = {
-    responseId: uuidv4(),
-    formResponse: formResponses
-  }
   let formItems = formItemsObject.formItems
 
   let { finalResponse, errors } = validateJSON(formItems, formResponses)
@@ -25,6 +21,11 @@ export async function serverValidate(formItemsObject: FormItemsObject, formRespo
     return errors
   } else {
     try {
+      let formResponseObject : FormResponseObject = {
+        responseId: uuidv4(),
+        formResponse: formResponses
+      }
+
       // Save the data
       const db = firestoreServer()
       const formCollection =  db.doc(`Responses/${formItemsObject.formId}`)

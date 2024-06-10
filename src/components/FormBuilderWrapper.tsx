@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import FormItem from "@/interfaces/FormItem";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
-import { constants } from "@/constants";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import FormItem from "@/interfaces/FormItem";
-import { useEffect, useMemo, useRef, useState } from "react";
+import FormItemsObject from "@/interfaces/FormItemsObject";
 
-const NewFormPage = () => {
+
+export default function FormBuilderWrapper({ formItemsObject } : { formItemsObject: FormItemsObject }) {
 	const debounceRefs = useMemo(() => new Map(), []);
 	const firstRenderRef = useRef(false);
 	const focusedItemRef = useRef({ id: "0", blurItem: () => {} });
@@ -15,9 +16,7 @@ const NewFormPage = () => {
 	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const isSavingRef = useRef(false);
 
-	const [formItems, setFormItems] = useState<FormItem[]>(
-		constants.defaultFormItems,
-	);
+	const [formItems, setFormItems] = useState<FormItem[]>(formItemsObject.formItems);
 
 	useEffect(() => {
 		firstRenderRef.current = false;
@@ -42,6 +41,4 @@ const NewFormPage = () => {
 			<Toolbar />
 		</FormBuilderContext.Provider>
 	);
-};
-
-export default NewFormPage;
+}

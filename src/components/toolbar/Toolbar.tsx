@@ -163,8 +163,6 @@ const Toolbar = () => {
 				},
 				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
 			);
-			// localStorage.setItem("formItems", JSON.stringify(formItems));
-			// router.push("../../new-form/save");
 		});
 	}
 };
