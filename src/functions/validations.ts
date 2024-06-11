@@ -143,7 +143,7 @@ function validateDropdownInput(item: FormItem, response: DropdownResponse, error
   if (!response.selected && !item.props.required) return;
 
   // Workaround for zod to work tsk tsk
-  const zodLiterals = item.props.items.map((option) => z.literal(option.value)) as unknown as readonly [ z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[] ]
+  const zodLiterals = item.props.items.map((option) => z.literal(option.id)) as unknown as readonly [ z.ZodLiteral<string>, z.ZodLiteral<string>, ...z.ZodLiteral<string>[] ]
 
   let dropdownResponseValidate = z.object({
     selected: z.union(zodLiterals, {
