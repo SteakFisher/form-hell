@@ -8,6 +8,9 @@ declare global {
 			MESSAGING_SENDER_ID: string;
 			APP_ID: string;
 
+			TURSO_AUTH_TOKEN: string;
+			TURSO_DB_URL: string;
+
 			FIREBASE_SERVICE_ACCOUNT_KEY: string;
 		}
 	}
