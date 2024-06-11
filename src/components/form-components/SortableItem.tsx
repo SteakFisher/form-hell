@@ -22,6 +22,7 @@ import React, {
 	MutableRefObject,
 	useContext,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState,
 	useTransition,
@@ -187,21 +188,22 @@ export function SortableItem<T extends propsTypes>({
 		debounceRefs.delete(id);
 	}
 
-	function blurItem() {
-		const refs = debounceRefs.get(id);
+	function blurItem(focusingItemId: string) {
+		setIsFocused(false);
+		focusingItemIdRef.current = focusingItemId;
+		focusedHeightRef.current = autoHeightChildRef.current?.clientHeight ?? 0;
 
+		const refs = debounceRefs.get(id);
 		if (refs) {
 			refs.forEach((ref) => {
 				ref.flush();
 			});
 		}
-
-		setIsFocused(false);
 	}
 
 	function handleOnFocus() {
 		if (focusedItemRef.current.id === id) return;
-		focusedItemRef.current.blurItem();
+		focusedItemRef.current.blurItem(id);
 		focusedItemRef.current = {
 			...focusedItemRef.current,
 			id: id,
@@ -228,12 +230,8 @@ function UnfocusedSortableItem<T extends propsTypes>({
 
 	const unfocusedSortableItemRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		if (
-			unfocusedSortableItemRef.current &&
-			heightDiffRef.current.shouldScroll &&
-			focusingItemIdRef.current
-		) {
+	useLayoutEffect(() => {
+		if (unfocusedSortableItemRef.current && focusingItemIdRef.current) {
 			const shouldScroll = () => {
 				for (const formItem of formItems) {
 					if (formItem.id === id) return true;

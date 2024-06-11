@@ -5,7 +5,10 @@ import FormItem from "../interfaces/FormItem";
 interface FormBuilderContextInterface {
 	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;
 	firstRenderRef: RefObject<boolean>;
-	focusedItemRef: MutableRefObject<{ id: string; blurItem: () => void }>;
+	focusedItemRef: MutableRefObject<{
+		id: string;
+		blurItem: (focusingItemId: string) => void;
+	}>;
 	formBuilderRef: RefObject<HTMLDivElement>;
 	formItems: FormItem[];
 	heightDiffRef: MutableRefObject<{
