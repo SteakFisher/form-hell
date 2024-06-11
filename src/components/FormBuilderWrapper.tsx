@@ -6,6 +6,7 @@ import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
 import FormItemsObject from "@/interfaces/FormItemsObject";
+import { v4 as uuid } from "uuid";
 
 
 export default function FormBuilderWrapper({ formItemsObject } : { formItemsObject: FormItemsObject }) {
@@ -15,6 +16,7 @@ export default function FormBuilderWrapper({ formItemsObject } : { formItemsObje
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const isSavingRef = useRef(false);
+	const keyPrefixRef = useRef(uuid());
 
 	const [formItems, setFormItems] = useState<FormItem[]>(formItemsObject.formItems);
 
@@ -32,6 +34,7 @@ export default function FormBuilderWrapper({ formItemsObject } : { formItemsObje
 				formItems,
 				heightDiffRef,
 				isSavingRef,
+				keyPrefixRef,
 				setFormItems,
 			}}
 		>

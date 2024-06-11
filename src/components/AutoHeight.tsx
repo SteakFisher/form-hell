@@ -50,7 +50,10 @@ const AutoHeight = ({
 			if (focusedElement == null) return;
 			const rect = focusedElement.getBoundingClientRect();
 			const newBottom = rect.top + newHeight;
-			const isTopBelowStart = rect.top >= 0;
+			const heightDiff = heightDiffRef.current.shouldScroll
+				? heightDiffRef.current.heightDiff
+				: 0;
+			const isTopBelowStart = rect.top + heightDiff >= 0;
 			const isBottomAboveEnd = newBottom <= window.innerHeight;
 			const verticalPadding = 30;
 
@@ -59,12 +62,18 @@ const AutoHeight = ({
 				heightDiffRef.current.shouldScroll = false;
 				return;
 			}
+
 			if (!isTopBelowStart) {
-				if (isBottomAboveEnd) {
-					const heightDiff = heightDiffRef.current.shouldScroll
-						? heightDiffRef.current.heightDiff
-						: 0;
+				const totalHeight = newHeight + verticalPadding;
+				if (totalHeight < window.innerHeight) {
 					const scrollTopPx = rect.top - verticalPadding + heightDiff;
+					window.scrollBy({
+						left: 0,
+						top: scrollTopPx,
+						behavior: "smooth",
+					});
+				} else if (totalHeight === window.innerHeight) {
+					const scrollTopPx = rect.top + heightDiff;
 					window.scrollBy({
 						left: 0,
 						top: scrollTopPx,
@@ -74,10 +83,8 @@ const AutoHeight = ({
 			} else {
 				if (!isBottomAboveEnd) {
 					const totalHeight = newHeight + verticalPadding;
+
 					if (totalHeight < window.innerHeight) {
-						const heightDiff = heightDiffRef.current.shouldScroll
-							? heightDiffRef.current.heightDiff
-							: 0;
 						const scrollTopPx =
 							newBottom -
 							window.innerHeight +

@@ -73,6 +73,7 @@
 .borderless-input {
 	@apply border-none px-0;
 }
+
 .custom-focus:focus-visible {
 	@apply outline-none outline-[0px];
 }

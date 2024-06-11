@@ -5,7 +5,10 @@ import FormItem from "../interfaces/FormItem";
 interface FormBuilderContextInterface {
 	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;
 	firstRenderRef: RefObject<boolean>;
-	focusedItemRef: MutableRefObject<{ id: string; blurItem: () => void }>;
+	focusedItemRef: MutableRefObject<{
+		id: string;
+		blurItem: (focusingItemId: string) => void;
+	}>;
 	formBuilderRef: RefObject<HTMLDivElement>;
 	formItems: FormItem[];
 	heightDiffRef: MutableRefObject<{
@@ -13,6 +16,7 @@ interface FormBuilderContextInterface {
 		shouldScroll: boolean;
 	}>;
 	isSavingRef: MutableRefObject<boolean>;
+	keyPrefixRef: MutableRefObject<string>;
 	setFormItems: (formItems: FormItem[]) => void;
 }
 
@@ -24,5 +28,6 @@ export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	formItems: [],
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },
 	isSavingRef: { current: false },
+	keyPrefixRef: { current: "" },
 	setFormItems: () => {},
 });
