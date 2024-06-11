@@ -19,6 +19,7 @@ import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProp
 import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
 import FormItem from "@/interfaces/FormItem";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 export type FBValidateError = { id: string; message: string };
 
@@ -188,6 +189,9 @@ export async function FBValidate(
 		}
 	}
 
+	localStorage.setItem("formItemsObject", JSON.stringify(formItems));
+	// after saving
+	redirect(`/form/${3}/edit`);
 	return { id: "", message: "" };
 }
 
