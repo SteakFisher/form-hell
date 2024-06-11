@@ -30,7 +30,11 @@ export default function DropdownComponent({ item, id } : { id: string; item: For
       </CardHeader>
       <CardContent>
         <Select onValueChange={(value) => {
-          formResponses[id] = { selected: value, type: "dropdown" }
+          props.items.map((item) => {
+            if (item.value === value) {
+              formResponses[id] = { selected: item.id, type: "dropdown" }
+            }
+          })
         }}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select Item" />
