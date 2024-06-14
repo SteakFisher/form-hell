@@ -35,8 +35,8 @@ jobs:
         run: |
           touch .env.local
           echo TURSO_DB_URL="file:local.db" >> .env.local
-          cat .env
-          
+          cat .env.local
+
       - uses: actions/cache@v4
         with:
           # See here for caching with `yarn` https://github.com/actions/cache/blob/main/examples.md#node---yarn or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
