@@ -4,7 +4,7 @@ import { FBValidateAction } from "@/actions/FBValidateAction";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { FBValidate } from "@/functions/FBValidation";
-import FormItem from "@/interfaces/FormItem";
+import FBFormObject from "@/interfaces/FormItemsObject";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -39,7 +39,12 @@ import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import ToolbarButton from "./ToolbarButton";
 
-const Toolbar = () => {
+type ToolbarProps = {
+	formId: string;
+	type: "new" | "edit";
+};
+
+const Toolbar = ({ formId, type }: ToolbarProps) => {
 	const savingTimeout = 750;
 	const toastDuration = 2000;
 	const {
@@ -51,9 +56,10 @@ const Toolbar = () => {
 		keyPrefixRef,
 		setFormItems,
 	} = useContext(FormBuilderContext);
+	const formObject = { formId: formId, formItems: formItems };
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const newFormItemsRef = useRef<FormItem[]>([]);
+	const newFormItemsRef = useRef<FBFormObject>({ formId: "", formItems: [] });
 	const importJsonRef = useRef("");
 
 	const [importOpen, setImportOpen] = useState(false);
@@ -277,7 +283,7 @@ const Toolbar = () => {
 	}
 
 	async function handleCopyClick() {
-		const errorObj = await FBValidate(formItems);
+		const errorObj = await FBValidate(formObject);
 		if (errorObj.message) {
 			if (errorObj.id === "0") {
 				toast.error(errorObj.message, {
@@ -311,7 +317,7 @@ const Toolbar = () => {
 	}
 
 	async function handleDownloadClick() {
-		const errorObj = await FBValidate(formItems);
+		const errorObj = await FBValidate(formObject);
 		if (errorObj.message) {
 			if (errorObj.id === "0") {
 				toast.error(errorObj.message, {
@@ -369,10 +375,14 @@ const Toolbar = () => {
 		fr.readAsText(selectedFile);
 	}
 
-	function handleSaveClick() {
+	async function handleSaveClick() {
 		setIsSavingDialogOpen(true);
 		const timeoutStart = Date.now();
 		isSavingRef.current = true;
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
+			ref.flush();
+		});
+
 		const errorElement = formBuilderRef.current?.querySelector(
 			'[data-error="true"]',
 		);
@@ -389,41 +399,37 @@ const Toolbar = () => {
 			return;
 		}
 
-		FBValidateAction(formItems).then((errorObj) => {
-			if (errorObj.message) {
-				if (errorObj.id === "0") {
-					setTimeout(
-						() => {
-							toast.error(errorObj.message, {
-								duration: 2500,
-							});
-							setIsSavingDialogOpen(false);
-						},
-						Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
-					);
-				}
-				const errorElement = formBuilderRef.current?.querySelector(
-					`#${CSS.escape(errorObj.id)}`,
+		const errorObj = await FBValidateAction(formObject, type);
+		if (errorObj.message) {
+			if (errorObj.id === "0") {
+				setTimeout(
+					() => {
+						toast.error(errorObj.message, {
+							duration: 2500,
+						});
+						setIsSavingDialogOpen(false);
+					},
+					Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
 				);
-				if (errorElement) {
-					setTimeout(
-						() => {
-							focusAndScrollToElement(
-								errorElement,
-								setIsSavingDialogOpen,
-							);
-							toast.error(errorObj.message, {
-								duration: 2500,
-							});
-						},
-						Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
-					);
-				}
-				return;
 			}
-			debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
-				ref.flush();
-			});
+			const errorElement = formBuilderRef.current?.querySelector(
+				`#${CSS.escape(errorObj.id)}`,
+			);
+			if (errorElement) {
+				setTimeout(
+					() => {
+						focusAndScrollToElement(errorElement, setIsSavingDialogOpen);
+						toast.error(errorObj.message, {
+							duration: 2500,
+						});
+					},
+					Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
+				);
+			}
+			return;
+		}
+
+		if (type === "edit") {
 			isSavingRef.current = false;
 			setTimeout(
 				() => {
@@ -434,27 +440,30 @@ const Toolbar = () => {
 				},
 				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
 			);
-		});
+		}
 	}
 
 	function insertForm() {
 		keyPrefixRef.current = uuid();
-		setFormItems([...newFormItemsRef.current]);
+		setFormItems([...newFormItemsRef.current.formItems]);
 		document.getElementById("0")?.focus();
 		setImportOpen(false);
 	}
 
 	async function validateAndInsertForm(jsonString: string) {
 		try {
-			const newFormItems: FormItem[] = JSON.parse(jsonString);
-			const errorObj = await FBValidate(newFormItems);
+			const newFormObject: FBFormObject = {
+				formId: formId,
+				formItems: JSON.parse(jsonString),
+			};
+			const errorObj = await FBValidate(newFormObject);
 			if (errorObj.message) {
 				toast.error("Invalid JSON", {
 					duration: toastDuration,
 				});
 				return;
 			}
-			newFormItemsRef.current = newFormItems;
+			newFormItemsRef.current = newFormObject;
 			setInsertDialogOpen(true);
 		} catch (error) {
 			toast.error("Invalid JSON", {
