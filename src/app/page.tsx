@@ -1,12 +1,19 @@
+
+import { signIn } from "@/helpers/auth";
 import Link from "next/link";
 
-export default async function Home() {
-	// const result = await db.select().from(fooTable).all();
-	// console.log(result);
-
+export default function SignIn() {
 	return (
-		<main className="flex min-h-screen flex-col items-start p-10">
-			<Link href="./form">Create New Form</Link>
-		</main>
+		<form
+			action={async () => {
+				"use server";
+				await signIn("google", {
+					redirect: true,
+					redirectTo: "/form",
+				});
+			}}
+		>
+			<button type="submit">Signin with Google</button>
+		</form>
 	);
 }
