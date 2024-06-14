@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { db } from "@/helpers/drizzleTurso";
-import { fooTable } from "@/../drizzle/schema";
 
 export default async function Home() {
 	// const result = await db.select().from(fooTable).all();
