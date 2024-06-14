@@ -17,14 +17,42 @@ import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/mult
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
-import FormItem from "@/interfaces/FormItem";
+import FBFormObject from "@/interfaces/FormItemsObject";
 import { z } from "zod";
 
 export type FBValidateError = { id: string; message: string };
 
 export async function FBValidate(
-	formItems: FormItem[],
+	formObject: FBFormObject,
 ): Promise<FBValidateError> {
+	const formObjectError = z
+		.object({
+			formId: z
+				.string({
+					invalid_type_error: "The 'formId' prop must be of type 'string'",
+					required_error: "The 'formId' prop is required",
+				})
+				.uuid({
+					message: "formId is not a valid uuid",
+				}),
+			formItems: z
+				.any({
+					invalid_type_error: "The 'formItems' prop must be an array",
+					required_error: "The 'formItems' prop is required",
+				})
+				.array(),
+		})
+		.strict()
+		.safeParse(formObject);
+
+	if (!formObjectError.success) {
+		return {
+			id: "0",
+			message: formObjectError.error.errors[0].message,
+		};
+	}
+
+	const formItems = formObject.formItems;
 	let titleParsed = false;
 	if (formItems.length < 2) {
 		return { id: "0", message: "Form must have atleast one element" };
@@ -38,7 +66,9 @@ export async function FBValidate(
 						invalid_type_error: `The 'id' prop must be of type 'string'`,
 						required_error: "The 'id' prop is required",
 					}),
-					props: z.any(),
+					props: z.any({
+						required_error: "The 'props' prop is required",
+					}),
 					mediaProps: z
 						.object({
 							mediaAltText: z
@@ -229,29 +259,37 @@ function validateDropdown(
 	const parseResult = z
 		.object({
 			items: z
-				.object({
-					id: z
-						.string({
-							invalid_type_error: "Invalid dropdown item ID",
-							required_error: "Invalid dropdown item ID",
-						})
-						.uuid({ message: "Invalid dropdown item ID" }),
-					parentId: z.literal(parentId, {
-						invalid_type_error: "Invalid dropdown item parent ID",
-					}),
-					value: z
-						.string({
-							invalid_type_error:
-								"Dropdown item value must be of type 'string'",
-							required_error: "Dropdown item value is required",
-						})
-						.trim()
-						.min(1, { message: "Dropdown item value must not be empty" })
-						.max(dropdownConstants.itemMaxLength, {
-							message: `Dropdown item value must not exceed ${dropdownConstants.itemMaxLength} characters`,
+				.object(
+					{
+						id: z
+							.string({
+								invalid_type_error: "Invalid dropdown item ID",
+								required_error: "Invalid dropdown item ID",
+							})
+							.uuid({ message: "Invalid dropdown item ID" }),
+						parentId: z.literal(parentId, {
+							invalid_type_error: "Invalid dropdown item parent ID",
 						}),
-				})
-				.strict({ message: "Invalid dropdown item" })
+						value: z
+							.string({
+								invalid_type_error:
+									"Dropdown item value must be of type 'string'",
+								required_error: "Dropdown item value is required",
+							})
+							.trim()
+							.min(1, {
+								message: "Dropdown item value must not be empty",
+							})
+							.max(dropdownConstants.itemMaxLength, {
+								message: `Dropdown item value must not exceed ${dropdownConstants.itemMaxLength} characters`,
+							}),
+					},
+					{
+						invalid_type_error: "Invalid 'items' prop",
+						required_error: "The 'items' prop is required",
+					},
+				)
+				.strict({ message: "Invalid 'items' prop" })
 				.array()
 				.min(1, { message: "Dropdown must have atleast one item" })
 				.max(10, { message: "Dropdown can only have upto 10 items" }),
@@ -346,31 +384,39 @@ function validateMultipleChoice(
 				required_error: "The 'hasOther' prop is required",
 			}),
 			items: z
-				.object({
-					id: z
-						.string({
-							invalid_type_error: "Invalid multiple choice item ID",
-							required_error: "Invalid multiple choice item ID",
-						})
-						.uuid({ message: "Invalid multiple choice item ID" }),
-					parentId: z.literal(parentId, {
-						invalid_type_error: "Invalid multiple choice item parent ID",
-					}),
-					value: z
-						.string({
+				.object(
+					{
+						id: z
+							.string({
+								invalid_type_error: "Invalid multiple choice item ID",
+								required_error: "Invalid multiple choice item ID",
+							})
+							.uuid({ message: "Invalid multiple choice item ID" }),
+						parentId: z.literal(parentId, {
 							invalid_type_error:
-								"Multiple choice item value must be of type 'string'",
-							required_error: "Multiple choice item value is required",
-						})
-						.trim()
-						.min(1, {
-							message: "Multiple choice item value must not be empty",
-						})
-						.max(multipleChoiceConstants.itemMaxLength, {
-							message: `Multiple choice item value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+								"Invalid multiple choice item parent ID",
 						}),
-				})
-				.strict({ message: "Invalid multiple choice item" })
+						value: z
+							.string({
+								invalid_type_error:
+									"Multiple choice item value must be of type 'string'",
+								required_error:
+									"Multiple choice item value is required",
+							})
+							.trim()
+							.min(1, {
+								message: "Multiple choice item value must not be empty",
+							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice item value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							}),
+					},
+					{
+						invalid_type_error: "Invalid 'items' prop",
+						required_error: "The 'items' prop is required",
+					},
+				)
+				.strict({ message: "Invalid 'items' prop" })
 				.array()
 				.min(1, { message: "Multiple choice must have atleast one item" })
 				.max(10, {
@@ -413,35 +459,44 @@ function validateMultipleChoiceGrid(
 				required_error: "The 'allowMultiple' prop is required",
 			}),
 			columns: z
-				.object({
-					id: z
-						.string({
+				.object(
+					{
+						id: z
+							.string({
+								invalid_type_error:
+									"Invalid multiple choice grid column ID",
+								required_error:
+									"Invalid multiple choice grid column ID",
+							})
+							.uuid({
+								message: "Invalid multiple choice grid column ID",
+							}),
+						parentId: z.literal(parentId, {
 							invalid_type_error:
-								"Invalid multiple choice grid column ID",
-							required_error: "Invalid multiple choice grid column ID",
-						})
-						.uuid({ message: "Invalid multiple choice grid column ID" }),
-					parentId: z.literal(parentId, {
-						invalid_type_error:
-							"Invalid multiple choice grid column parent ID",
-					}),
-					value: z
-						.string({
-							invalid_type_error:
-								"Multiple choice grid column value must be of type 'string'",
-							required_error:
-								"Multiple choice grid column value is required",
-						})
-						.trim()
-						.min(1, {
-							message:
-								"Multiple choice grid column value must not be empty",
-						})
-						.max(multipleChoiceConstants.itemMaxLength, {
-							message: `Multiple choice grid column value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+								"Invalid multiple choice grid column parent ID",
 						}),
-				})
-				.strict({ message: "Invalid multiple choice grid column" })
+						value: z
+							.string({
+								invalid_type_error:
+									"Multiple choice grid column value must be of type 'string'",
+								required_error:
+									"Multiple choice grid column value is required",
+							})
+							.trim()
+							.min(1, {
+								message:
+									"Multiple choice grid column value must not be empty",
+							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice grid column value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							}),
+					},
+					{
+						invalid_type_error: "Invalid 'columns' prop",
+						required_error: "The 'columns' prop is required",
+					},
+				)
+				.strict({ message: "Invalid 'columns' prop" })
 				.array()
 				.min(1, {
 					message: "Multiple choice grid must have atleast one column",
@@ -454,34 +509,41 @@ function validateMultipleChoiceGrid(
 				required_error: "The 'required' prop is required",
 			}),
 			rows: z
-				.object({
-					id: z
-						.string({
-							invalid_type_error: "Invalid multiple choice grid row ID",
-							required_error: "Invalid multiple choice grid row ID",
-						})
-						.uuid({ message: "Invalid multiple choice grid row ID" }),
-					parentId: z.literal(parentId, {
-						invalid_type_error:
-							"Invalid multiple choice grid row parent ID",
-					}),
-					value: z
-						.string({
+				.object(
+					{
+						id: z
+							.string({
+								invalid_type_error:
+									"Invalid multiple choice grid row ID",
+								required_error: "Invalid multiple choice grid row ID",
+							})
+							.uuid({ message: "Invalid multiple choice grid row ID" }),
+						parentId: z.literal(parentId, {
 							invalid_type_error:
-								"Multiple choice grid row value must be of type 'string'",
-							required_error:
-								"Multiple choice grid row value is required",
-						})
-						.trim()
-						.min(1, {
-							message:
-								"Multiple choice grid row value must not be empty",
-						})
-						.max(multipleChoiceConstants.itemMaxLength, {
-							message: `Multiple choice grid row value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+								"Invalid multiple choice grid row parent ID",
 						}),
-				})
-				.strict({ message: "Invalid multiple choice grid row" })
+						value: z
+							.string({
+								invalid_type_error:
+									"Multiple choice grid row value must be of type 'string'",
+								required_error:
+									"Multiple choice grid row value is required",
+							})
+							.trim()
+							.min(1, {
+								message:
+									"Multiple choice grid row value must not be empty",
+							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice grid row value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							}),
+					},
+					{
+						invalid_type_error: "Invalid 'rows' prop",
+						required_error: "The 'rows' prop is required",
+					},
+				)
+				.strict({ message: "Invalid 'rows' prop" })
 				.array()
 				.min(1, {
 					message: "Multiple choice grid must have atleast one row",

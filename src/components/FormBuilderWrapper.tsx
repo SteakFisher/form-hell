@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import FormItem from "@/interfaces/FormItem";
-import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
-import FormItemsObject from "@/interfaces/FormItemsObject";
+import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import FormItem from "@/interfaces/FormItem";
+import FBFormObject from "@/interfaces/FormItemsObject";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 
+type FormBuilderWrapperProps = {
+	formObject: FBFormObject;
+	type: "edit" | "new";
+};
 
-export default function FormBuilderWrapper({ formItemsObject } : { formItemsObject: FormItemsObject }) {
+export default function FormBuilderWrapper({
+	formObject,
+	type,
+}: FormBuilderWrapperProps) {
 	const debounceRefs = useMemo(() => new Map(), []);
 	const firstRenderRef = useRef(false);
 	const focusedItemRef = useRef({ id: "0", blurItem: () => {} });
@@ -18,7 +25,9 @@ export default function FormBuilderWrapper({ formItemsObject } : { formItemsObje
 	const isSavingRef = useRef(false);
 	const keyPrefixRef = useRef(uuid());
 
-	const [formItems, setFormItems] = useState<FormItem[]>(formItemsObject.formItems);
+	const [formItems, setFormItems] = useState<FormItem[]>(
+		formObject.formItems,
+	);
 
 	useEffect(() => {
 		firstRenderRef.current = false;
@@ -41,7 +50,7 @@ export default function FormBuilderWrapper({ formItemsObject } : { formItemsObje
 			<div className="flex w-full justify-center pb-56 pt-20">
 				<FormBuilder />
 			</div>
-			<Toolbar />
+			<Toolbar formId={formObject.formId} type={type} />
 		</FormBuilderContext.Provider>
 	);
 }
