@@ -1,17 +1,31 @@
+import type { AdapterAccountType } from "next-auth/adapters";
+import FormItem from "@/interfaces/FormItem";
 import {
+	index,
 	integer,
 	sqliteTable,
 	text,
+	uniqueIndex,
 	primaryKey,
 } from "drizzle-orm/sqlite-core";
-import type { AdapterAccountType } from "next-auth/adapters";
 
-export const forms = sqliteTable("forms", {
-	formId: text("formId").primaryKey(),
-	userId: text("userId").notNull(),
-	formJson: text("formJson").notNull(),
-	version: integer("version").notNull(),
-});
+export const formsTable = sqliteTable(
+	"forms",
+	{
+		formId: text("formId").primaryKey(),
+		userId: text("userId").notNull(),
+		formJson: text("formJson", { mode: "json" })
+			.notNull()
+			.$type<FormItem[]>(),
+		version: integer("version", { mode: "number" }).notNull(),
+	},
+	(table) => {
+		return {
+			formIdInd: uniqueIndex("formId_ind").on(table.formId),
+			userIdInd: index("userId_ind").on(table.userId),
+		};
+	},
+);
 
 export const users = sqliteTable("user", {
 	id: text("id")
