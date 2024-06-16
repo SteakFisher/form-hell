@@ -34,12 +34,14 @@ export default function SignIn() {
 							"flex flex-1 items-center justify-center p-4 align-middle"
 						}
 					>
-						<Image
-							width={225}
-							height={225}
-							src={"/signinwithgoogle.svg"}
-							alt={"Sign In With Google"}
-						/>
+						<button type={"submit"}>
+							<Image
+								width={225}
+								height={225}
+								src={"/signinwithgoogle.svg"}
+								alt={"Sign In With Google"}
+							/>
+						</button>
 					</div>
 				</Card>
 			</div>
