@@ -4,26 +4,16 @@ import * as admin from "firebase-admin";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const serviceAccount = JSON.parse(
-	process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
+	process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string,
 );
 
 export default function FirebaseServer() {
-	// Your web app's Firebase configuration
-	// const firebaseConfig = {
-	// 	apiKey: process.env.API_KEY,
-	// 	authDomain: process.env.AUTH_DOMAIN,
-	// 	projectId: process.env.PROJECT_ID,
-	// 	storageBucket: process.env.STORAGE_BUCKET,
-	// 	messagingSenderId: process.env.MESSAGING_SENDER_ID,
-	// 	appId: process.env.APP_ID
-	// };
-
 	if (admin.apps.length === 0) {
 		return admin.initializeApp({
 			credential: admin.credential.cert(serviceAccount),
 			databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 		});
 	} else {
-		return admin.apps[0]
+		return admin.apps[0];
 	}
 }
