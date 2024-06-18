@@ -77,3 +77,7 @@
 .custom-focus:focus-visible {
 	@apply outline-none outline-[0px];
 }
+
+.rdp-vhidden {
+	@apply hidden;
+}

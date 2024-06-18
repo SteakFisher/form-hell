@@ -2,7 +2,7 @@ import FormBuilderWrapper from "@/components/FormBuilderWrapper";
 import { db } from "@/helpers/drizzleTurso";
 import FBFormObject from "@/interfaces/FormItemsObject";
 import { and, eq } from "drizzle-orm";
-import { formsTable } from "../../../../../drizzle/schema";
+import { formsTable } from "@/../drizzle/schema";
 
 async function Page({ params }: { params: { formId: string } }) {
 	const res = await db
