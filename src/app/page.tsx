@@ -1,23 +1,26 @@
 import { signIn } from "@/helpers/auth";
-import Link from "next/link";
 import {
 	Card,
-	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 
-export default function SignIn() {
+export default function SignIn({
+	searchParams,
+}: {
+	searchParams?: { loginRedirect?: string };
+}) {
+	let loginRedirectURL = searchParams?.loginRedirect ?? "/form";
+
 	return (
 		<form
 			action={async () => {
 				"use server";
 				await signIn("google", {
 					redirect: true,
-					redirectTo: "/form",
+					redirectTo: loginRedirectURL,
 				});
 			}}
 		>
