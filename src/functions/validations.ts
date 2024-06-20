@@ -65,49 +65,24 @@ export function validateJSON(
 
 		switch (response.type) {
 			case "text-input":
-				validateTextInput(
-					item,
-					response as TextInputResponse,
-					errors,
-					finalResponse,
-				);
+				validateTextInput(item, response, errors, finalResponse);
 				break;
 			case "dropdown":
-				validateDropdownInput(
-					item,
-					response as DropdownResponse,
-					errors,
-					finalResponse,
-				);
+				validateDropdownInput(item, response, errors, finalResponse);
 				break;
 			case "date":
-				validateDateInput(
-					item,
-					response as DateResponse,
-					errors,
-					finalResponse,
-				);
+				validateDateInput(item, response, errors, finalResponse);
 				break;
 			case "range":
-				validateRangeInput(
-					item,
-					response as RangeResponse,
-					errors,
-					finalResponse,
-				);
+				validateRangeInput(item, response, errors, finalResponse);
 				break;
 			case "multiple-choice":
-				validateMultipleChoiceInput(
-					item,
-					response as MultipleChoiceResponse,
-					errors,
-					finalResponse,
-				);
+				validateMultipleChoiceInput(item, response, errors, finalResponse);
 				break;
 			case "multiple-choice-grid":
 				validateMultipleChoiceGridInput(
 					item,
-					response as MultipleChoiceGridResponse,
+					response,
 					errors,
 					finalResponse,
 				);

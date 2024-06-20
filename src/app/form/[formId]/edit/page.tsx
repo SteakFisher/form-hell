@@ -1,26 +1,10 @@
 import FormBuilderWrapper from "@/components/FormBuilderWrapper";
-import { db } from "@/helpers/drizzleTurso";
-import FBFormObject from "@/interfaces/FormItemsObject";
-import { and, eq } from "drizzle-orm";
-import { formsTable } from "@/../drizzle/schema";
+import getFormById from "@/functions/getFormById";
 
 async function Page({ params }: { params: { formId: string } }) {
-	const res = await db
-		.select()
-		.from(formsTable)
-		.where(
-			and(
-				eq(formsTable.formId, params.formId),
-				eq(formsTable.userId, "TestUserId"),
-			),
-		);
-	if (res.length === 0) {
-		return <div>Form not found</div>;
-	}
-	const formObject: FBFormObject = {
-		formId: res[0].formId,
-		formItems: res[0].formJson,
-	};
+	const formObject = await getFormById(params.formId);
+
+	if (!formObject) return <h1>Form doesn't exist</h1>;
 
 	return <FormBuilderWrapper formObject={formObject} type="edit" />;
 }
