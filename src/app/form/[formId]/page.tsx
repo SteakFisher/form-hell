@@ -6,7 +6,7 @@ import { FormResponses, Response } from "@/interfaces/FormResponses";
 import { auth } from "@/helpers/auth";
 import { redirect } from "next/navigation";
 
-const formResponses: FormResponses<Response> = {};
+const formResponses: FormResponses = {};
 
 function sleep(ms = 0) {
 	return new Promise((resolve) => setTimeout(resolve, ms));

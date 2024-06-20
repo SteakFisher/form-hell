@@ -21,7 +21,7 @@ export default function FormRenderer({
 	formResponses,
 }: {
 	formItemsObject: FBFormObject;
-	formResponses: FormResponses<Response>;
+	formResponses: FormResponses;
 }) {
 	let formItems = formItemsObject.formItems;
 
