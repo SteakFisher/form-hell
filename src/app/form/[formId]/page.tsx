@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import FormItem from "@/interfaces/FormItem";
 import FBFormObject from "@/interfaces/FormItemsObject";
 import { FormResponses, Response } from "@/interfaces/FormResponses";
+import { auth } from "@/helpers/auth";
+import { redirect } from "next/navigation";
 
 const formResponses: FormResponses<Response> = {};
 
@@ -11,6 +13,14 @@ function sleep(ms = 0) {
 }
 
 export default async function Form() {
+	let requiresSignIn: boolean = true;
+
+	if (requiresSignIn) {
+		const session = await auth();
+
+		if (!session?.user) redirect("/");
+	}
+
 	let formItems: FormItem[] = [
 		{
 			id: "0",
