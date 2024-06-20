@@ -115,7 +115,7 @@ export function SortableItem<T extends propsTypes>({
 			}}
 		>
 			<div
-				className="custom-focus z-50 bg-card"
+				className="custom-focus z-20 bg-card"
 				onFocus={handleOnFocus}
 				ref={setNodeRef}
 				style={style}
@@ -162,7 +162,7 @@ export function SortableItem<T extends propsTypes>({
 					<div
 						// bg is simulated by parent cus corners dont line up
 						// why is css
-						className="absolute inset-y-0 right-0 flex cursor-move items-center focus-visible:opacity-50 focus-visible:outline-none"
+						className="absolute inset-y-0 right-0 flex cursor-move touch-none items-center focus-visible:opacity-50 focus-visible:outline-none"
 						{...attributes}
 						{...listeners}
 						onMouseDown={(e) => {
