@@ -18,16 +18,19 @@ export async function serverValidate(
 ) {
 	let formItems = formItemsObject.formItems;
 
-	let { finalResponse, errors } = validateJSON(formItems, formResponses);
+	let formResponseObject: FormResponseObject = {
+		responseId: uuidv4(),
+		formResponse: formResponses,
+	};
+
+	let { finalResponse, errors } = validateJSON(
+		formItemsObject,
+		formResponseObject,
+	);
 	if (Object.keys(errors).length > 0) {
 		return errors;
 	} else {
 		try {
-			let formResponseObject: FormResponseObject = {
-				responseId: uuidv4(),
-				formResponse: formResponses,
-			};
-
 			// Save the data
 			const db = firestoreServer();
 			const formCollection = db.doc(`Responses/${formItemsObject.formId}`);

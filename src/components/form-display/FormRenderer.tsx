@@ -28,7 +28,10 @@ export default function FormRenderer({
 	return (
 		<form
 			action={async () => {
-				let { errors } = validateJSON(formItems, formResponses);
+				let { errors } = validateJSON(
+					{ formId: "dummyVal", formItems },
+					{ responseId: "dummyVal", formResponse: formResponses },
+				);
 				if (Object.keys(errors).length == 0) {
 					errors = await serverValidate(formItemsObject, formResponses);
 				}

@@ -7,14 +7,16 @@ import DateResponse from "@/interfaces/form-component-response-interfaces/DateRe
 import RangeResponse from "@/interfaces/form-component-response-interfaces/RangeResponse";
 import { MultipleChoiceResponse } from "@/interfaces/form-component-response-interfaces/MultipleChoiceResponse";
 import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
+import FormItemsObject from "@/interfaces/FormItemsObject";
+import FormResponseObject from "@/interfaces/FormResponseObject";
 
 type Errors = {
 	[id: string]: string;
 };
 
 export function validateJSON(
-	formItems: FormItem[],
-	formResponses: FormResponses,
+	{ formItems }: FormItemsObject,
+	{ formResponse: formResponses }: FormResponseObject,
 ) {
 	let errors: Errors = {};
 	let finalResponse = {} as FormResponses;
