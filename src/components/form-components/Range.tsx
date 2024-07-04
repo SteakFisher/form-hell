@@ -2,7 +2,7 @@ import { constants, rangeConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { FormItemMediaProps } from "formhell-js";
 import {
 	ChangeEvent,
 	createContext,

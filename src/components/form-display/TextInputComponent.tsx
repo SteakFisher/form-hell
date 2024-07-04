@@ -6,7 +6,7 @@ import {Input} from "@/components/ui/input";
 import {useContext, useState} from "react";
 import {z, ZodError} from "zod";
 import {FormRendererContext} from "@/contexts/FormRendererContext";
-import FormItem from "@/interfaces/FormItem";
+import { FormItem } from "formhell-js";
 import ChildMediaComponent from "@/components/form-display/ChildMediaComponent";
 import {AspectRatio} from "@/components/ui/aspect-ratio";
 

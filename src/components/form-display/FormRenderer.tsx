@@ -11,8 +11,8 @@ import TextInputComponent from "@/components/form-display/TextInputComponent";
 import TitleComponent from "@/components/form-display/TitleComponent";
 import { Button } from "@/components/ui/button";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
-import FBFormObject from "@/interfaces/FormItemsObject";
-import { FormResponses } from "@/interfaces/FormResponses";
+import { FormItemsObject } from "formhell-js";
+import { FormResponses } from "formhell-js";
 import { toast } from "sonner";
 import { validateFormResponse } from "formhell-js";
 
@@ -20,7 +20,7 @@ export default function FormRenderer({
 	formItemsObject,
 	formResponses,
 }: {
-	formItemsObject: FBFormObject;
+	formItemsObject: FormItemsObject;
 	formResponses: FormResponses;
 }) {
 	let formItems = formItemsObject.formItems;

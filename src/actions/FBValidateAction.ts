@@ -2,14 +2,14 @@
 
 import { FBValidate } from "@/functions/FBValidation";
 import { db, increment } from "@/helpers/drizzleTurso";
-import FBFormObject from "@/interfaces/FormItemsObject";
+import { FormItemsObject } from "formhell-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { v4 as uuid } from "uuid";
 import { formsTable } from "../../drizzle/schema";
 
 export async function FBValidateAction(
-	formObject: FBFormObject,
+	formObject: FormItemsObject,
 	type: "edit" | "new",
 ) {
 	const errorObj = await FBValidate(formObject);
@@ -27,7 +27,6 @@ export async function FBValidateAction(
 			.returning({ formId: formsTable.formId });
 		if (res.length === 0) return { message: "Form not found", id: "0" };
 		return errorObj;
-		
 	} else if (type === "new") {
 		// store if not present
 		while ((await checkFormId(formObject.formId)).length !== 0) {

@@ -1,6 +1,6 @@
 import { MutableRefObject, RefObject, createContext } from "react";
 import { DebouncedState } from "use-debounce";
-import FormItem from "../interfaces/FormItem";
+import { FormItem } from "formhell-js";
 
 interface FormBuilderContextInterface {
 	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;

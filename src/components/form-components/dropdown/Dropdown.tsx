@@ -3,7 +3,7 @@ import { CardContent } from "@/components/ui/card";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { DropdownProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,

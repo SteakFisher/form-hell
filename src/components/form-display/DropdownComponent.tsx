@@ -15,8 +15,8 @@ import {Label} from "@/components/ui/label";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {useContext, useState} from "react";
-import {FormRendererContext} from "@/contexts/FormRendererContext";
-import FormItem from "@/interfaces/FormItem";
+import { FormRendererContext } from "@/contexts/FormRendererContext";
+import { FormItem } from "formhell-js";
 
 export default function DropdownComponent({ item, id } : { id: string; item: FormItem}) {
   const { formResponses } = useContext(FormRendererContext)

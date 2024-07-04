@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/tooltip";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
-import RangeResponse from "@/interfaces/form-component-response-interfaces/RangeResponse";
+import { RangeResponse } from "formhell-js";
 import { cn } from "@/lib/utils";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as React from "react";
 import { useContext, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import FormItem from "@/interfaces/FormItem";
+import { FormItem } from "formhell-js";
 
 const Slider = React.forwardRef<
 	React.ElementRef<typeof SliderPrimitive.Root>,

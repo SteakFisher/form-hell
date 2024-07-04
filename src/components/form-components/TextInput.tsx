@@ -14,7 +14,7 @@ import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { validateRegex } from "@/functions/validateRegex";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { FormItemMediaProps } from "formhell-js";
 import { cn } from "@/lib/utils";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {

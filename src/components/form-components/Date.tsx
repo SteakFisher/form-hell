@@ -1,5 +1,5 @@
 import DateProps from "@/interfaces/form-component-interfaces/DateProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { FormItemMediaProps } from "formhell-js";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { memo } from "react";
 import { Button } from "../ui/button";

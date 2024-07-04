@@ -17,13 +17,13 @@ import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/mult
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
 import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
-import FBFormObject from "@/interfaces/FormItemsObject";
+import { FormItemsObject } from "formhell-js";
 import { z } from "zod";
 
 export type FBValidateError = { id: string; message: string };
 
 export async function FBValidate(
-	formObject: FBFormObject,
+	formObject: FormItemsObject,
 ): Promise<FBValidateError> {
 	const formObjectError = z
 		.object({

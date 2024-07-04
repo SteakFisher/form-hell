@@ -5,7 +5,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import Image from "next/image";
 import {YTIframe} from "@/components/form-components/Media";
 import getVideoId from "get-video-id";
-import FormItem from "@/interfaces/FormItem";
+import { FormItem } from "formhell-js";
 
 
 export default function MediaComponent({
