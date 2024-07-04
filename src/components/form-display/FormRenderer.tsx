@@ -11,10 +11,10 @@ import TextInputComponent from "@/components/form-display/TextInputComponent";
 import TitleComponent from "@/components/form-display/TitleComponent";
 import { Button } from "@/components/ui/button";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
-import { validateJSON } from "@/functions/validations";
 import FBFormObject from "@/interfaces/FormItemsObject";
-import { FormResponses, Response } from "@/interfaces/FormResponses";
+import { FormResponses } from "@/interfaces/FormResponses";
 import { toast } from "sonner";
+import { validateFormResponse } from "formhell-js";
 
 export default function FormRenderer({
 	formItemsObject,
@@ -28,7 +28,7 @@ export default function FormRenderer({
 	return (
 		<form
 			action={async () => {
-				let { errors } = validateJSON(
+				let { errors } = validateFormResponse(
 					{ formId: "dummyVal", formItems },
 					{ responseId: "dummyVal", formResponse: formResponses },
 				);
