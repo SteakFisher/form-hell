@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
+import { TitleProps } from "formhell-js";
 
 
 export default function TitleComponent({ props } : { props: TitleProps}) {

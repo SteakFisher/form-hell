@@ -8,7 +8,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
-import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
+import { RangeProps } from "formhell-js";
 import { RangeResponse } from "formhell-js";
 import { cn } from "@/lib/utils";
 import * as SliderPrimitive from "@radix-ui/react-slider";

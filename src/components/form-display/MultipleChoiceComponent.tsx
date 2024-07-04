@@ -1,6 +1,6 @@
 "use client";
 
-import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
+import { MultipleChoiceProps } from "formhell-js";
 import {
 	Card,
 	CardContent,

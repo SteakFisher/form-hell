@@ -1,6 +1,6 @@
 "use client";
 
-import DateProps from "@/interfaces/form-component-interfaces/DateProps";
+import { DateProps } from "formhell-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";

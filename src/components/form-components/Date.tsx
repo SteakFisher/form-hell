@@ -1,4 +1,4 @@
-import DateProps from "@/interfaces/form-component-interfaces/DateProps";
+import { DateProps } from "formhell-js";
 import { FormItemMediaProps } from "formhell-js";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { memo } from "react";
