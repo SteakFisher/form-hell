@@ -1,6 +1,6 @@
 "use client";
 
-import DateProps from "@/interfaces/form-component-interfaces/DateProps";
+import { DateProps } from "formhell-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,7 +15,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { useContext, useState } from "react";
 import { cn } from "@/lib/utils";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
-import FormItem from "@/interfaces/FormItem";
+import { FormItem } from "formhell-js";
 
 export default function DateComponent({
 	item,

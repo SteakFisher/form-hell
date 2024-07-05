@@ -1,6 +1,6 @@
 import FormRenderer from "@/components/form-display/FormRenderer";
 import { Card } from "@/components/ui/card";
-import { FormResponses } from "@/interfaces/FormResponses";
+import { FormResponses } from "formhell-js";
 import { auth } from "@/helpers/auth";
 import { redirect } from "next/navigation";
 import getFormById from "@/functions/getFormById";

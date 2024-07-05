@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, MCGridConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { MultipleChoiceGridItemProps } from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridItemProps";
+import { MultipleChoiceGridItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";

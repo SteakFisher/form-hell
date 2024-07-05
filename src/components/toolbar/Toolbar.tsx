@@ -4,7 +4,7 @@ import { FBValidateAction } from "@/actions/FBValidateAction";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { FBValidate } from "@/functions/FBValidation";
-import FBFormObject from "@/interfaces/FormItemsObject";
+import { FormItemsObject } from "formhell-js";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -59,7 +59,10 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	const formObject = { formId: formId, formItems: formItems };
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const newFormItemsRef = useRef<FBFormObject>({ formId: "", formItems: [] });
+	const newFormItemsRef = useRef<FormItemsObject>({
+		formId: "",
+		formItems: [],
+	});
 	const importJsonRef = useRef("");
 
 	const [importOpen, setImportOpen] = useState(false);
@@ -452,7 +455,7 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 
 	async function validateAndInsertForm(jsonString: string) {
 		try {
-			const newFormObject: FBFormObject = {
+			const newFormObject: FormItemsObject = {
 				formId: formId,
 				formItems: JSON.parse(jsonString),
 			};

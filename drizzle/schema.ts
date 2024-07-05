@@ -1,5 +1,5 @@
 import type { AdapterAccountType } from "next-auth/adapters";
-import FormItem from "@/interfaces/FormItem";
+import { FormItem } from "formhell-js";
 import {
 	index,
 	integer,

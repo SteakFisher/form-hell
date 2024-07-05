@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, dropdownConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { DropdownItemProps } from "@/interfaces/form-component-interfaces/dropdown/DropdownItemProps";
+import { DropdownItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";

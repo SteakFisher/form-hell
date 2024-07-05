@@ -1,6 +1,5 @@
 import { createContext } from "react";
-import { FormResponses } from "@/interfaces/FormResponses";
-import { Response } from "@/interfaces/FormResponses";
+import { FormResponses } from "formhell-js";
 
 interface FormRendererContextInterface {
 	formResponses: FormResponses;

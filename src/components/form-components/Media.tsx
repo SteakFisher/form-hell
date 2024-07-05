@@ -3,8 +3,8 @@ import { constants, mediaConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { validateImageUrl, validateVideoUrl } from "@/functions/mediaHelpers";
-import MediaProps from "@/interfaces/form-component-interfaces/MediaProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { MediaProps } from "formhell-js";
+import { FormItemMediaProps } from "formhell-js";
 import { ImageIcon, Link2Icon } from "@radix-ui/react-icons";
 import getVideoId from "get-video-id";
 import {
