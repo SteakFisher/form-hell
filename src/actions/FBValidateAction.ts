@@ -27,7 +27,6 @@ export async function FBValidateAction(
 			.returning({ formId: formsTable.formId });
 		if (res.length === 0) return { message: "Form not found", id: "0" };
 		return errorObj;
-		
 	} else if (type === "new") {
 		// store if not present
 		while ((await checkFormId(formObject.formId)).length !== 0) {

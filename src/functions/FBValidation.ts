@@ -16,7 +16,7 @@ import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/mult
 import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { RangeProps } from "@/interfaces/form-component-interfaces/RangeProps";
 import TextInputProps from "@/interfaces/form-component-interfaces/TextInputProps";
-import TitleProps from "@/interfaces/form-component-interfaces/TitleProps";
+import FormItem from "@/interfaces/FormItem";
 import FBFormObject from "@/interfaces/FormItemsObject";
 import { z } from "zod";
 
@@ -26,22 +26,61 @@ export async function FBValidate(
 	formObject: FBFormObject,
 ): Promise<FBValidateError> {
 	const formObjectError = z
-		.object({
-			formId: z
-				.string({
-					invalid_type_error: "The 'formId' prop must be of type 'string'",
-					required_error: "The 'formId' prop is required",
-				})
-				.uuid({
-					message: "formId is not a valid uuid",
-				}),
-			formItems: z
-				.any({
-					invalid_type_error: "The 'formItems' prop must be an array",
-					required_error: "The 'formItems' prop is required",
-				})
-				.array(),
-		})
+		.object(
+			{
+				formId: z
+					.string({
+						invalid_type_error:
+							"The 'formId' prop must be of type 'string'",
+						required_error: "The 'formId' prop is required",
+					})
+					.uuid({
+						message: "formId is not a valid uuid",
+					}),
+				formItems: z
+					.any({
+						invalid_type_error: "The 'formItems' prop must be an array",
+						required_error: "The 'formItems' prop is required",
+					})
+					.array(),
+				formTitleObj: z
+					.object(
+						{
+							description: z
+								.string({
+									invalid_type_error:
+										"The 'description' prop must be of type 'string'",
+									required_error: "The 'description' prop is required",
+								})
+								.max(
+									titleConstants.formDescMaxLength,
+									`Form description must not exceed ${titleConstants.formDescMaxLength} characters`,
+								),
+							title: z
+								.string({
+									invalid_type_error:
+										"The 'title' prop must be of type 'string'",
+									required_error: "The 'title' prop is required",
+								})
+								.max(
+									titleConstants.formTitleMaxLength,
+									`Form title must not exceed ${titleConstants.formTitleMaxLength} characters`,
+								)
+								.trim()
+								.min(1, "Form title is required"),
+						},
+						{
+							invalid_type_error: "Invalid form title object",
+							required_error: "Form title object is required",
+						},
+					)
+					.strict(),
+			},
+			{
+				invalid_type_error: "Invalid form object",
+				required_error: "Form object is required",
+			},
+		)
 		.strict()
 		.safeParse(formObject);
 
@@ -53,79 +92,17 @@ export async function FBValidate(
 	}
 
 	const formItems = formObject.formItems;
-	let titleParsed = false;
-	if (formItems.length < 2) {
+	return ValidateFormItems(formItems);
+}
+
+export async function ValidateFormItems(
+	formItems: FormItem[],
+): Promise<FBValidateError> {
+	if (formItems.length === 0) {
 		return { id: "0", message: "Form must have atleast one element" };
 	}
 	for (const formItem of formItems) {
-		if (!titleParsed) {
-			titleParsed = true;
-			const formItemError = await z
-				.object({
-					id: z.literal("0", {
-						invalid_type_error: `The 'id' prop must be of type 'string'`,
-						required_error: "The 'id' prop is required",
-					}),
-					props: z.any({
-						required_error: "The 'props' prop is required",
-					}),
-					mediaProps: z
-						.object({
-							mediaAltText: z
-								.string({
-									invalid_type_error: `The 'mediaAltText' prop must be of type 'string'`,
-									required_error:
-										"The 'mediaAltText' prop is required",
-								})
-								.max(mediaConstants.altTextMaxLength, {
-									message: `Alt text must not exceed ${mediaConstants.altTextMaxLength} characters`,
-								}),
-							mediaType: z.union(
-								[z.literal("image"), z.literal("video")],
-								{
-									invalid_type_error: `The 'mediaType' prop must be of type 'image' | 'video'`,
-									required_error: "The 'mediaType' prop is required",
-								},
-							),
-							mediaUrl: z
-								.string({
-									invalid_type_error: `The 'mediaUrl' prop must be of type 'string'`,
-									required_error: "The 'mediaUrl' prop is required",
-								})
-								.refine(
-									async (url) => {
-										if (url === "") return true;
-										await validateUrl(
-											url,
-											formItem.mediaProps.mediaType,
-										);
-									},
-									{
-										message: "Invalid url",
-									},
-								),
-						})
-						.strict(),
-				})
-				.strict()
-				.safeParseAsync(formItem);
-
-			if (!formItemError.success) {
-				return {
-					id: formItem.id,
-					message: formItemError.error.errors[0].message,
-				};
-			}
-			if (formItem.props.type !== "title")
-				return { id: formItem.id, message: "Invalid title" };
-
-			const propsError = validateTitle(formItem.props).error;
-			if (propsError) {
-				return { id: formItem.id, message: propsError };
-			} else continue;
-		}
-
-		const formItemError = z
+		const formItemError = await z
 			.object({
 				id: z
 					.string({
@@ -135,7 +112,9 @@ export async function FBValidate(
 					.uuid({
 						message: "id is not a valid uuid",
 					}),
-				props: z.any(),
+				props: z.any({
+					required_error: "The 'props' prop is required",
+				}),
 				mediaProps: z
 					.object({
 						mediaAltText: z
@@ -146,19 +125,32 @@ export async function FBValidate(
 							.max(mediaConstants.altTextMaxLength, {
 								message: `Alt text must not exceed ${mediaConstants.altTextMaxLength} characters`,
 							}),
-						mediaUrl: z.string({
-							invalid_type_error: `The 'mediaUrl' prop must be of type 'string'`,
-							required_error: "The 'mediaUrl' prop is required",
-						}),
 						mediaType: z.union([z.literal("image"), z.literal("video")], {
 							invalid_type_error: `The 'mediaType' prop must be of type 'image' | 'video'`,
 							required_error: "The 'mediaType' prop is required",
 						}),
+						mediaUrl: z
+							.string({
+								invalid_type_error: `The 'mediaUrl' prop must be of type 'string'`,
+								required_error: "The 'mediaUrl' prop is required",
+							})
+							.refine(
+								async (url) => {
+									if (url === "") return true;
+									await validateUrl(
+										url,
+										formItem.mediaProps.mediaType,
+									);
+								},
+								{
+									message: "Invalid url",
+								},
+							),
 					})
 					.strict(),
 			})
 			.strict()
-			.safeParse(formItem);
+			.safeParseAsync(formItem);
 
 		if (!formItemError.success) {
 			return {
@@ -202,10 +194,6 @@ export async function FBValidate(
 			}
 			case "text-input": {
 				propsError = validateTextInput(formItem.props).error;
-				break;
-			}
-			case "title": {
-				propsError = validateTitle(formItem.props).error;
 				break;
 			}
 
@@ -276,12 +264,12 @@ function validateDropdown(
 									"Dropdown item value must be of type 'string'",
 								required_error: "Dropdown item value is required",
 							})
+							.max(dropdownConstants.itemMaxLength, {
+								message: `Dropdown item value must not exceed ${dropdownConstants.itemMaxLength} characters`,
+							})
 							.trim()
 							.min(1, {
 								message: "Dropdown item value must not be empty",
-							})
-							.max(dropdownConstants.itemMaxLength, {
-								message: `Dropdown item value must not exceed ${dropdownConstants.itemMaxLength} characters`,
 							}),
 					},
 					{
@@ -403,12 +391,12 @@ function validateMultipleChoice(
 								required_error:
 									"Multiple choice item value is required",
 							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice item value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							})
 							.trim()
 							.min(1, {
 								message: "Multiple choice item value must not be empty",
-							})
-							.max(multipleChoiceConstants.itemMaxLength, {
-								message: `Multiple choice item value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
 							}),
 					},
 					{
@@ -482,13 +470,13 @@ function validateMultipleChoiceGrid(
 								required_error:
 									"Multiple choice grid column value is required",
 							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice grid column value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							})
 							.trim()
 							.min(1, {
 								message:
 									"Multiple choice grid column value must not be empty",
-							})
-							.max(multipleChoiceConstants.itemMaxLength, {
-								message: `Multiple choice grid column value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
 							}),
 					},
 					{
@@ -529,13 +517,13 @@ function validateMultipleChoiceGrid(
 								required_error:
 									"Multiple choice grid row value is required",
 							})
+							.max(multipleChoiceConstants.itemMaxLength, {
+								message: `Multiple choice grid row value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
+							})
 							.trim()
 							.min(1, {
 								message:
 									"Multiple choice grid row value must not be empty",
-							})
-							.max(multipleChoiceConstants.itemMaxLength, {
-								message: `Multiple choice grid row value must not exceed ${multipleChoiceConstants.itemMaxLength} characters`,
 							}),
 					},
 					{
@@ -714,39 +702,6 @@ function validateTextInput(props: TextInputProps): validateResult {
 			type: z.literal("text-input", {
 				invalid_type_error: "Invalid text input object",
 				required_error: "Invalid text input object",
-			}),
-		})
-		.strict()
-		.safeParse(props);
-
-	if (!parseResult.success) {
-		return { error: parseResult.error.errors[0].message };
-	}
-	return { error: "" };
-}
-
-function validateTitle(props: TitleProps): validateResult {
-	const parseResult = z
-		.object({
-			description: z.string({
-				invalid_type_error: `The 'description' prop must be of type 'boolean'`,
-				required_error: "The 'description' prop is required",
-			}),
-			required: z.boolean({
-				invalid_type_error: `The 'required' prop must be of type 'boolean'`,
-				required_error: "The 'required' prop is required",
-			}),
-			title: z
-				.string({
-					invalid_type_error: `The 'title' prop must be of type 'string'`,
-					required_error: "The 'title' prop is required",
-				})
-				.max(titleConstants.formTitleMaxLength, {
-					message: `Form title must not exceed ${titleConstants.formTitleMaxLength}`,
-				}),
-			type: z.literal("title", {
-				invalid_type_error: "Invalid title object",
-				required_error: "Invalid title object",
 			}),
 		})
 		.strict()

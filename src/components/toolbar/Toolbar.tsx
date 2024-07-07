@@ -3,7 +3,12 @@
 import { FBValidateAction } from "@/actions/FBValidateAction";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { FBValidate } from "@/functions/FBValidation";
+import {
+	FBValidate,
+	FBValidateError,
+	ValidateFormItems,
+} from "@/functions/FBValidation";
+import FormItem from "@/interfaces/FormItem";
 import FBFormObject from "@/interfaces/FormItemsObject";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
@@ -27,6 +32,7 @@ import {
 	AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -36,6 +42,7 @@ import {
 	DialogTrigger,
 } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import ToolbarButton from "./ToolbarButton";
 
@@ -52,15 +59,27 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 		focusedItemRef,
 		formBuilderRef,
 		formItems,
+		formTitleObjRef,
 		isSavingRef,
 		keyPrefixRef,
 		setFormItems,
+		setFormTitle,
 	} = useContext(FormBuilderContext);
-	const formObject = { formId: formId, formItems: formItems };
+	const formObject: FBFormObject = {
+		formId: formId,
+		formItems: formItems,
+		formTitleObj: formTitleObjRef.current,
+	};
 
+	const exportTitleRef = useRef(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const newFormItemsRef = useRef<FBFormObject>({ formId: "", formItems: [] });
+	const newFormObjectRef = useRef<FBFormObject>({
+		formId: "",
+		formItems: [],
+		formTitleObj: { title: "", description: "" },
+	});
 	const importJsonRef = useRef("");
+	const importTitleRef = useRef(false);
 
 	const [importOpen, setImportOpen] = useState(false);
 	const [insertDialogOpen, setInsertDialogOpen] = useState(false);
@@ -68,9 +87,23 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	const [isSavingDialogOpen, setIsSavingDialogOpen] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+	const handleExportTitleChange = useDebouncedCallback(
+		(isChecked: boolean) => {
+			exportTitleRef.current = isChecked;
+		},
+		constants.debounceWait,
+	);
+
 	const handleImportJsonChange = useDebouncedCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			importJsonRef.current = e.target.value;
+		},
+		constants.debounceWait,
+	);
+
+	const handleImportTitleChange = useDebouncedCallback(
+		(isChecked: boolean) => {
+			importTitleRef.current = isChecked;
 		},
 		constants.debounceWait,
 	);
@@ -98,7 +131,16 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 				<PopoverContent align="start" className="w-auto" side="left">
 					<div className="flex flex-col items-center">
 						<h4 className="font-medium leading-none">Import from JSON</h4>
-						<div className="mt-5 flex items-center">
+						<div className="mt-6 flex w-full">
+							<Label className="pr-1" htmlFor="insert-title">
+								Include title and description
+							</Label>
+							<Checkbox
+								id="insert-title"
+								onCheckedChange={handleImportTitleChange}
+							/>
+						</div>
+						<div className="mt-2 flex items-center">
 							<Input
 								onChange={handleImportJsonChange}
 								placeholder="Paste JSON here..."
@@ -203,8 +245,17 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 				<PopoverContent align="start" className="w-auto" side="left">
 					<div className="flex flex-col items-center">
 						<h4 className="font-medium leading-none">Export as JSON</h4>
+						<div className="mt-6 flex w-full">
+							<Label className="pr-1" htmlFor="export-title">
+								Include title and description
+							</Label>
+							<Checkbox
+								id="export-title"
+								onCheckedChange={handleExportTitleChange}
+							/>
+						</div>
 						<Button
-							className="mt-5 flex items-center justify-center"
+							className="mt-2 flex items-center justify-center"
 							onClick={handleCopyClick}
 							variant="secondary"
 						>
@@ -278,12 +329,16 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	);
 
 	function handleClearClick() {
-		setFormItems(constants.defaultFormItems);
+		setFormItems([]);
 		toast.success("Form cleared");
 	}
 
 	async function handleCopyClick() {
-		const errorObj = await FBValidate(formObject);
+		handleExportTitleChange.flush();
+		const exportTitle = exportTitleRef.current;
+		const errorObj = exportTitle
+			? await FBValidate(formObject)
+			: await ValidateFormItems(formItems);
 		if (errorObj.message) {
 			if (errorObj.id === "0") {
 				toast.error(errorObj.message, {
@@ -303,7 +358,7 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 		}
 		setExportOpen(false);
 		navigator.clipboard
-			.writeText(JSON.stringify(formItems))
+			.writeText(JSON.stringify(exportTitle ? formObject : formItems))
 			.catch(() => {
 				toast.error("Error copying JSON", {
 					duration: toastDuration,
@@ -317,7 +372,12 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	}
 
 	async function handleDownloadClick() {
-		const errorObj = await FBValidate(formObject);
+		handleExportTitleChange.flush();
+		const exportTitle = exportTitleRef.current;
+
+		const errorObj = exportTitle
+			? await FBValidate(formObject)
+			: await ValidateFormItems(formItems);
 		if (errorObj.message) {
 			if (errorObj.id === "0") {
 				toast.error(errorObj.message, {
@@ -336,7 +396,7 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 			return;
 		}
 		setExportOpen(false);
-		DownloadJSON(JSON.stringify(formItems));
+		DownloadJSON(JSON.stringify(exportTitle ? formObject : formItems));
 	}
 
 	function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -445,25 +505,44 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 
 	function insertForm() {
 		keyPrefixRef.current = uuid();
-		setFormItems([...newFormItemsRef.current.formItems]);
+		if (newFormObjectRef.current.formId) {
+			formTitleObjRef.current = newFormObjectRef.current.formTitleObj;
+			setFormTitle(newFormObjectRef.current.formTitleObj.title);
+		}
+		setFormItems([...newFormObjectRef.current.formItems]);
 		document.getElementById("0")?.focus();
 		setImportOpen(false);
 	}
 
 	async function validateAndInsertForm(jsonString: string) {
+		handleImportTitleChange.flush();
+		const importTitle = importTitleRef.current;
 		try {
-			const newFormObject: FBFormObject = {
-				formId: formId,
-				formItems: JSON.parse(jsonString),
-			};
-			const errorObj = await FBValidate(newFormObject);
+			const newFormObjectOrItems = JSON.parse(jsonString);
+			let errorObj: FBValidateError;
+			errorObj = await FBValidate(newFormObjectOrItems);
 			if (errorObj.message) {
-				toast.error("Invalid JSON", {
-					duration: toastDuration,
-				});
+				errorObj = await ValidateFormItems(newFormObjectOrItems);
+				if (errorObj.message) {
+					toast.error("Invalid JSON", {
+						duration: toastDuration,
+					});
+					return;
+				}
+				const newFormItems: FormItem[] = newFormObjectOrItems;
+				newFormObjectRef.current = {
+					formId: "",
+					formItems: newFormItems,
+					formTitleObj: { title: "", description: "" },
+				};
+				setInsertDialogOpen(true);
 				return;
 			}
-			newFormItemsRef.current = newFormObject;
+
+			const newFormObject: FBFormObject = newFormObjectOrItems;
+			newFormObjectRef.current = importTitle
+				? newFormObject
+				: { ...newFormObject, formId: "" };
 			setInsertDialogOpen(true);
 		} catch (error) {
 			toast.error("Invalid JSON", {

@@ -44,9 +44,7 @@ const FormBuilder = () => {
 
 	return (
 		<Card className="w-[900px] [overflow-anchor:none]">
-			{formItems[0].props.type === "title" && (
-				<Title key={formItems[0].id} props={formItems[0].props} />
-			)}
+			<Title />
 			<CardContent className="pb-0" ref={formBuilderRef}>
 				<DndContext
 					id={"sortable-items-dndcontext"}

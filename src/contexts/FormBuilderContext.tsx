@@ -1,3 +1,5 @@
+import { titleConstants } from "@/constants";
+import FormTitleProps from "@/interfaces/FormTitleProps";
 import { MutableRefObject, RefObject, createContext } from "react";
 import { DebouncedState } from "use-debounce";
 import FormItem from "../interfaces/FormItem";
@@ -11,6 +13,8 @@ interface FormBuilderContextInterface {
 	}>;
 	formBuilderRef: RefObject<HTMLDivElement>;
 	formItems: FormItem[];
+	formTitle: string;
+	formTitleObjRef: MutableRefObject<FormTitleProps>;
 	heightDiffRef: MutableRefObject<{
 		heightDiff: number;
 		shouldScroll: boolean;
@@ -18,6 +22,7 @@ interface FormBuilderContextInterface {
 	isSavingRef: MutableRefObject<boolean>;
 	keyPrefixRef: MutableRefObject<string>;
 	setFormItems: (formItems: FormItem[]) => void;
+	setFormTitle: (formTitle: string) => void;
 }
 
 export const FormBuilderContext = createContext<FormBuilderContextInterface>({
@@ -26,8 +31,11 @@ export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	focusedItemRef: { current: { id: "", blurItem: () => {} } },
 	formBuilderRef: { current: null },
 	formItems: [],
+	formTitle: "",
+	formTitleObjRef: { current: titleConstants.defaultProps },
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },
 	isSavingRef: { current: false },
 	keyPrefixRef: { current: "" },
 	setFormItems: () => {},
+	setFormTitle: () => {},
 });

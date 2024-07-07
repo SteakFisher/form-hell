@@ -5,7 +5,6 @@ import MultipleChoiceGridProps from "./form-component-interfaces/multiple-choice
 import { MultipleChoiceProps } from "./form-component-interfaces/multiple-choice/MultipleChoiceProps";
 import { RangeProps } from "./form-component-interfaces/RangeProps";
 import TextInputProps from "./form-component-interfaces/TextInputProps";
-import TitleProps from "./form-component-interfaces/TitleProps";
 
 export type propsTypes =
 	| DateProps
@@ -14,5 +13,4 @@ export type propsTypes =
 	| MultipleChoiceProps
 	| MultipleChoiceGridProps
 	| RangeProps
-	| TextInputProps
-	| TitleProps;
+	| TextInputProps;

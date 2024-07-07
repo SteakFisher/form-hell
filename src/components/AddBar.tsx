@@ -6,7 +6,6 @@ import {
 	multipleChoiceConstants,
 	rangeConstants,
 	textInputConstants,
-	titleConstants,
 } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import FormItem from "@/interfaces/FormItem";
@@ -188,12 +187,16 @@ function AddBar({
 		};
 
 		const newFormItems: FormItem[] = [];
-		formItems.forEach((formItem) => {
-			newFormItems.push(formItem);
-			if (formItem.id === id) {
-				newFormItems.push(newItem);
-			}
-		});
+		if (id === "0") {
+			newFormItems.push(newItem, ...formItems);
+		} else {
+			formItems.forEach((formItem) => {
+				newFormItems.push(formItem);
+				if (formItem.id === id) {
+					newFormItems.push(newItem);
+				}
+			});
+		}
 
 		setIsOpen(false);
 		setFormItems(newFormItems);
@@ -245,8 +248,6 @@ function AddBar({
 				return rangeConstants.defaultProps;
 			case "text-input":
 				return textInputConstants.defaultProps;
-			case "title":
-				return titleConstants.defaultProps;
 		}
 	}
 }
