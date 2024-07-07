@@ -33,7 +33,7 @@ export default function FormRenderer({
 					{ responseId: "dummyVal", formResponse: formResponses },
 				);
 				if (Object.keys(errors).length == 0) {
-					errors = await serverValidate(formItemsObject, formResponses);
+					errors = await serverValidate(formItemsObject.formId, formResponses);
 				}
 				if (Object.keys(errors).length > 0) {
 					Object.keys(errors).map((key) => {

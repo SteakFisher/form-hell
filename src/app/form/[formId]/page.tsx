@@ -18,6 +18,10 @@ export default async function Form({
 }: {
 	params: { formId: string };
 }) {
+	const formItemsObject = await getFormById(formId);
+
+	if (!formItemsObject) return <h1>{"Form doesn't exist"}</h1>;
+
 	let requiresSignIn: boolean = true;
 
 	if (requiresSignIn) {
@@ -30,10 +34,6 @@ export default async function Form({
 					}).toString(),
 			);
 	}
-
-	const formItemsObject = await getFormById(formId);
-
-	if (!formItemsObject) return <h1>{"Form doesn't exist"}</h1>;
 
 	return (
 		<div className={"mb-4 mt-10 flex flex-grow justify-center"}>

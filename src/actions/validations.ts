@@ -7,15 +7,23 @@ import { v4 as uuidv4 } from "uuid";
 import { FormItemsObject } from "formhell-js";
 import { MultipleChoiceGridResponse } from "formhell-js";
 import { validateFormResponse } from "formhell-js";
+import getFormById from "@/functions/getFormById";
 
 type SelectedJSONGridResponse = {
 	[key: string]: Array<string>;
 };
 
 export async function serverValidate(
-	formItemsObject: FormItemsObject,
+	formId: string,
 	formResponses: FormResponses,
 ) {
+	const formItemsObject = await getFormById(formId);
+
+	if (!formItemsObject)
+		return {
+			error: "Form ID provided was invalid",
+		};
+
 	let formItems = formItemsObject.formItems;
 
 	let formResponseObject: FormResponseObject = {
@@ -27,6 +35,7 @@ export async function serverValidate(
 		formItemsObject,
 		formResponseObject,
 	);
+
 	if (Object.keys(errors).length > 0) {
 		return errors;
 	} else {
