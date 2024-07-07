@@ -2,14 +2,14 @@
 
 import { FBValidate } from "@/functions/FBValidation";
 import { db, increment } from "@/helpers/drizzleTurso";
-import { FormItemsObject } from "formhell-js";
+import { FBFormObject } from "formhell-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { v4 as uuid } from "uuid";
 import { formsTable } from "../../drizzle/schema";
 
 export async function FBValidateAction(
-	formObject: FormItemsObject,
+	formObject: FBFormObject,
 	type: "edit" | "new",
 ) {
 	const errorObj = await FBValidate(formObject);

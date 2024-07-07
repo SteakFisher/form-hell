@@ -1,19 +1,18 @@
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { TitleProps } from "formhell-js";
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { FormTitleProps } from "formhell-js";
 
-
-export default function TitleComponent({ props } : { props: TitleProps}) {
-  return (
-    <CardHeader className={"flex justify-center items-center"}>
-      <CardTitle>{props.title}</CardTitle>
-      <CardDescription>{props.description}</CardDescription>
-    </CardHeader>
-  )
+export default function TitleComponent({ props }: { props: FormTitleProps }) {
+	return (
+		<CardHeader className={"flex items-center justify-center"}>
+			<CardTitle>{props.title}</CardTitle>
+			<CardDescription>{props.description}</CardDescription>
+		</CardHeader>
+	);
 }

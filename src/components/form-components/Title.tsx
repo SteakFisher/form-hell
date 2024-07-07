@@ -2,27 +2,34 @@ import { CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, titleConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { TitleProps } from "formhell-js";
+import { FormTitleProps } from "formhell-js";
 import autosize from "autosize";
 import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-const Title = ({ props }: { props: TitleProps }) => {
-	const { debounceRefs, focusedItemRef } = useContext(FormBuilderContext);
+const Title = () => {
+	const {
+		debounceRefs,
+		focusedItemRef,
+		formTitle,
+		formTitleObjRef,
+		setFormTitle,
+	} = useContext(FormBuilderContext);
+	const formTitleObj = formTitleObjRef.current;
 
 	const descriptionRef = useRef(null);
 	const formTitleRef = useRef(null);
 
 	const handleTitleChange = useDebouncedCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-			props.title = e.target.value;
+			setFormTitle(e.target.value);
 		},
 		constants.debounceWait,
 	);
 
 	const handleDescriptionChange = useDebouncedCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-			props.description = e.target.value;
+			formTitleObj.description = e.target.value;
 		},
 		constants.debounceWait,
 	);
@@ -54,7 +61,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 			<Textarea
 				ref={formTitleRef}
 				placeholder="Form Title"
-				defaultValue={props.title}
+				defaultValue={formTitle}
 				maxLength={titleConstants.formTitleMaxLength}
 				className="borderless-input mb-3 h-[50px] resize-none text-2xl"
 				onChange={handleTitleChange}
@@ -62,7 +69,7 @@ const Title = ({ props }: { props: TitleProps }) => {
 			<Textarea
 				ref={descriptionRef}
 				placeholder="Description"
-				defaultValue={props.description}
+				defaultValue={formTitleObj.description}
 				maxLength={titleConstants.formDescMaxLength}
 				className="h-[42px] resize-none text-base"
 				onChange={handleDescriptionChange}
