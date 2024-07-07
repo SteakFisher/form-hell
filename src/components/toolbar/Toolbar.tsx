@@ -8,7 +8,7 @@ import {
 	FBValidateError,
 	ValidateFormItems,
 } from "@/functions/FBValidation";
-import FormItem from "@/interfaces/FormItem";
+import {FormItem} from "formhell-js";
 import FBFormObject from "@/interfaces/FormItemsObject";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";

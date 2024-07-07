@@ -1,10 +1,12 @@
-import DateProps from "./interfaces/form-component-interfaces/DateProps";
-import { DropdownProps } from "./interfaces/form-component-interfaces/dropdown/DropdownProps";
-import MediaProps from "./interfaces/form-component-interfaces/MediaProps";
-import MultipleChoiceGridProps from "./interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
-import { MultipleChoiceProps } from "./interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
-import { RangeProps } from "./interfaces/form-component-interfaces/RangeProps";
-import TextInputProps from "./interfaces/form-component-interfaces/TextInputProps";
+import { DateProps } from "formhell-js";
+import { DropdownProps } from "formhell-js";
+import { MediaProps } from "formhell-js";
+import { MultipleChoiceGridProps } from "formhell-js";
+import { MultipleChoiceProps } from "formhell-js";
+import { RangeProps } from "formhell-js";
+import { TextInputProps } from "formhell-js";
+import { TitleProps } from "formhell-js";
+import { FormItem } from "formhell-js";
 import FormTitleProps from "./interfaces/FormTitleProps";
 
 const DatePropsObj: DateProps = {

@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import { MultipleChoiceProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { MultipleChoiceProps } from "formhell-js";
+import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,

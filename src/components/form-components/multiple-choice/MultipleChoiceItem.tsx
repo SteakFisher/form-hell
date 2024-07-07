@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { MultipleChoiceItemProps } from "@/interfaces/form-component-interfaces/multiple-choice/MultipleChoiceItemProps";
+import { MultipleChoiceItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {

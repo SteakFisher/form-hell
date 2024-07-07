@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { MCGridConstants, constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import MultipleChoiceGridProps from "@/interfaces/form-component-interfaces/multiple-choice-grid/MultipleChoiceGridProps";
-import { FormItemMediaProps } from "@/interfaces/FormItemMediaProps";
+import { MultipleChoiceGridProps } from "formhell-js";
+import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,

@@ -8,9 +8,9 @@ import {
 	textInputConstants,
 } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import FormItem from "@/interfaces/FormItem";
-import { FormItemTypes } from "@/interfaces/FormItemTypes";
-import { propsTypes } from "@/interfaces/propsTypes";
+import { FormItem } from "formhell-js";
+import { FormItemTypes } from "formhell-js";
+import { propsTypes } from "formhell-js";
 import {
 	CalendarIcon,
 	CheckCircledIcon,

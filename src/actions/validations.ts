@@ -1,21 +1,29 @@
 "use server";
 
-import { FormResponses, Response } from "@/interfaces/FormResponses";
-import { validateJSON } from "@/functions/validations";
+import { FormResponses } from "formhell-js";
 import firestoreServer from "@/helpers/firestoreServer";
-import FormResponseObject from "@/interfaces/FormResponseObject";
+import { FormResponseObject } from "formhell-js";
 import { v4 as uuidv4 } from "uuid";
-import FormItemsObject from "@/interfaces/FormItemsObject";
-import MultipleChoiceGridResponse from "@/interfaces/form-component-response-interfaces/MultipleChoiceGridResponse";
+import { FormItemsObject } from "formhell-js";
+import { MultipleChoiceGridResponse } from "formhell-js";
+import { validateFormResponse } from "formhell-js";
+import getFormById from "@/functions/getFormById";
 
 type SelectedJSONGridResponse = {
 	[key: string]: Array<string>;
 };
 
 export async function serverValidate(
-	formItemsObject: FormItemsObject,
+	formId: string,
 	formResponses: FormResponses,
 ) {
+	const formItemsObject = await getFormById(formId);
+
+	if (!formItemsObject)
+		return {
+			error: "Form ID provided was invalid",
+		};
+
 	let formItems = formItemsObject.formItems;
 
 	let formResponseObject: FormResponseObject = {
@@ -23,10 +31,11 @@ export async function serverValidate(
 		formResponse: formResponses,
 	};
 
-	let { finalResponse, errors } = validateJSON(
+	let { finalResponse, errors } = validateFormResponse(
 		formItemsObject,
 		formResponseObject,
 	);
+
 	if (Object.keys(errors).length > 0) {
 		return errors;
 	} else {
