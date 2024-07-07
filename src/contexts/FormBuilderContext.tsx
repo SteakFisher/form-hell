@@ -1,5 +1,5 @@
 import { titleConstants } from "@/constants";
-import FormTitleProps from "@/interfaces/FormTitleProps";
+import { FormTitleProps } from "formhell-js";
 import { MutableRefObject, RefObject, createContext } from "react";
 import { DebouncedState } from "use-debounce";
 import { FormItem } from "formhell-js";

@@ -4,7 +4,6 @@ import { FormResponses } from "formhell-js";
 import firestoreServer from "@/helpers/firestoreServer";
 import { FormResponseObject } from "formhell-js";
 import { v4 as uuidv4 } from "uuid";
-import { FormItemsObject } from "formhell-js";
 import { MultipleChoiceGridResponse } from "formhell-js";
 import { validateFormResponse } from "formhell-js";
 import getFormById from "@/functions/getFormById";

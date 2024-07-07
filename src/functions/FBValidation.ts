@@ -16,15 +16,15 @@ import { MultipleChoiceGridProps } from "formhell-js";
 import { MultipleChoiceProps } from "formhell-js";
 import { RangeProps } from "formhell-js";
 import { TextInputProps } from "formhell-js";
-import { TitleProps } from "formhell-js";
-import { FormItemsObject } from "formhell-js";
-import {FormItem} from "formhell-js";
+import { FormTitleProps } from "formhell-js";
+import { FBFormObject } from "formhell-js";
+import { FormItem } from "formhell-js";
 import { z } from "zod";
 
 export type FBValidateError = { id: string; message: string };
 
 export async function FBValidate(
-	formObject: FormItemsObject,
+	formObject: FBFormObject,
 ): Promise<FBValidateError> {
 	const formObjectError = z
 		.object(

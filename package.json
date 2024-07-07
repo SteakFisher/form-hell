@@ -55,7 +55,7 @@
 		"embla-carousel-react": "^8.0.0-rc22",
 		"firebase": "^10.12.2",
 		"firebase-admin": "^12.1.1",
-		"formhell-js": "^0.0.1",
+		"formhell-js": "^0.0.2",
 		"get-video-id": "^4.1.5",
 		"lucide-react": "^0.364.0",
 		"moment": "^2.30.1",

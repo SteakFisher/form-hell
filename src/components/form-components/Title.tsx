@@ -2,7 +2,7 @@ import { CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, titleConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { TitleProps } from "formhell-js";
+import { FormTitleProps } from "formhell-js";
 import autosize from "autosize";
 import React, { useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";

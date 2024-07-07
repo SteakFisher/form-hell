@@ -4,13 +4,13 @@ import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { FormItem } from "formhell-js";
-import { FormItemsObject } from "formhell-js";
+import { FBFormObject } from "formhell-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import FBMenuBar from "./FBMenuBar";
 
 type FormBuilderWrapperProps = {
-	formObject: FormItemsObject;
+	formObject: FBFormObject;
 	type: "edit" | "new";
 };
 

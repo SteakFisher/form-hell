@@ -8,8 +8,8 @@ import {
 	FBValidateError,
 	ValidateFormItems,
 } from "@/functions/FBValidation";
-import {FormItem} from "formhell-js";
-import FBFormObject from "@/interfaces/FormItemsObject";
+import { FormItem } from "formhell-js";
+import { FBFormObject } from "formhell-js";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

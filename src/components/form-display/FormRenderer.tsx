@@ -11,7 +11,7 @@ import TextInputComponent from "@/components/form-display/TextInputComponent";
 import TitleComponent from "@/components/form-display/TitleComponent";
 import { Button } from "@/components/ui/button";
 import { FormRendererContext } from "@/contexts/FormRendererContext";
-import { FormItemsObject } from "formhell-js";
+import { FBFormObject } from "formhell-js";
 import { FormResponses } from "formhell-js";
 import { toast } from "sonner";
 import { validateFormResponse } from "formhell-js";
@@ -20,7 +20,7 @@ export default function FormRenderer({
 	formItemsObject,
 	formResponses,
 }: {
-	formItemsObject: FormItemsObject;
+	formItemsObject: FBFormObject;
 	formResponses: FormResponses;
 }) {
 	let formItems = formItemsObject.formItems;
@@ -29,11 +29,21 @@ export default function FormRenderer({
 		<form
 			action={async () => {
 				let { errors } = validateFormResponse(
-					{ formId: "dummyVal", formItems },
+					{
+						formId: "placeholder",
+						formItems,
+						formTitleObj: {
+							description: "placeholder",
+							title: "placeholder",
+						},
+					},
 					{ responseId: "dummyVal", formResponse: formResponses },
 				);
 				if (Object.keys(errors).length == 0) {
-					errors = await serverValidate(formItemsObject.formId, formResponses);
+					errors = await serverValidate(
+						formItemsObject.formId,
+						formResponses,
+					);
 				}
 				if (Object.keys(errors).length > 0) {
 					Object.keys(errors).map((key) => {
@@ -59,10 +69,9 @@ export default function FormRenderer({
 					formResponses: formResponses,
 				}}
 			>
+				<TitleComponent props={formItemsObject.formTitleObj} />
 				{formItems.map((item) => {
 					switch (item.props.type) {
-						case "title":
-							return <TitleComponent key={item.id} props={item.props} />;
 						case "text-input":
 							return (
 								<TextInputComponent
