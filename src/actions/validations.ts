@@ -1,15 +1,22 @@
 "use server";
 
-import { FormResponses } from "formhell-js";
+import {
+	FormResponseObject,
+	FormResponses,
+	MultipleChoiceGridResponse,
+	validateFormResponse,
+} from "formhell-js";
 import firestoreServer from "@/helpers/firestoreServer";
-import { FormResponseObject } from "formhell-js";
 import { v4 as uuidv4 } from "uuid";
-import { MultipleChoiceGridResponse } from "formhell-js";
-import { validateFormResponse } from "formhell-js";
 import getFormById from "@/functions/getFormById";
+import { z } from "zod";
 
 type SelectedJSONGridResponse = {
 	[key: string]: Array<string>;
+};
+
+type Errors = {
+	[id: string]: string;
 };
 
 export async function serverValidate(
@@ -38,6 +45,43 @@ export async function serverValidate(
 	if (Object.keys(errors).length > 0) {
 		return errors;
 	} else {
+		let webhookURL = "http://localhost:5000/validate";
+
+		if (webhookURL) {
+			try {
+				let sendWebhookReq = () => {
+					return new Promise<Errors | undefined>((resolve, reject) => {
+						setTimeout(async () => {
+							let webhookResponse = await fetch(webhookURL, {
+								method: "POST",
+								headers: {
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify(finalResponse),
+							});
+
+							if (webhookResponse.status == 420) {
+								let errorSchema = z.record(z.string(), z.string());
+								let webhookError = await webhookResponse.json();
+
+								try {
+									let finalError: Errors =
+										errorSchema.parse(webhookError);
+									resolve(finalError);
+								} catch (e) {}
+							}
+						}, 2000);
+					});
+				};
+
+				let error = await sendWebhookReq();
+
+				if (error && Object.keys(error).length > 0) {
+					return error;
+				}
+			} catch (e) {}
+		}
+
 		try {
 			// Save the data
 			const db = firestoreServer();
@@ -78,13 +122,8 @@ export async function serverValidate(
 
 			let result = await writeBatch.commit();
 
-			console.log(result);
-
 			if (result.length < writeCount)
 				return { error: "An error occurred while saving the data" };
-
-			// let document = await db.doc(`Responses/FormID/ComponentID/ResponseID`).get()
-			// console.log(document.data())
 
 			return {};
 		} catch (e) {
