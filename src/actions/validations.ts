@@ -10,6 +10,7 @@ import firestoreServer from "@/helpers/firestoreServer";
 import { v4 as uuidv4 } from "uuid";
 import getFormById from "@/functions/getFormById";
 import { z } from "zod";
+import { webhookValidation } from "@/functions/validations/webhookValidation";
 
 type SelectedJSONGridResponse = {
 	[key: string]: Array<string>;
@@ -49,35 +50,7 @@ export async function serverValidate(
 
 		if (webhookURL) {
 			try {
-				let sendWebhookReq = () => {
-					return new Promise<Errors | undefined>((resolve, reject) => {
-						setTimeout(async () => {
-							let webhookResponse = await fetch(webhookURL, {
-								method: "POST",
-								headers: {
-									"Content-Type": "application/json",
-								},
-								body: JSON.stringify(finalResponse),
-							});
-
-							if (webhookResponse.status == 420) {
-								let errorSchema = z.record(z.string(), z.string());
-								let webhookError = await webhookResponse.json();
-
-								try {
-									let finalError: Errors =
-										errorSchema.parse(webhookError);
-									resolve(finalError);
-								} catch (e) {
-									resolve({});
-								}
-							} else resolve({});
-						}, 2000);
-						resolve({});
-					});
-				};
-
-				let error = await sendWebhookReq();
+				let error = await webhookValidation(webhookURL, finalResponse);
 
 				if (error && Object.keys(error).length > 0) {
 					return error;

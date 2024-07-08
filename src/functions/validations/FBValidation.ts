@@ -8,7 +8,7 @@ import {
 	titleConstants,
 } from "@/constants";
 import { validateImageUrl, validateVideoUrl } from "@/functions/mediaHelpers";
-import { validateRegex } from "@/functions/validateRegex";
+import { validateRegex } from "@/functions/validations/validateRegex";
 import {
 	DateProps,
 	DropdownProps,

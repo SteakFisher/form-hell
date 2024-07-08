@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { constants, textInputConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import { validateRegex } from "@/functions/validateRegex";
+import { validateRegex } from "@/functions/validations/validateRegex";
 import { TextInputProps } from "formhell-js";
 import { FormItemMediaProps } from "formhell-js";
 import { cn } from "@/lib/utils";

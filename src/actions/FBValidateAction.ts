@@ -1,6 +1,6 @@
 "use server";
 
-import { FBValidate } from "@/functions/FBValidation";
+import { FBValidate } from "@/functions/validations/FBValidation";
 import { db, increment } from "@/helpers/drizzleTurso";
 import { eq } from "drizzle-orm";
 import { FBFormObject } from "formhell-js";
