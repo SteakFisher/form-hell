@@ -3,8 +3,7 @@
 import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { FormItem } from "formhell-js";
-import { FBFormObject } from "formhell-js";
+import { FBFormObject, FormItem } from "formhell-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import FBMenuBar from "./FBMenuBar";
@@ -22,17 +21,15 @@ export default function FormBuilderWrapper({
 	const firstRenderRef = useRef(false);
 	const focusedItemRef = useRef({ id: "0", blurItem: () => {} });
 	const formBuilderRef = useRef<HTMLDivElement>(null);
-	const formTitleObjRef = useRef(formObject.formTitleObj);
 	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const isSavingRef = useRef(false);
 	const keyPrefixRef = useRef(uuid());
 
+	const [formDesc, setFormDesc] = useState(
+		formObject.formTitleObj.description,
+	);
 	const [formItems, setFormItems] = useState<FormItem[]>(formObject.formItems);
 	const [formTitle, setFormTitle] = useState(formObject.formTitleObj.title);
-
-	useEffect(() => {
-		formTitleObjRef.current.title = formTitle;
-	}, [formTitle]);
 
 	useEffect(() => {
 		firstRenderRef.current = false;
@@ -46,12 +43,13 @@ export default function FormBuilderWrapper({
 					firstRenderRef,
 					focusedItemRef,
 					formBuilderRef,
+					formDesc,
 					formItems,
 					formTitle,
-					formTitleObjRef,
 					heightDiffRef,
 					isSavingRef,
 					keyPrefixRef,
+					setFormDesc,
 					setFormItems,
 					setFormTitle,
 				}}

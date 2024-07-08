@@ -1,8 +1,6 @@
-import { titleConstants } from "@/constants";
-import { FormTitleProps } from "formhell-js";
+import { FormItem } from "formhell-js";
 import { MutableRefObject, RefObject, createContext } from "react";
 import { DebouncedState } from "use-debounce";
-import { FormItem } from "formhell-js";
 
 interface FormBuilderContextInterface {
 	debounceRefs: Map<string, Map<string, DebouncedState<() => void>>>;
@@ -12,15 +10,16 @@ interface FormBuilderContextInterface {
 		blurItem: (focusingItemId: string) => void;
 	}>;
 	formBuilderRef: RefObject<HTMLDivElement>;
+	formDesc: string;
 	formItems: FormItem[];
 	formTitle: string;
-	formTitleObjRef: MutableRefObject<FormTitleProps>;
 	heightDiffRef: MutableRefObject<{
 		heightDiff: number;
 		shouldScroll: boolean;
 	}>;
 	isSavingRef: MutableRefObject<boolean>;
 	keyPrefixRef: MutableRefObject<string>;
+	setFormDesc: (formDesc: string) => void;
 	setFormItems: (formItems: FormItem[]) => void;
 	setFormTitle: (formTitle: string) => void;
 }
@@ -30,12 +29,13 @@ export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	firstRenderRef: { current: true },
 	focusedItemRef: { current: { id: "", blurItem: () => {} } },
 	formBuilderRef: { current: null },
+	formDesc: "",
 	formItems: [],
 	formTitle: "",
-	formTitleObjRef: { current: titleConstants.defaultProps },
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },
 	isSavingRef: { current: false },
 	keyPrefixRef: { current: "" },
+	setFormDesc: () => {},
 	setFormItems: () => {},
 	setFormTitle: () => {},
 });
