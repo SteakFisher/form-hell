@@ -1,9 +1,9 @@
 import FormRenderer from "@/components/form-display/FormRenderer";
 import { Card } from "@/components/ui/card";
-import { FormResponses } from "formhell-js";
-import { auth } from "@/helpers/auth";
-import { redirect } from "next/navigation";
 import getFormById from "@/functions/getFormById";
+import { auth } from "@/helpers/auth";
+import { FormResponses } from "formhell-js";
+import { redirect } from "next/navigation";
 
 const formResponses: FormResponses = {};
 
@@ -37,7 +37,7 @@ export default async function Form({
 
 	return (
 		<div className={"mb-4 mt-10 flex flex-grow justify-center"}>
-			<Card className={"flex w-4/6 flex-col justify-center "}>
+			<Card className={"flex h-min w-4/6 flex-col"}>
 				<FormRenderer
 					formItemsObject={formItemsObject}
 					formResponses={formResponses}

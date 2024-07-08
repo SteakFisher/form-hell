@@ -8,9 +8,6 @@ import {
 	textInputConstants,
 } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { FormItem } from "formhell-js";
-import { FormItemTypes } from "formhell-js";
-import { propsTypes } from "formhell-js";
 import {
 	CalendarIcon,
 	CheckCircledIcon,
@@ -19,6 +16,7 @@ import {
 	SliderIcon,
 	TextIcon,
 } from "@radix-ui/react-icons";
+import { FormItem, FormItemTypes, propsTypes } from "formhell-js";
 import {
 	MutableRefObject,
 	useContext,
@@ -215,7 +213,6 @@ function AddBar({
 					...dropdownConstants.defaultProps,
 					items: new Array({
 						id: uuidv4(),
-						parentId: parentId,
 						value: "",
 					}),
 				};
@@ -226,7 +223,6 @@ function AddBar({
 					...multipleChoiceConstants.defaultProps,
 					items: new Array({
 						id: uuidv4(),
-						parentId: parentId,
 						value: "",
 					}),
 				};
@@ -235,12 +231,10 @@ function AddBar({
 					...MCGridConstants.defaultProps,
 					columns: new Array({
 						id: uuidv4(),
-						parentId: parentId,
 						value: "",
 					}),
 					rows: new Array({
 						id: uuidv4(),
-						parentId: parentId,
 						value: "",
 					}),
 				};

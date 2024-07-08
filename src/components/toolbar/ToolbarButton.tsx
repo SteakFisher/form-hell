@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { ReactNode, useRef, useState } from "react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -20,10 +20,27 @@ const ToolbarButton = ({
 	desc,
 	onBtnClick,
 }: ToolbarButtonProps) => {
+	const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	const [tooltipOpen, setTooltipOpen] = useState(false);
+
 	return (
 		<TooltipProvider>
-			<Tooltip delayDuration={200}>
-				<TooltipTrigger asChild>
+			<Tooltip delayDuration={200} open={tooltipOpen}>
+				<TooltipTrigger
+					onMouseEnter={() => {
+						openTimeoutRef.current = setTimeout(() => {
+							setTooltipOpen(true);
+						}, 500);
+					}}
+					onMouseLeave={() => {
+						if (!openTimeoutRef.current) return;
+						clearTimeout(openTimeoutRef.current);
+						setTooltipOpen(false);
+					}}
+					onPointerDown={(e) => e.preventDefault()}
+					asChild
+				>
 					<div
 						className={cn("flex size-12 border border-accent", className)}
 						style={{ cursor: "pointer" }}
@@ -33,7 +50,10 @@ const ToolbarButton = ({
 						{children}
 					</div>
 				</TooltipTrigger>
-				<TooltipContent side="bottom">
+				<TooltipContent
+					onPointerDownOutside={(e) => e.preventDefault()}
+					side="bottom"
+				>
 					<p>{desc}</p>
 				</TooltipContent>
 			</Tooltip>

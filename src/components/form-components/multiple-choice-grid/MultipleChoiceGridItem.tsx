@@ -2,11 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, MCGridConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { MultipleChoiceGridItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
+import { MultipleChoiceGridItemProps } from "formhell-js";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { MCGridContext } from "./MultipleChoiceGrid";
@@ -14,12 +14,14 @@ import { MCGridContext } from "./MultipleChoiceGrid";
 const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
 	hideDelete,
 	onDelete,
+	parentId,
 	placeholder,
 	props,
 	type,
 }: {
 	hideDelete: boolean;
 	onDelete: (idToDelete: string) => void;
+	parentId: string;
 	placeholder: string;
 	props: MultipleChoiceGridItemProps;
 	type: "row" | "column";
@@ -53,7 +55,7 @@ const MultipleChoiceGridItem = memo(function MultipleChoiceGridItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		const refs = debounceRefs.get(props.parentId);
+		const refs = debounceRefs.get(parentId);
 		if (!refs) return;
 		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);

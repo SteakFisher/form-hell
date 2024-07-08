@@ -8,9 +8,9 @@ import {
 	FBValidateError,
 	ValidateFormItems,
 } from "@/functions/FBValidation";
-import { FormItem } from "formhell-js";
-import { FBFormObject } from "formhell-js";
+import { FBFormObject, FormItem } from "formhell-js";
 import { DownloadIcon, FileIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
@@ -58,18 +58,21 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 		debounceRefs,
 		focusedItemRef,
 		formBuilderRef,
+		formDesc,
 		formItems,
-		formTitleObjRef,
+		formTitle,
 		isSavingRef,
-		keyPrefixRef,
+		setFormDesc,
 		setFormItems,
 		setFormTitle,
 	} = useContext(FormBuilderContext);
 	const formObject: FBFormObject = {
 		formId: formId,
 		formItems: formItems,
-		formTitleObj: formTitleObjRef.current,
+		formTitleObj: { title: formTitle, description: formDesc },
 	};
+
+	const router = useRouter();
 
 	const exportTitleRef = useRef(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -116,7 +119,7 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	}, [importOpen]);
 
 	return (
-		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform space-y-2 rounded border-2 bg-black p-2 shadow-md">
+		<div className="fixed right-3 top-1/2 -translate-y-1/2 transform space-y-2 rounded border-2 bg-black p-2 shadow-sm shadow-black">
 			<Popover open={importOpen} onOpenChange={setImportOpen}>
 				<PopoverTrigger className="flex">
 					<ToolbarButton
@@ -336,6 +339,9 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	async function handleCopyClick() {
 		handleExportTitleChange.flush();
 		const exportTitle = exportTitleRef.current;
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
+			ref.flush();
+		});
 		const errorObj = exportTitle
 			? await FBValidate(formObject)
 			: await ValidateFormItems(formItems);
@@ -374,6 +380,9 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	async function handleDownloadClick() {
 		handleExportTitleChange.flush();
 		const exportTitle = exportTitleRef.current;
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
+			ref.flush();
+		});
 
 		const errorObj = exportTitle
 			? await FBValidate(formObject)
@@ -489,28 +498,31 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 			return;
 		}
 
-		if (type === "edit") {
-			isSavingRef.current = false;
-			setTimeout(
-				() => {
-					setIsSavingDialogOpen(false);
-					toast.success("Form saved successfully!", {
-						duration: toastDuration,
-					});
-				},
-				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
-			);
+		if (type === "new") {
+			router.push(`/form/${formId}/edit`);
+			return;
 		}
+		isSavingRef.current = false;
+		setTimeout(
+			() => {
+				setIsSavingDialogOpen(false);
+				toast.success("Form saved successfully!", {
+					duration: toastDuration,
+				});
+			},
+			Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
+		);
 	}
 
 	function insertForm() {
-		keyPrefixRef.current = uuid();
 		if (newFormObjectRef.current.formId) {
-			formTitleObjRef.current = newFormObjectRef.current.formTitleObj;
+			setFormDesc(newFormObjectRef.current.formTitleObj.description);
 			setFormTitle(newFormObjectRef.current.formTitleObj.title);
 		}
-		setFormItems([...newFormObjectRef.current.formItems]);
-		document.getElementById("0")?.focus();
+		for (const formItem of newFormObjectRef.current.formItems) {
+			formItem.id = uuid();
+		}
+		setFormItems([...formItems, ...newFormObjectRef.current.formItems]);
 		setImportOpen(false);
 	}
 

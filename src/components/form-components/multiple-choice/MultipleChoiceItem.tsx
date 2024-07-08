@@ -3,7 +3,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { MultipleChoiceItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -12,6 +11,7 @@ import {
 	DragHandleDots2Icon,
 } from "@radix-ui/react-icons";
 import autosize from "autosize";
+import { MultipleChoiceItemProps } from "formhell-js";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { MultipleChoiceContext } from "./MultipleChoice";
@@ -19,12 +19,14 @@ import { MultipleChoiceContext } from "./MultipleChoice";
 const MultipleChoiceItem = memo(function MultipleChoiceItem({
 	hideDelete,
 	index,
+	parentId,
 	props,
 	isRadio,
 	onDelete,
 }: {
 	hideDelete: boolean;
 	index: number;
+	parentId: string;
 	props: MultipleChoiceItemProps;
 	isRadio: boolean;
 	onDelete: (idToDelete: string) => void;
@@ -54,7 +56,7 @@ const MultipleChoiceItem = memo(function MultipleChoiceItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		const refs = debounceRefs.get(props.parentId);
+		const refs = debounceRefs.get(parentId);
 		if (!refs) return;
 		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);
