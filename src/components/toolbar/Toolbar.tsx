@@ -61,7 +61,6 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 		formItems,
 		formTitle,
 		isSavingRef,
-		keyPrefixRef,
 		setFormDesc,
 		setFormItems,
 		setFormTitle,
@@ -337,6 +336,9 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	async function handleCopyClick() {
 		handleExportTitleChange.flush();
 		const exportTitle = exportTitleRef.current;
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
+			ref.flush();
+		});
 		const errorObj = exportTitle
 			? await FBValidate(formObject)
 			: await ValidateFormItems(formItems);
@@ -375,6 +377,9 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	async function handleDownloadClick() {
 		handleExportTitleChange.flush();
 		const exportTitle = exportTitleRef.current;
+		debounceRefs.get(focusedItemRef.current.id)?.forEach((ref) => {
+			ref.flush();
+		});
 
 		const errorObj = exportTitle
 			? await FBValidate(formObject)
@@ -505,7 +510,6 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 	}
 
 	function insertForm() {
-		keyPrefixRef.current = uuid();
 		if (newFormObjectRef.current.formId) {
 			setFormDesc(newFormObjectRef.current.formTitleObj.description);
 			setFormTitle(newFormObjectRef.current.formTitleObj.title);

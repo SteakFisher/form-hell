@@ -18,7 +18,6 @@ interface FormBuilderContextInterface {
 		shouldScroll: boolean;
 	}>;
 	isSavingRef: MutableRefObject<boolean>;
-	keyPrefixRef: MutableRefObject<string>;
 	setFormDesc: (formDesc: string) => void;
 	setFormItems: (formItems: FormItem[]) => void;
 	setFormTitle: (formTitle: string) => void;
@@ -34,7 +33,6 @@ export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	formTitle: "",
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },
 	isSavingRef: { current: false },
-	keyPrefixRef: { current: "" },
 	setFormDesc: () => {},
 	setFormItems: () => {},
 	setFormTitle: () => {},

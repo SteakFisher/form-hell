@@ -33,7 +33,7 @@ import Range from "./form-components/Range";
 import MultipleChoiceGrid from "./form-components/multiple-choice-grid/MultipleChoiceGrid";
 
 const FormBuilder = () => {
-	const { formBuilderRef, formItems, keyPrefixRef, setFormItems } =
+	const { formBuilderRef, formItems, setFormItems } =
 		useContext(FormBuilderContext);
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -64,7 +64,7 @@ const FormBuilder = () => {
 									return (
 										<Date
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -73,7 +73,7 @@ const FormBuilder = () => {
 									return (
 										<Dropdown
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -82,7 +82,7 @@ const FormBuilder = () => {
 									return (
 										<Media
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -91,7 +91,7 @@ const FormBuilder = () => {
 									return (
 										<MultipleChoice
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -100,7 +100,7 @@ const FormBuilder = () => {
 									return (
 										<MultipleChoiceGrid
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -109,7 +109,7 @@ const FormBuilder = () => {
 									return (
 										<Range
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>
@@ -118,7 +118,7 @@ const FormBuilder = () => {
 									return (
 										<TextInput
 											id={formItem.id}
-											key={`${keyPrefixRef.current}${formItem.id}`}
+											key={formItem.id}
 											mediaProps={formItem.mediaProps}
 											props={formItem.props}
 										/>

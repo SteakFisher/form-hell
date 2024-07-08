@@ -5,7 +5,6 @@ import Toolbar from "@/components/toolbar/Toolbar";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { FBFormObject, FormItem } from "formhell-js";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { v4 as uuid } from "uuid";
 import FBMenuBar from "./FBMenuBar";
 
 type FormBuilderWrapperProps = {
@@ -23,7 +22,6 @@ export default function FormBuilderWrapper({
 	const formBuilderRef = useRef<HTMLDivElement>(null);
 	const heightDiffRef = useRef({ heightDiff: 0, shouldScroll: false });
 	const isSavingRef = useRef(false);
-	const keyPrefixRef = useRef(uuid());
 
 	const [formDesc, setFormDesc] = useState(
 		formObject.formTitleObj.description,
@@ -48,7 +46,6 @@ export default function FormBuilderWrapper({
 					formTitle,
 					heightDiffRef,
 					isSavingRef,
-					keyPrefixRef,
 					setFormDesc,
 					setFormItems,
 					setFormTitle,
