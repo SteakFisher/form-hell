@@ -10,6 +10,7 @@ import {
 } from "@/functions/FBValidation";
 import { FBFormObject, FormItem } from "formhell-js";
 import { DownloadIcon, FileIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
@@ -70,6 +71,8 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 		formItems: formItems,
 		formTitleObj: { title: formTitle, description: formDesc },
 	};
+
+	const router = useRouter();
 
 	const exportTitleRef = useRef(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -495,18 +498,20 @@ const Toolbar = ({ formId, type }: ToolbarProps) => {
 			return;
 		}
 
-		if (type === "edit") {
-			isSavingRef.current = false;
-			setTimeout(
-				() => {
-					setIsSavingDialogOpen(false);
-					toast.success("Form saved successfully!", {
-						duration: toastDuration,
-					});
-				},
-				Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
-			);
+		if (type === "new") {
+			router.push(`/form/${formId}/edit`);
+			return;
 		}
+		isSavingRef.current = false;
+		setTimeout(
+			() => {
+				setIsSavingDialogOpen(false);
+				toast.success("Form saved successfully!", {
+					duration: toastDuration,
+				});
+			},
+			Math.max(savingTimeout - (Date.now() - timeoutStart), 0),
+		);
 	}
 
 	function insertForm() {

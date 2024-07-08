@@ -1,13 +1,13 @@
-import type { AdapterAccountType } from "next-auth/adapters";
-import { FormItem } from "formhell-js";
 import {
 	index,
 	integer,
+	primaryKey,
 	sqliteTable,
 	text,
 	uniqueIndex,
-	primaryKey,
 } from "drizzle-orm/sqlite-core";
+import { FBFormObject } from "formhell-js";
+import type { AdapterAccountType } from "next-auth/adapters";
 
 export const formsTable = sqliteTable(
 	"forms",
@@ -16,7 +16,7 @@ export const formsTable = sqliteTable(
 		userId: text("userId").notNull(),
 		formJson: text("formJson", { mode: "json" })
 			.notNull()
-			.$type<FormItem[]>(),
+			.$type<FBFormObject>(),
 		version: integer("version", { mode: "number" }).notNull(),
 	},
 	(table) => {

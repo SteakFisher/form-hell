@@ -5,8 +5,6 @@ import { Label } from "@/components/ui/label";
 import { MCGridConstants, constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import { MultipleChoiceGridProps } from "formhell-js";
-import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,
@@ -27,6 +25,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon } from "@radix-ui/react-icons";
+import { FormItemMediaProps, MultipleChoiceGridProps } from "formhell-js";
 import {
 	createContext,
 	memo,
@@ -243,6 +242,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 											onDelete={(idToDelete) =>
 												handleDeleteClick(idToDelete, "row")
 											}
+											parentId={id}
 											placeholder={`Row ${index + 1}`}
 											props={item}
 											type="row"
@@ -292,6 +292,7 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 												handleDeleteClick(idToDelete, "column")
 											}
 											placeholder={`Column ${index + 1}`}
+											parentId={id}
 											props={item}
 											type="column"
 										/>
@@ -349,7 +350,6 @@ const FocusedMultipleChoiceGrid = memo(function FocusedMultipleChoiceGrid({
 	function handleAddItemClick(type: "row" | "column") {
 		const newItem = {
 			id: uuidv4(),
-			parentId: id,
 			value: "",
 		};
 

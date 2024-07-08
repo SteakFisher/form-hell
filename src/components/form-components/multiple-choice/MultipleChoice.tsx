@@ -7,8 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { constants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import { MultipleChoiceProps } from "formhell-js";
-import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,
@@ -29,6 +27,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CircleIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { FormItemMediaProps, MultipleChoiceProps } from "formhell-js";
 import {
 	createContext,
 	memo,
@@ -208,6 +207,7 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 									isRadio={isRadio}
 									key={item.id}
 									onDelete={handleDeleteClick}
+									parentId={id}
 									props={item}
 								/>
 							);
@@ -267,7 +267,6 @@ const FocusedMultipleChoice = memo(function FocusedMultipleChoice({
 	function handleAddItemClick() {
 		const newItem = {
 			id: uuidv4(),
-			parentId: id,
 			value: "",
 		};
 		props.items.push(newItem);

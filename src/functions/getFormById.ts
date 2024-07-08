@@ -1,7 +1,7 @@
 import { db } from "@/helpers/drizzleTurso";
-import { formsTable } from "../../drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { FBFormObject } from "formhell-js";
+import { formsTable } from "../../drizzle/schema";
 
 export default async function getFormById(formId: string) {
 	const res = await db
@@ -16,14 +16,6 @@ export default async function getFormById(formId: string) {
 	if (res.length === 0) {
 		return;
 	}
-	const formObject: FBFormObject = {
-		formId: res[0].formId,
-		formItems: res[0].formJson,
-		formTitleObj: {
-			description: "placeholder",
-			title: "placeholder",
-		},
-	};
-
+	const formObject: FBFormObject = res[0].formJson;
 	return formObject;
 }

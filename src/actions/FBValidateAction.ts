@@ -2,9 +2,8 @@
 
 import { FBValidate } from "@/functions/FBValidation";
 import { db, increment } from "@/helpers/drizzleTurso";
-import { FBFormObject } from "formhell-js";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { FBFormObject } from "formhell-js";
 import { v4 as uuid } from "uuid";
 import { formsTable } from "../../drizzle/schema";
 
@@ -20,7 +19,7 @@ export async function FBValidateAction(
 		const res = await db
 			.update(formsTable)
 			.set({
-				formJson: formObject.formItems,
+				formJson: formObject,
 				version: increment(formsTable.version),
 			})
 			.where(eq(formsTable.formId, formObject.formId))
@@ -37,12 +36,11 @@ export async function FBValidateAction(
 			.values({
 				userId: "TestUserId",
 				formId: formObject.formId,
-				formJson: formObject.formItems,
+				formJson: formObject,
 				version: 1,
 			})
 			.onConflictDoNothing();
 		// in future batch as much requests as possible, including form json for edit
-		redirect(`/form/${formObject.formId}/edit`);
 	}
 
 	return errorObj;

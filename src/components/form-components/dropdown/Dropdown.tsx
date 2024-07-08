@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
-import { DropdownProps } from "formhell-js";
-import { FormItemMediaProps } from "formhell-js";
 import {
 	DndContext,
 	DragEndEvent,
@@ -23,6 +21,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { DropdownProps, FormItemMediaProps } from "formhell-js";
 import {
 	createContext,
 	memo,
@@ -151,6 +150,7 @@ const FocusedDropdown = memo(function FocusedDropdown({
 								<DropdownItem
 									hideDelete={hideDelete}
 									index={index + 1}
+									parentId={id}
 									props={item}
 									key={item.id}
 									onDelete={handleDeleteClick}
@@ -192,7 +192,6 @@ const FocusedDropdown = memo(function FocusedDropdown({
 	function handleAddItemClick() {
 		const newItem = {
 			id: uuidv4(),
-			parentId: id,
 			value: "",
 		};
 		props.items.push(newItem);

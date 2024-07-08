@@ -2,11 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { constants, dropdownConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
-import { DropdownItemProps } from "formhell-js";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
 import autosize from "autosize";
+import { DropdownItemProps } from "formhell-js";
 import { ChangeEvent, memo, useContext, useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { DropdownContext } from "./Dropdown";
@@ -14,11 +14,13 @@ import { DropdownContext } from "./Dropdown";
 const DropdownItem = memo(function DropdownItem({
 	hideDelete,
 	index,
+	parentId,
 	props,
 	onDelete,
 }: {
 	hideDelete: boolean;
 	index: number;
+	parentId: string;
 	props: DropdownItemProps;
 	onDelete: (idToDelete: string) => void;
 }) {
@@ -47,7 +49,7 @@ const DropdownItem = memo(function DropdownItem({
 		if (textRef.current == null) return;
 		autosize(textRef.current);
 
-		const refs = debounceRefs.get(props.parentId);
+		const refs = debounceRefs.get(parentId);
 		if (!refs) return;
 		refs.set(`${props.id}:text`, handleTextChange);
 	}, []);

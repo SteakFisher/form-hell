@@ -73,11 +73,11 @@ export default function MultipleChoiceComponent({
 						{props.hasOther ? (
 							<div
 								className="flex items-center space-x-2"
-								key={props.items[0].parentId}
+								key={id}
 							>
 								<RadioGroupItem
 									value={"other"}
-									id={props.items[0].parentId + "-other"}
+									id={id + "-other"}
 								/>
 								<Input
 									ref={inputRef}

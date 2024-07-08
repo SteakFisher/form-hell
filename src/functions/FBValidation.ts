@@ -168,7 +168,7 @@ export async function ValidateFormItems(
 				break;
 			}
 			case "dropdown": {
-				propsError = validateDropdown(formItem.id, formItem.props).error;
+				propsError = validateDropdown(formItem.props).error;
 				break;
 			}
 			case "media": {
@@ -177,17 +177,11 @@ export async function ValidateFormItems(
 				break;
 			}
 			case "multiple-choice": {
-				propsError = validateMultipleChoice(
-					formItem.id,
-					formItem.props,
-				).error;
+				propsError = validateMultipleChoice(formItem.props).error;
 				break;
 			}
 			case "multiple-choice-grid": {
-				propsError = validateMultipleChoiceGrid(
-					formItem.id,
-					formItem.props,
-				).error;
+				propsError = validateMultipleChoiceGrid(formItem.props).error;
 				break;
 			}
 			case "range": {
@@ -242,10 +236,7 @@ function validateDate(props: DateProps): validateResult {
 	return { error: "" };
 }
 
-function validateDropdown(
-	parentId: string,
-	props: DropdownProps,
-): validateResult {
+function validateDropdown(props: DropdownProps): validateResult {
 	const parseResult = z
 		.object({
 			items: z
@@ -257,9 +248,6 @@ function validateDropdown(
 								required_error: "Invalid dropdown item ID",
 							})
 							.uuid({ message: "Invalid dropdown item ID" }),
-						parentId: z.literal(parentId, {
-							invalid_type_error: "Invalid dropdown item parent ID",
-						}),
 						value: z
 							.string({
 								invalid_type_error:
@@ -359,10 +347,7 @@ async function validateMedia(props: MediaProps): Promise<validateResult> {
 	return { error: "" };
 }
 
-function validateMultipleChoice(
-	parentId: string,
-	props: MultipleChoiceProps,
-): validateResult {
+function validateMultipleChoice(props: MultipleChoiceProps): validateResult {
 	const parseResult = z
 		.object({
 			allowMultiple: z.boolean({
@@ -382,10 +367,6 @@ function validateMultipleChoice(
 								required_error: "Invalid multiple choice item ID",
 							})
 							.uuid({ message: "Invalid multiple choice item ID" }),
-						parentId: z.literal(parentId, {
-							invalid_type_error:
-								"Invalid multiple choice item parent ID",
-						}),
 						value: z
 							.string({
 								invalid_type_error:
@@ -439,7 +420,6 @@ function validateMultipleChoice(
 }
 
 function validateMultipleChoiceGrid(
-	parentId: string,
 	props: MultipleChoiceGridProps,
 ): validateResult {
 	const parseResult = z
@@ -461,10 +441,6 @@ function validateMultipleChoiceGrid(
 							.uuid({
 								message: "Invalid multiple choice grid column ID",
 							}),
-						parentId: z.literal(parentId, {
-							invalid_type_error:
-								"Invalid multiple choice grid column parent ID",
-						}),
 						value: z
 							.string({
 								invalid_type_error:
@@ -508,10 +484,6 @@ function validateMultipleChoiceGrid(
 								required_error: "Invalid multiple choice grid row ID",
 							})
 							.uuid({ message: "Invalid multiple choice grid row ID" }),
-						parentId: z.literal(parentId, {
-							invalid_type_error:
-								"Invalid multiple choice grid row parent ID",
-						}),
 						value: z
 							.string({
 								invalid_type_error:
