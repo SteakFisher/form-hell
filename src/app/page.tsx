@@ -1,11 +1,11 @@
-import { signIn } from "@/helpers/auth";
+import SignInWithGoogle from "@/../public/signinwithgoogle.svg";
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import Image from "next/image";
+import { signIn } from "@/helpers/auth";
 
 export default function SignIn({
 	searchParams,
@@ -24,26 +24,17 @@ export default function SignIn({
 				});
 			}}
 		>
-			<div className="flex h-screen w-full items-center justify-center p-4">
-				<Card className="w-full max-w-md">
+			<div className="flex size-full h-screen flex-col items-center justify-center">
+				<Card>
 					<CardHeader className="space-y-1 text-center">
-						<CardTitle className="text-2xl font-bold">Sign in</CardTitle>
+						<CardTitle className="text-2xl">Sign in</CardTitle>
 						<CardDescription>
 							Sign in to your account using your Google account.
 						</CardDescription>
 					</CardHeader>
-					<div
-						className={
-							"flex flex-1 items-center justify-center p-4 align-middle"
-						}
-					>
+					<div className={"flex items-center justify-center pb-4"}>
 						<button type={"submit"}>
-							<Image
-								width={225}
-								height={225}
-								src={"/signinwithgoogle.svg"}
-								alt={"Sign In With Google"}
-							/>
+							<SignInWithGoogle />
 						</button>
 					</div>
 				</Card>

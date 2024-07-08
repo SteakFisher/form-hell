@@ -52,7 +52,7 @@ export default function FormBuilderWrapper({
 				}}
 			>
 				<FBMenuBar />
-				<div className="flex w-full justify-center pb-56 pt-20">
+				<div className="flex h-min w-full justify-center pb-56 pt-20">
 					<FormBuilder />
 				</div>
 				<Toolbar formId={formObject.formId} type={type} />
