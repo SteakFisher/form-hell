@@ -73,6 +73,7 @@ export async function serverValidate(
 								}
 							} else resolve({});
 						}, 2000);
+						resolve({});
 					});
 				};
 
