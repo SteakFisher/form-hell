@@ -68,8 +68,10 @@ export async function serverValidate(
 									let finalError: Errors =
 										errorSchema.parse(webhookError);
 									resolve(finalError);
-								} catch (e) {}
-							}
+								} catch (e) {
+									resolve({});
+								}
+							} else resolve({});
 						}, 2000);
 					});
 				};
@@ -79,7 +81,9 @@ export async function serverValidate(
 				if (error && Object.keys(error).length > 0) {
 					return error;
 				}
-			} catch (e) {}
+			} catch (e) {
+				return {};
+			}
 		}
 
 		try {
