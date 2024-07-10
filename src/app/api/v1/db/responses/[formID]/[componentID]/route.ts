@@ -30,12 +30,8 @@ export async function GET(
 	let retComponentData: FirebaseFirestore.DocumentData[] = [];
 
 	componentData.docs.map((doc) => {
-		let dataProps = doc.data() as Response;
-
-		dataProps = validateResponseComponent(dataProps);
-
-		retComponentData.push(dataProps);
+		retComponentData.push(doc.data());
 	});
 
-	return NextResponse.json(retComponentData as FormResponses[]);
+	return NextResponse.json(retComponentData);
 }
