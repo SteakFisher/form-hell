@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import firestoreServer from "@/helpers/firestoreServer";
 import {
 	DateResponse,
+	FormItem,
+	FormResponses,
 	getDateValidateObject,
 	getDropdownValidateObject,
 	getInputValidateObject,
@@ -11,6 +13,7 @@ import {
 	MultipleChoiceGridResponse,
 	Response,
 } from "formhell-js";
+import validateResponseComponent from "@/functions/validations/validateResponseComponent";
 
 export async function GET(
 	req: NextRequest,
@@ -29,70 +32,10 @@ export async function GET(
 	componentData.docs.map((doc) => {
 		let dataProps = doc.data() as Response;
 
-		switch (dataProps.type) {
-			case "text-input":
-				const zodInputObj = getInputValidateObject();
-				let { success: inputSuccess } = zodInputObj.safeParse(dataProps);
-				if (!inputSuccess) return;
-				break;
-
-			case "date":
-				const zodDateObj = getDateValidateObject();
-				let dateData = {
-					type: "date",
-					// @ts-ignore
-					date: new Date(dataProps.date.seconds * 1000),
-				} as DateResponse;
-				let { success: dateSuccess } = zodDateObj.safeParse(dateData);
-				if (!dateSuccess) return;
-				break;
-
-			case "range":
-				const zodRangeObj = getRangeValidateObject();
-				let { success: rangeSuccess } = zodRangeObj.safeParse(dataProps);
-				if (!rangeSuccess) return;
-				break;
-
-			case "dropdown":
-				const zodDropdownObj = getDropdownValidateObject();
-				let { success: dropdownSuccess } =
-					zodDropdownObj.safeParse(dataProps);
-				if (!dropdownSuccess) return;
-				break;
-
-			case "multiple-choice":
-				const zodMultipleChoiceObj = getMultipleChoiceValidateObject();
-				let { success: multipleChoiceSuccess } =
-					zodMultipleChoiceObj.safeParse(dataProps);
-				if (!multipleChoiceSuccess) return;
-				break;
-
-			case "multiple-choice-grid":
-				const zodMultipleChoiceGridObj =
-					getMultipleChoiceGridValidateObject();
-
-				let newDataProps = {
-					type: "multiple-choice-grid",
-					selected: {},
-				} as MultipleChoiceGridResponse;
-
-				let dropdownDataProps = dataProps.selected;
-
-				Object.keys(dropdownDataProps).map((row) => {
-					newDataProps.selected[row] = new Set(dropdownDataProps[row]);
-				});
-
-				let { success: multipleChoiceGridSuccess } =
-					zodMultipleChoiceGridObj.safeParse(newDataProps);
-				if (!multipleChoiceGridSuccess) return;
-				break;
-
-			default:
-				return;
-		}
+		dataProps = validateResponseComponent(dataProps);
 
 		retComponentData.push(dataProps);
 	});
 
-	return NextResponse.json(retComponentData);
+	return NextResponse.json(retComponentData as FormResponses[]);
 }
