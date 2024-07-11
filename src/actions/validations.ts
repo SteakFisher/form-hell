@@ -9,7 +9,6 @@ import {
 import firestoreServer from "@/helpers/firestoreServer";
 import { v4 as uuidv4 } from "uuid";
 import getFormById from "@/functions/getFormById";
-import { z } from "zod";
 import { webhookValidation } from "@/functions/validations/webhookValidation";
 
 type SelectedJSONGridResponse = {
@@ -63,16 +62,23 @@ export async function serverValidate(
 		try {
 			// Save the data
 			const db = firestoreServer();
-			const formCollection = db.doc(`Responses/${formItemsObject.formId}`);
+			const formCollection = db.doc(`Forms/${formItemsObject.formId}`);
 			let writeBatch = db.batch();
+
+			writeBatch.set(formCollection, { version: 0 });
 
 			let writeCount = 0;
 
+			let responseId = formResponseObject.responseId;
+			let responseCollection = formCollection
+				.collection(`Response`)
+				.doc(responseId);
+			writeBatch.set(responseCollection, { amount: 0 });
+
 			formItems.map(async (item) => {
-				let responseId = formResponseObject.responseId;
-				let responseCollection = formCollection
-					.collection(`${item.id}`)
-					.doc(responseId);
+				let responseComponentCollection = responseCollection
+					.collection(`Component`)
+					.doc(`${item.id}`);
 
 				if (finalResponse[item.id] == undefined) return;
 
@@ -87,7 +93,7 @@ export async function serverValidate(
 						);
 					});
 					writeCount++;
-					writeBatch.set(responseCollection, {
+					writeBatch.set(responseComponentCollection, {
 						...finalResponse[item.id],
 						selected: selected,
 					});
@@ -95,7 +101,7 @@ export async function serverValidate(
 				}
 
 				writeCount++;
-				writeBatch.set(responseCollection, finalResponse[item.id]);
+				writeBatch.set(responseComponentCollection, finalResponse[item.id]);
 			});
 
 			let result = await writeBatch.commit();
