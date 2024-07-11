@@ -14,7 +14,7 @@ import {
 	TextInputResponse,
 } from "formhell-js";
 
-export default function validateResponseComponent(
+export default function validateDBResponseComponent(
 	dataProps: Response,
 ): Response {
 	switch (dataProps.type) {
