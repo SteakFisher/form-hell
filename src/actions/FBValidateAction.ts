@@ -11,6 +11,7 @@ export async function FBValidateAction(
 	formObject: FBFormObject,
 	type: "edit" | "new",
 ) {
+	// add auth call
 	const errorObj = await FBValidate(formObject);
 	if (errorObj.message) return errorObj;
 
@@ -34,7 +35,6 @@ export async function FBValidateAction(
 		await db
 			.insert(formsTable)
 			.values({
-				userId: "TestUserId",
 				formId: formObject.formId,
 				formJson: formObject,
 				version: 1,

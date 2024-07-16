@@ -53,12 +53,13 @@ TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<
 	HTMLTableRowElement,
-	React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+	React.HTMLAttributes<HTMLTableRowElement> & { disableHover?: boolean }
+>(({ className, disableHover, ...props }, ref) => (
 	<tr
 		ref={ref}
 		className={cn(
-			"border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+			"border-b transition-colors data-[state=selected]:bg-muted",
+			disableHover || "hover:bg-muted/50",
 			className,
 		)}
 		{...props}
@@ -73,7 +74,7 @@ const TableHead = React.forwardRef<
 	<th
 		ref={ref}
 		className={cn(
-			"h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+			"h-10 px-2 text-left align-middle font-medium text-muted-foreground",
 			className,
 		)}
 		{...props}
@@ -85,14 +86,7 @@ const TableCell = React.forwardRef<
 	HTMLTableCellElement,
 	React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-	<td
-		ref={ref}
-		className={cn(
-			"p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-			className,
-		)}
-		{...props}
-	/>
+	<td ref={ref} className={cn("p-2 align-middle", className)} {...props} />
 ));
 TableCell.displayName = "TableCell";
 
@@ -110,11 +104,11 @@ TableCaption.displayName = "TableCaption";
 
 export {
 	Table,
-	TableHeader,
 	TableBody,
+	TableCaption,
+	TableCell,
 	TableFooter,
 	TableHead,
+	TableHeader,
 	TableRow,
-	TableCell,
-	TableCaption,
 };

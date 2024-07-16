@@ -80,6 +80,7 @@ const TitlePropsObj: FormTitleProps = {
 export const constants = Object.freeze({
 	autoHeightDuration: 225,
 	debounceWait: 500,
+	emailRegex: /.+@.+/,
 	formItemTitleMaxLength: 500,
 	intRegex: /^(-)?((0+)|[1-9]\d*)$/,
 });

@@ -43,92 +43,94 @@ const FormBuilder = () => {
 	);
 
 	return (
-		<Card className="w-[900px] [overflow-anchor:none]">
-			<Title />
-			<CardContent className="pb-0" ref={formBuilderRef}>
-				<DndContext
-					id={"sortable-items-dndcontext"}
-					sensors={sensors}
-					collisionDetection={closestCenter}
-					onDragEnd={handleDragEnd}
-					modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-				>
-					<SortableContext
-						items={formItems}
-						strategy={verticalListSortingStrategy}
+		<div className="flex w-full justify-center pb-56 pt-10">
+			<Card className="w-[900px] [overflow-anchor:none]">
+				<Title />
+				<CardContent className="pb-0" ref={formBuilderRef}>
+					<DndContext
+						id={"sortable-items-dndcontext"}
+						sensors={sensors}
+						collisionDetection={closestCenter}
+						onDragEnd={handleDragEnd}
+						modifiers={[restrictToVerticalAxis, restrictToParentElement]}
 					>
-						<AddBar id={"0"} />
-						{formItems.map((formItem) => {
-							switch (formItem.props.type) {
-								case "date":
-									return (
-										<Date
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "dropdown":
-									return (
-										<Dropdown
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "media":
-									return (
-										<Media
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "multiple-choice":
-									return (
-										<MultipleChoice
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "multiple-choice-grid":
-									return (
-										<MultipleChoiceGrid
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "range":
-									return (
-										<Range
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-								case "text-input":
-									return (
-										<TextInput
-											id={formItem.id}
-											key={formItem.id}
-											mediaProps={formItem.mediaProps}
-											props={formItem.props}
-										/>
-									);
-							}
-						})}
-					</SortableContext>
-				</DndContext>
-			</CardContent>
-		</Card>
+						<SortableContext
+							items={formItems}
+							strategy={verticalListSortingStrategy}
+						>
+							<AddBar id={"0"} />
+							{formItems.map((formItem) => {
+								switch (formItem.props.type) {
+									case "date":
+										return (
+											<Date
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "dropdown":
+										return (
+											<Dropdown
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "media":
+										return (
+											<Media
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "multiple-choice":
+										return (
+											<MultipleChoice
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "multiple-choice-grid":
+										return (
+											<MultipleChoiceGrid
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "range":
+										return (
+											<Range
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+									case "text-input":
+										return (
+											<TextInput
+												id={formItem.id}
+												key={formItem.id}
+												mediaProps={formItem.mediaProps}
+												props={formItem.props}
+											/>
+										);
+								}
+							})}
+						</SortableContext>
+					</DndContext>
+				</CardContent>
+			</Card>
+		</div>
 	);
 
 	function handleDragEnd(event: DragEndEvent) {

@@ -18,6 +18,7 @@ interface FormBuilderContextInterface {
 		shouldScroll: boolean;
 	}>;
 	isSavingRef: MutableRefObject<boolean>;
+	setFbTab: (fbTab: "form-builder" | "settings") => void;
 	setFormDesc: (formDesc: string) => void;
 	setFormItems: (formItems: FormItem[]) => void;
 	setFormTitle: (formTitle: string) => void;
@@ -33,6 +34,7 @@ export const FormBuilderContext = createContext<FormBuilderContextInterface>({
 	formTitle: "",
 	heightDiffRef: { current: { heightDiff: 0, shouldScroll: false } },
 	isSavingRef: { current: false },
+	setFbTab: () => {},
 	setFormDesc: () => {},
 	setFormItems: () => {},
 	setFormTitle: () => {},

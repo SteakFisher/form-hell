@@ -3,9 +3,11 @@
 import FormBuilder from "@/components/FormBuilder";
 import Toolbar from "@/components/toolbar/Toolbar";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
+import { SettingsObject } from "@/types/Settings";
 import { FBFormObject, FormItem } from "formhell-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import FBMenuBar from "./FBMenuBar";
+import FBSettings from "./settings/FBSettings";
 
 type FormBuilderWrapperProps = {
 	formObject: FBFormObject;
@@ -17,6 +19,9 @@ export default function FormBuilderWrapper({
 	type,
 }: FormBuilderWrapperProps) {
 	const debounceRefs = useMemo(() => new Map(), []);
+	const [fbTab, setFbTab] = useState<"form-builder" | "settings">(
+		"form-builder",
+	);
 	const firstRenderRef = useRef(false);
 	const focusedItemRef = useRef({ id: "0", blurItem: () => {} });
 	const formBuilderRef = useRef<HTMLDivElement>(null);
@@ -33,30 +38,39 @@ export default function FormBuilderWrapper({
 		firstRenderRef.current = false;
 	}, []);
 
+	const settingsObj: SettingsObject = {
+		formAccess: new Map([["asdfasdfasdf@gmail.com", "owner"]]),
+	};
+
 	return (
 		<>
-			<FormBuilderContext.Provider
-				value={{
-					debounceRefs,
-					firstRenderRef,
-					focusedItemRef,
-					formBuilderRef,
-					formDesc,
-					formItems,
-					formTitle,
-					heightDiffRef,
-					isSavingRef,
-					setFormDesc,
-					setFormItems,
-					setFormTitle,
-				}}
-			>
-				<FBMenuBar />
-				<div className="flex h-min w-full justify-center pb-56 pt-20">
+			<FBMenuBar fbTab={fbTab} formTitle={formTitle} setFbTab={setFbTab} />
+			{/* leave space for the menu bar */}
+			<div className="h-16" />
+			{fbTab === "form-builder" ? (
+				<FormBuilderContext.Provider
+					value={{
+						debounceRefs,
+						firstRenderRef,
+						focusedItemRef,
+						formBuilderRef,
+						formDesc,
+						formItems,
+						formTitle,
+						heightDiffRef,
+						isSavingRef,
+						setFbTab,
+						setFormDesc,
+						setFormItems,
+						setFormTitle,
+					}}
+				>
 					<FormBuilder />
-				</div>
-				<Toolbar formId={formObject.formId} type={type} />
-			</FormBuilderContext.Provider>
+					<Toolbar formId={formObject.formId} type={type} />
+				</FormBuilderContext.Provider>
+			) : (
+				<FBSettings settingsObj={settingsObj} />
+			)}
 		</>
 	);
 }

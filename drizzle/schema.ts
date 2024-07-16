@@ -4,7 +4,6 @@ import {
 	primaryKey,
 	sqliteTable,
 	text,
-	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { FBFormObject } from "formhell-js";
 import type { AdapterAccountType } from "next-auth/adapters";
@@ -13,7 +12,6 @@ export const formsTable = sqliteTable(
 	"forms",
 	{
 		formId: text("formId").primaryKey(),
-		userId: text("userId").notNull(),
 		formJson: text("formJson", { mode: "json" })
 			.notNull()
 			.$type<FBFormObject>(),
@@ -21,8 +19,35 @@ export const formsTable = sqliteTable(
 	},
 	(table) => {
 		return {
-			formIdInd: uniqueIndex("formId_ind").on(table.formId),
-			userIdInd: index("userId_ind").on(table.userId),
+			formIdInd: index("formId_ind").on(table.formId),
+		};
+	},
+);
+
+export const formAccessTable = sqliteTable(
+	"form-access",
+	{
+		formId: text("formId")
+			.notNull()
+			.references(() => formsTable.formId, {
+				onDelete: "cascade",
+			}),
+		userId: text("userId")
+			.notNull()
+			.references(() => users.id, {
+				onDelete: "cascade",
+			}),
+		permission: text("formJson", {
+			enum: ["read", "write", "owner"],
+		}).notNull(),
+	},
+	(table) => {
+		return {
+			compositeKey: primaryKey({
+				columns: [table.formId, table.userId],
+			}),
+			formIdInd: index("formAccess_formId_ind").on(table.formId),
+			userIdInd: index("formAccess_userId_ind").on(table.userId),
 		};
 	},
 );
@@ -61,13 +86,21 @@ export const accounts = sqliteTable(
 	}),
 );
 
-export const sessions = sqliteTable("session", {
-	sessionToken: text("sessionToken").primaryKey(),
-	userId: text("userId")
-		.notNull()
-		.references(() => users.id, { onDelete: "cascade" }),
-	expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
-});
+export const sessions = sqliteTable(
+	"session",
+	{
+		sessionToken: text("sessionToken").primaryKey(),
+		userId: text("userId")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
+	},
+	(table) => {
+		return {
+			sessionTokenInd: index("sessionToken_ind").on(table.sessionToken),
+		};
+	},
+);
 
 export const authenticators = sqliteTable(
 	"authenticator",

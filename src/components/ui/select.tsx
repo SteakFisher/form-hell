@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
 	CaretSortIcon,
 	CheckIcon,
@@ -8,6 +7,7 @@ import {
 	ChevronUpIcon,
 } from "@radix-ui/react-icons";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -19,18 +19,24 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+		centerText?: boolean;
+	}
+>(({ centerText, className, children, ...props }, ref) => (
 	<SelectPrimitive.Trigger
 		ref={ref}
 		className={cn(
 			"focus:border-1 flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:border-ring focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+			centerText && "relative justify-center",
 			className,
 		)}
 		{...props}
 	>
 		{children}
-		<SelectPrimitive.Icon asChild>
+		<SelectPrimitive.Icon
+			className={cn(centerText && "absolute right-1")}
+			asChild
+		>
 			<CaretSortIcon className="h-4 w-4 opacity-50" />
 		</SelectPrimitive.Icon>
 	</SelectPrimitive.Trigger>
@@ -152,13 +158,13 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 export {
 	Select,
-	SelectGroup,
-	SelectValue,
-	SelectTrigger,
 	SelectContent,
-	SelectLabel,
+	SelectGroup,
 	SelectItem,
-	SelectSeparator,
-	SelectScrollUpButton,
+	SelectLabel,
 	SelectScrollDownButton,
+	SelectScrollUpButton,
+	SelectSeparator,
+	SelectTrigger,
+	SelectValue,
 };

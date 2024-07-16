@@ -13,10 +13,9 @@ import { constants, textInputConstants } from "@/constants";
 import { FormBuilderContext } from "@/contexts/FormBuilderContext";
 import { SortableItemContext } from "@/contexts/SortableItemContext";
 import { validateRegex } from "@/functions/validateRegex";
-import { TextInputProps } from "formhell-js";
-import { FormItemMediaProps } from "formhell-js";
 import { cn } from "@/lib/utils";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
+import { FormItemMediaProps, TextInputProps } from "formhell-js";
 import {
 	ChangeEvent,
 	createContext,
@@ -142,7 +141,6 @@ function FocusedTextInput({
 	id: string;
 	props: TextInputProps;
 }) {
-	const emailRegex = /.+@.+/;
 	const positiveNumRegex = /^([1-9]\d*)?$/;
 
 	const { debounceRefs } = useContext(FormBuilderContext);
@@ -408,7 +406,7 @@ function FocusedTextInput({
 	function handlePresetChange(inputType: string) {
 		switch (inputType) {
 			case "email":
-				setRegexPattern(emailRegex.toString());
+				setRegexPattern(constants.emailRegex.toString());
 				break;
 			case "number":
 				setRegexPattern(constants.intRegex.toString());
